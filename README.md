@@ -52,6 +52,12 @@ The script maintains two tabs:
 
 After you change `google-apps-script.gs`, use **Deploy → Manage deployments → Edit → New version → Deploy** so the live Web App picks up changes.
 
+### Troubleshooting (empty sheet)
+
+1. **`events` tab** — If this stays empty, the site is not reaching your Web App (wrong `/exec` URL in Netlify build, ad blocker, or Apps Script errors). In Apps Script, open **Executions** after you use the site; you should see `doPost` runs.
+2. **`Completed_hotel_visits` tab** — Rows appear only when a participant **closes a hotel detail modal** (not from scrolling the main results list alone). Open a hotel → close it (✕ or backdrop); then check the tab within a few seconds.
+3. **Script must write to the correct spreadsheet** — Prefer creating the script via **Extensions → Apps Script** inside your Sheet. If the project is standalone, set Script property **`SPREADSHEET_ID`** to the Sheet ID from the URL (`/d/<ID>/edit`).
+
 ### Notes
 
 - Streaming uses a **2s batch flush** (plus a forced flush on pagehide/visibility hidden).

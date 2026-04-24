@@ -15,6 +15,23 @@
 const EVENTS_SHEET = "events";
 const VISITS_SHEET = "Completed_hotel_visits";
 
+/**
+ * Spreadsheet to write to.
+ * - Best: create this script from the Sheet (Extensions → Apps Script) so getActiveSpreadsheet() works.
+ * - Otherwise: Project Settings → Script properties → add SPREADSHEET_ID = id from the Sheet URL
+ *   (.../spreadsheets/d/THIS_ID/edit...)
+ */
+function getSpreadsheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (ss) return ss;
+  const id = PropertiesService.getScriptProperties().getProperty("SPREADSHEET_ID");
+  if (id && String(id).trim()) return SpreadsheetApp.openById(String(id).trim());
+  throw new Error(
+    "No spreadsheet: open this project from the target Sheet (Extensions → Apps Script), " +
+      "or set Script property SPREADSHEET_ID to the Sheet ID."
+  );
+}
+
 function doPost(e) {
   try {
     const raw = e && e.postData && e.postData.contents ? e.postData.contents : "";
@@ -22,7 +39,7 @@ function doPost(e) {
     const events = Array.isArray(payload.events) ? payload.events : [];
     const prolific = payload.prolific || {};
 
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const ss = getSpreadsheet_();
 
     const shEvents = ss.getSheetByName(EVENTS_SHEET) || ss.insertSheet(EVENTS_SHEET);
     ensureEventsHeader_(shEvents);
