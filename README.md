@@ -44,11 +44,13 @@ or add `?stream=YOUR_WEB_APP_URL` to the study URL.
 
 ### 4) What gets written to the sheet
 
-Each row is one event with:
+The script maintains two tabs:
 
-- participant identifiers (`PROLIFIC_PID`, `STUDY_ID`, `SESSION_ID` if present in the URL)
-- page context (phase/cond/url)
-- event fields (`event_type`, `element_id`, `timestamp`, `value_json`)
+- **`events`** — one row per streamed event (full JSON in `value_json`), including clicks, hovers, mouse samples, etc.
+- **`Completed_hotel_visits`** — one row each time a participant **closes** a hotel modal, with columns:
+  **Hotel**, **Time in modal**, **Scroll depth (now)**, **Scroll depth (max)**, **Direction changes**, **Scroll speed max (px/ms)**, **Scroll speed mean (px/ms)**, **Exit**
+
+After you change `google-apps-script.gs`, use **Deploy → Manage deployments → Edit → New version → Deploy** so the live Web App picks up changes.
 
 ### Notes
 
