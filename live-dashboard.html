@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Live experiment dashboard</title>
+    <link rel="stylesheet" href="./live-dashboard.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="top__brand">
+        <h1>Live tracking</h1>
+        <p class="tagline">Hotel listing task — researcher view</p>
+      </div>
+      <div class="top__meta" id="sessionMeta" aria-live="polite"></div>
+      <div class="top__actions">
+        <button type="button" class="btn" id="btnSync" title="Pull full event log from the task tab">Sync now</button>
+        <button type="button" class="btn" id="btnExport" title="Download JSON snapshot">Export JSON</button>
+        <button type="button" class="btn btn--ghost" id="btnPause" aria-pressed="false">Pause</button>
+      </div>
+    </header>
+
+    <div class="statusbar">
+      <div class="statusbar__left">
+        <span id="statusDot" class="status-dot" aria-hidden="true"></span>
+        <span id="statusText">Starting…</span>
+        <span class="sep">·</span>
+        <span class="muted">Events <strong id="eventCount">0</strong></span>
+        <span class="sep">·</span>
+        <span class="muted" id="lastTick">—</span>
+      </div>
+    </div>
+
+    <main>
+      <section class="panel">
+        <div class="panel__head">
+          <h2>Hotel modal</h2>
+        </div>
+        <div id="livePanel"></div>
+        <details class="help">
+          <summary>Setup tips</summary>
+          <p>
+            Serve this folder over HTTP and open both URLs on the same origin, e.g.
+            <code>http://localhost:8080/index.html</code> and
+            <code>http://localhost:8080/live-dashboard.html</code>. Mixed <code>file://</code> and
+            <code>http://</code> will not sync.
+          </p>
+        </details>
+      </section>
+
+      <section class="panel">
+        <div class="panel__head">
+          <h2>Listing page</h2>
+          <span class="panel__hint">After tab exit</span>
+        </div>
+        <div id="resultsTiming"></div>
+      </section>
+
+      <section class="panel panel--wide">
+        <div class="panel__head">
+          <h2>Completed hotel visits</h2>
+        </div>
+        <div id="hotelHistory"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__head">
+          <h2>Scroll (final)</h2>
+        </div>
+        <div id="scrollFinal"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__head">
+          <h2>Sections (final)</h2>
+        </div>
+        <div id="sectionFinal"></div>
+      </section>
+
+      <section class="panel panel--wide">
+        <div class="panel__head">
+          <h2>Clicks</h2>
+        </div>
+        <div id="clicksFeed" class="feed"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__head">
+          <h2>Hovers</h2>
+        </div>
+        <div id="hoversFeed" class="feed"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel__head">
+          <h2>Mouse</h2>
+          <span class="panel__hint">Latest 500ms sample</span>
+        </div>
+        <div id="mouseFeed"></div>
+      </section>
+    </main>
+    <script src="./live-dashboard.js"></script>
+  </body>
+</html>

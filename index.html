@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hotel search – mock listing</title>
+    <!-- Streaming to Google Sheets (Apps Script Web App URL). Fill in after you deploy. -->
+    <!-- Example: https://script.google.com/macros/s/AKfycb.../exec -->
+    <meta name="tracking-stream-url" content="" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar__inner">
+        <div class="brand">
+          <div class="brand__logo" aria-hidden="true">B</div>
+          <div class="brand__text">
+            <div class="brand__name">BookNow</div>
+            <div class="brand__tag">Mock hotel listings</div>
+          </div>
+        </div>
+
+        <div class="pill-row">
+          <span class="pill"><strong>Phase</strong>: <span id="phaseLabel">1</span></span>
+          <span class="pill"><strong>Condition</strong>: <span id="condLabel">none</span></span>
+          <button class="pill-btn" id="downloadLogBtn" type="button">Download log</button>
+          <button class="pill-btn pill-btn--ghost" id="resetLogBtn" type="button">Reset log</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="app">
+      <div class="layout">
+        <aside class="filters" aria-label="Search filters">
+          <h2 class="h2">Filters</h2>
+          <div class="filter">
+            <div class="filter__label">Price per night</div>
+            <div class="filter__value">$240–$330</div>
+          </div>
+          <div class="filter">
+            <div class="filter__label">Star rating</div>
+            <div class="filter__value">4★–5★</div>
+          </div>
+          <div class="filter">
+            <div class="filter__label">Neighborhood</div>
+            <div class="filter__value">Chicago Loop • River • Michigan Ave</div>
+          </div>
+          <div class="callout" id="coverStory">
+            <div class="callout__title">Note:</div>
+            <div class="callout__text">
+              These listings have recently been relisted on our platform. Guest ratings and reviews are being migrated and are not yet displayed.
+            </div>
+          </div>
+        </aside>
+
+        <section class="content" aria-label="Search results">
+          <div class="content__head">
+            <h1 class="h1">Chicago hotels</h1>
+            <div class="sort">
+              <label class="sort__label" for="sortSelect">Sort</label>
+              <select id="sortSelect" class="sort__select">
+                <option value="recommended">Recommended</option>
+                <option value="price_low">Price (low to high)</option>
+                <option value="price_high">Price (high to low)</option>
+                <option value="stars_high">Stars (high to low)</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="results" class="results"></div>
+        </section>
+      </div>
+    </main>
+
+    <div id="modalRoot" class="modal-root" aria-hidden="true"></div>
+
+    <script src="./tracking.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
+
