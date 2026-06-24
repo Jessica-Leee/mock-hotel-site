@@ -10,6 +10,15 @@ This project is a static website (HTML/CSS/JS). You can host it on any static ho
 
 After deploy you’ll get a public URL like `https://your-study-site.netlify.app`.
 
+## Open the two Chicago versions
+
+- **No reviews:** `hotels-no-reviews.html`
+- **With reviews:** `hotels-with-reviews.html`
+
+`index.html` currently opens the no-review version. Hotel details are text-only; hotel photos and galleries are not rendered.
+
+The no-review page is labeled as Phase 1 browsing and uses the relisted-hotel cover story from the experiment design. The review page is labeled as the Phase 2 Full Reviews Control condition and does not show an AI summary.
+
 ## Ensure multiple participants are recorded
 
 Every participant’s browser sends events to a server endpoint (Google Apps Script Web App).
@@ -62,4 +71,3 @@ After you change `google-apps-script.gs`, use **Deploy → Manage deployments �
 
 - Streaming uses a **2s batch flush** (plus a forced flush on pagehide/visibility hidden).
 - If you need guaranteed delivery / retries across network outages, we can add an ack + retry queue.
-

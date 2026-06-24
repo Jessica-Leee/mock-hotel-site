@@ -1,0 +1,1517 @@
+{
+  "hotel_id": "the_robey_chicago",
+  "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+  "ground_truth_attributes": {
+    "cleanliness": "good",
+    "serviceQuality": "good",
+    "roomComfort": "good",
+    "wifiReliability": "good",
+    "noiseLevel": "noisy",
+    "locationConvenience": "convenient",
+    "valueForMoney": "good",
+    "breakfastQuality": "good"
+  },
+  "reviews": [
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_001",
+      "guest_type": "local staycation guest",
+      "rating_10": 7,
+      "title": "Worked well for this trip",
+      "stay_date": "Jun 2026",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "locationConvenience",
+        "wifiReliability"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. We tried Cafe Robey, Clever Coyote, The Up Room and Solana, which made it convenient to stay close in the evening. We heard hallway doors and nearby nightlife more than expected. Being close to transit saved time, especially when crossing town. I had no trouble using the Wi-Fi from the room or lobby."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_002",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 10,
+      "title": "Great base in Chicago",
+      "stay_date": "Jan 2024",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "locationConvenience",
+        "cleanliness",
+        "wifiReliability"
+      ],
+      "text": "I stayed at The Robey, Chicago, a Member of Design Hotels during a trip with elderly parents. We used Damen station more than expected, and it helped with timing. Being close to transit saved time, especially when crossing town. I had no trouble using the Wi-Fi from the room or lobby. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_003",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "Feb 2026",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "serviceQuality",
+        "roomComfort"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. We used Damen station more than expected, and it helped with timing. The location made it easy to walk to restaurants, transit and major sights. Service was polished without feeling stiff, especially at check-in. The bed was comfortable, and the room layout worked well for unpacking and relaxing."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_004",
+      "guest_type": "parents visiting a student",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Jan 2025",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "roomComfort"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. Parking was useful, though it added to the planning. Staff gave helpful directions and followed up when we asked for extra towels. The room felt thoughtfully designed, with enough space around the bed and desk. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_005",
+      "guest_type": "international tourist",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "Sep 2024",
+      "mentioned_attributes": [
+        "cleanliness",
+        "serviceQuality"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. The King Room, 330 sq ft matched the listing and made a clear first impression. Housekeeping did a strong job; towels, counters and floors were consistently clean. Service was polished without feeling stiff, especially at check-in. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_006",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 10,
+      "title": "Great base in Chicago",
+      "stay_date": "Dec 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "roomComfort",
+        "cleanliness",
+        "valueForMoney"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. Parking was useful, though it added to the planning. The bathroom and bedding felt crisp, which made the stay easier to trust. For the location and room quality, the stay felt fairly priced. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_007",
+      "guest_type": "wedding guest",
+      "rating_10": 9,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Jan 2024",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "breakfastQuality",
+        "roomComfort"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. I would book again because the price felt reasonable for this part of Chicago. Breakfast was a pleasant start, with enough options before heading out. The bed was comfortable, and the room layout worked well for unpacking and relaxing. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_008",
+      "guest_type": "solo traveler",
+      "rating_10": 9,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Jun 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "breakfastQuality",
+        "wifiReliability",
+        "locationConvenience"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. The location near Wicker Park restaurants, the United Center, Lincoln Park Zoo and Wrigley Field shaped most of our plans. Housekeeping did a strong job; towels, counters and floors were consistently clean. The breakfast service was good, and coffee was easy to get in the morning. The internet connection was steady enough for work, maps and streaming."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_009",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 9,
+      "title": "Comfortable and convenient",
+      "stay_date": "Aug 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "valueForMoney",
+        "breakfastQuality"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. The King Room, 330 sq ft matched the listing and made a clear first impression. The room felt clean when we arrived, and the bathroom looked freshly serviced. The breakfast service was good, and coffee was easy to get in the morning. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_010",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 7,
+      "title": "Convenient but not perfect",
+      "stay_date": "Sep 2025",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "serviceQuality"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. The location near Wicker Park restaurants, the United Center, Lincoln Park Zoo and Wrigley Field shaped most of our plans. Street noise carried into the room late at night. The concierge and front desk made the stay feel well managed. I liked the stay overall, with a couple of practical caveats."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_011",
+      "guest_type": "local staycation guest",
+      "rating_10": 9,
+      "title": "Polished stay",
+      "stay_date": "Jan 2024",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "serviceQuality",
+        "cleanliness"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. For the location and room quality, the stay felt fairly priced. The front desk was warm and handled check-in quickly. The bathroom and bedding felt crisp, which made the stay easier to trust. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_012",
+      "guest_type": "local staycation guest",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "Nov 2025",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "valueForMoney",
+        "wifiReliability"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. We tried Cafe Robey, Clever Coyote, The Up Room and Solana, which made it convenient to stay close in the evening. Being close to transit saved time, especially when crossing town. Compared with similar hotels nearby, the value felt solid. Wi-Fi connected quickly and did not drop during my stay."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_013",
+      "guest_type": "business traveler",
+      "rating_10": 9,
+      "title": "Polished stay",
+      "stay_date": "Feb 2026",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "cleanliness"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. The King Room, 330 sq ft matched the listing and made a clear first impression. The front desk was warm and handled check-in quickly. The room felt clean when we arrived, and the bathroom looked freshly serviced. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_014",
+      "guest_type": "conference attendee",
+      "rating_10": 9,
+      "title": "Polished stay",
+      "stay_date": "Jan 2026",
+      "mentioned_attributes": [
+        "cleanliness",
+        "locationConvenience",
+        "roomComfort"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. I noticed clean linens and a tidy bathroom throughout the stay. The location made it easy to walk to restaurants, transit and major sights. The room felt thoughtfully designed, with enough space around the bed and desk. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_015",
+      "guest_type": "wedding guest",
+      "rating_10": 7,
+      "title": "Nice hotel, a few issues",
+      "stay_date": "Apr 2025",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "wifiReliability",
+        "roomComfort",
+        "cleanliness"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. We tried Cafe Robey, Clever Coyote, The Up Room and Solana, which made it convenient to stay close in the evening. The location is fun, but the room was not as quiet as I hoped. Wi-Fi connected quickly and did not drop during my stay. The seating and bed were comfortable enough for a two-night stay."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_016",
+      "guest_type": "business traveler",
+      "rating_10": 8,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Sep 2024",
+      "mentioned_attributes": [
+        "roomComfort",
+        "serviceQuality"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. The King Room, 330 sq ft matched the listing and made a clear first impression. The seating and bed were comfortable enough for a two-night stay. The concierge and front desk made the stay feel well managed. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_017",
+      "guest_type": "parents visiting a student",
+      "rating_10": 7,
+      "title": "Stylish with caveats",
+      "stay_date": "Jan 2026",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "roomComfort"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. We tried Cafe Robey, Clever Coyote, The Up Room and Solana, which made it convenient to stay close in the evening. Street noise carried into the room late at night. The bed was comfortable, and the room layout worked well for unpacking and relaxing. I would stay again, but only if the rate made sense."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_018",
+      "guest_type": "solo traveler",
+      "rating_10": 8,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Dec 2025",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "valueForMoney",
+        "wifiReliability",
+        "noiseLevel"
+      ],
+      "text": "I stayed at The Robey, Chicago, a Member of Design Hotels during a solo visit. Being close to transit saved time, especially when crossing town. I would book again because the price felt reasonable for this part of Chicago. Street noise carried into the room late at night. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_019",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Sep 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "serviceQuality",
+        "roomComfort",
+        "noiseLevel"
+      ],
+      "text": "I stayed at The Robey, Chicago, a Member of Design Hotels during a trip with elderly parents. The King Room, 330 sq ft matched the listing and made a clear first impression. Breakfast was better than expected and helped before a packed day. Staff gave helpful directions and followed up when we asked for extra towels. The room felt thoughtfully designed, with enough space around the bed and desk."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_020",
+      "guest_type": "remote worker",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "Feb 2025",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "roomComfort",
+        "noiseLevel"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. The neighborhood was convenient for food, shopping and quick rides. The seating and bed were comfortable enough for a two-night stay. Light sleepers may want earplugs because traffic and guests were audible. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_021",
+      "guest_type": "family with young children",
+      "rating_10": 7,
+      "title": "Worked well for this trip",
+      "stay_date": "Dec 2025",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "roomComfort"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. Parking was useful, though it added to the planning. We heard hallway doors and nearby nightlife more than expected. The bed was comfortable, and the room layout worked well for unpacking and relaxing. It worked for this trip, though a few details kept it from being excellent."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_022",
+      "guest_type": "remote worker",
+      "rating_10": 9,
+      "title": "Comfortable and convenient",
+      "stay_date": "Jul 2024",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "cleanliness"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. Service was polished without feeling stiff, especially at check-in. Housekeeping did a strong job; towels, counters and floors were consistently clean. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_023",
+      "guest_type": "international tourist",
+      "rating_10": 7,
+      "title": "Worked well for this trip",
+      "stay_date": "Jun 2024",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "cleanliness"
+      ],
+      "text": "I stayed at The Robey, Chicago, a Member of Design Hotels during a first sightseeing trip to Chicago. The location near Wicker Park restaurants, the United Center, Lincoln Park Zoo and Wrigley Field shaped most of our plans. We heard hallway doors and nearby nightlife more than expected. Housekeeping did a strong job; towels, counters and floors were consistently clean. The positives outweighed the drawbacks, but the hotel is not perfect."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_024",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "Oct 2024",
+      "mentioned_attributes": [
+        "roomComfort",
+        "valueForMoney"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. Being near Damen station made the first day easier. The room felt thoughtfully designed, with enough space around the bed and desk. Compared with similar hotels nearby, the value felt solid. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_025",
+      "guest_type": "wedding guest",
+      "rating_10": 9,
+      "title": "Polished stay",
+      "stay_date": "Apr 2025",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "locationConvenience",
+        "cleanliness",
+        "wifiReliability"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. Parking was useful, though it added to the planning. The concierge and front desk made the stay feel well managed. Being close to transit saved time, especially when crossing town. The room felt clean when we arrived, and the bathroom looked freshly serviced."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_026",
+      "guest_type": "business traveler",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "May 2026",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "valueForMoney"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. Being near Damen station made the first day easier. The internet connection was steady enough for work, maps and streaming. I would book again because the price felt reasonable for this part of Chicago. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_027",
+      "guest_type": "wedding guest",
+      "rating_10": 9,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Nov 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "breakfastQuality",
+        "locationConvenience",
+        "serviceQuality"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. Parking was useful, though it added to the planning. I noticed clean linens and a tidy bathroom throughout the stay. We liked having a real breakfast option on-site instead of searching early. The location made it easy to walk to restaurants, transit and major sights."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_028",
+      "guest_type": "parents visiting a student",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Oct 2025",
+      "mentioned_attributes": [
+        "roomComfort",
+        "locationConvenience",
+        "noiseLevel",
+        "wifiReliability"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. We tried Cafe Robey, Clever Coyote, The Up Room and Solana, which made it convenient to stay close in the evening. Street noise carried into the room late at night. The internet connection was steady enough for work, maps and streaming. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_029",
+      "guest_type": "business traveler",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "Nov 2024",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "cleanliness",
+        "noiseLevel"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. The location near Wicker Park restaurants, the United Center, Lincoln Park Zoo and Wrigley Field shaped most of our plans. The bathroom and bedding felt crisp, which made the stay easier to trust. Street noise carried into the room late at night. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_030",
+      "guest_type": "solo traveler",
+      "rating_10": 8,
+      "title": "Polished stay",
+      "stay_date": "Jun 2024",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "locationConvenience"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. The King Room, 330 sq ft matched the listing and made a clear first impression. I had no trouble using the Wi-Fi from the room or lobby. Being close to transit saved time, especially when crossing town. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_031",
+      "guest_type": "wedding guest",
+      "rating_10": 7,
+      "title": "Stylish with caveats",
+      "stay_date": "Oct 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "noiseLevel",
+        "wifiReliability"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. I noticed clean linens and a tidy bathroom throughout the stay. Street noise carried into the room late at night. I had no trouble using the Wi-Fi from the room or lobby. The positives outweighed the drawbacks, but the hotel is not perfect."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_032",
+      "guest_type": "wedding guest",
+      "rating_10": 8,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Sep 2025",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "cleanliness"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. The hotel details, including rooftop lounges, outdoor pool, fitness center and five restaurants, gave the stay a polished feel. For the location and room quality, the stay felt fairly priced. The bathroom and bedding felt crisp, which made the stay easier to trust. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_033",
+      "guest_type": "friends on a weekend trip",
+      "rating_10": 8,
+      "title": "Great base in Chicago",
+      "stay_date": "Feb 2026",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "breakfastQuality",
+        "serviceQuality"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. Wi-Fi stayed reliable during video calls and evening browsing. We liked having a real breakfast option on-site instead of searching early. Service was polished without feeling stiff, especially at check-in. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_034",
+      "guest_type": "solo traveler",
+      "rating_10": 7,
+      "title": "Worked well for this trip",
+      "stay_date": "May 2025",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "serviceQuality",
+        "valueForMoney"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. Parking was useful, though it added to the planning. Light sleepers may want earplugs because traffic and guests were audible. Staff gave helpful directions and followed up when we asked for extra towels. The hotel delivered enough comfort and convenience to feel like good value."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_035",
+      "guest_type": "local staycation guest",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Dec 2024",
+      "mentioned_attributes": [
+        "cleanliness",
+        "wifiReliability",
+        "roomComfort",
+        "noiseLevel"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. Housekeeping did a strong job; towels, counters and floors were consistently clean. Wi-Fi stayed reliable during video calls and evening browsing. The bed was comfortable, and the room layout worked well for unpacking and relaxing. Light sleepers may want earplugs because traffic and guests were audible."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_036",
+      "guest_type": "conference attendee",
+      "rating_10": 8,
+      "title": "Polished stay",
+      "stay_date": "Jun 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "locationConvenience"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. We used Damen station more than expected, and it helped with timing. The room felt clean when we arrived, and the bathroom looked freshly serviced. We could reach most plans without thinking too hard about transportation. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_037",
+      "guest_type": "international tourist",
+      "rating_10": 8,
+      "title": "Great base in Chicago",
+      "stay_date": "Sep 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "breakfastQuality",
+        "serviceQuality"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. The King Room, 330 sq ft matched the listing and made a clear first impression. Housekeeping did a strong job; towels, counters and floors were consistently clean. We liked having a real breakfast option on-site instead of searching early. Staff gave helpful directions and followed up when we asked for extra towels."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_038",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 9,
+      "title": "Comfortable and convenient",
+      "stay_date": "Mar 2025",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "cleanliness",
+        "locationConvenience",
+        "serviceQuality"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. The hotel details, including rooftop lounges, outdoor pool, fitness center and five restaurants, gave the stay a polished feel. The internet connection was steady enough for work, maps and streaming. The bathroom and bedding felt crisp, which made the stay easier to trust. The concierge and front desk made the stay feel well managed."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_039",
+      "guest_type": "friends on a weekend trip",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "May 2025",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "serviceQuality",
+        "valueForMoney"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. Parking was useful, though it added to the planning. Street noise carried into the room late at night. I would book again because the price felt reasonable for this part of Chicago. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_040",
+      "guest_type": "parents visiting a student",
+      "rating_10": 10,
+      "title": "Polished stay",
+      "stay_date": "Mar 2024",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "breakfastQuality",
+        "serviceQuality",
+        "wifiReliability"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. Parking was useful, though it added to the planning. Being close to transit saved time, especially when crossing town. I had no trouble using the Wi-Fi from the room or lobby. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_041",
+      "guest_type": "local staycation guest",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "Mar 2026",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "roomComfort",
+        "breakfastQuality"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. The front desk was warm and handled check-in quickly. We slept well, and the linens made the room feel more upscale. Breakfast was a pleasant start, with enough options before heading out. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_042",
+      "guest_type": "business traveler",
+      "rating_10": 7,
+      "title": "Convenient but not perfect",
+      "stay_date": "May 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "serviceQuality",
+        "noiseLevel",
+        "locationConvenience"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. I noticed clean linens and a tidy bathroom throughout the stay. Service was polished without feeling stiff, especially at check-in. Being close to transit saved time, especially when crossing town. I would stay again, but only if the rate made sense."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_043",
+      "guest_type": "solo traveler",
+      "rating_10": 9,
+      "title": "Polished stay",
+      "stay_date": "Jan 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "serviceQuality",
+        "roomComfort"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. The bathroom and bedding felt crisp, which made the stay easier to trust. Staff gave helpful directions and followed up when we asked for extra towels. We slept well, and the linens made the room feel more upscale. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_044",
+      "guest_type": "couple",
+      "rating_10": 8,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Jul 2024",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "roomComfort"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. The hotel details, including rooftop lounges, outdoor pool, fitness center and five restaurants, gave the stay a polished feel. Compared with similar hotels nearby, the value felt solid. The bed was comfortable, and the room layout worked well for unpacking and relaxing. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_045",
+      "guest_type": "friends on a weekend trip",
+      "rating_10": 7,
+      "title": "Stylish with caveats",
+      "stay_date": "Dec 2025",
+      "mentioned_attributes": [
+        "roomComfort",
+        "noiseLevel",
+        "serviceQuality"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. We tried Cafe Robey, Clever Coyote, The Up Room and Solana, which made it convenient to stay close in the evening. The room felt thoughtfully designed, with enough space around the bed and desk. The location is fun, but the room was not as quiet as I hoped. Staff gave helpful directions and followed up when we asked for extra towels."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_046",
+      "guest_type": "solo traveler",
+      "rating_10": 10,
+      "title": "Strong city stay",
+      "stay_date": "Feb 2024",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "serviceQuality",
+        "roomComfort",
+        "wifiReliability"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. The location near Wicker Park restaurants, the United Center, Lincoln Park Zoo and Wrigley Field shaped most of our plans. The neighborhood was convenient for food, shopping and quick rides. Wi-Fi connected quickly and did not drop during my stay. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_047",
+      "guest_type": "couple",
+      "rating_10": 7,
+      "title": "Worked well for this trip",
+      "stay_date": "Dec 2025",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "roomComfort",
+        "noiseLevel"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. We used Damen station more than expected, and it helped with timing. The seating and bed were comfortable enough for a two-night stay. The location is fun, but the room was not as quiet as I hoped. I liked the stay overall, with a couple of practical caveats."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_048",
+      "guest_type": "parents visiting a student",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Nov 2024",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "breakfastQuality"
+      ],
+      "text": "I stayed at The Robey, Chicago, a Member of Design Hotels during a visit with our student in Chicago. The hotel details, including rooftop lounges, outdoor pool, fitness center and five restaurants, gave the stay a polished feel. The front desk was warm and handled check-in quickly. Breakfast was a pleasant start, with enough options before heading out. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_049",
+      "guest_type": "parents visiting a student",
+      "rating_10": 8,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Jul 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "noiseLevel",
+        "valueForMoney",
+        "cleanliness"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. Breakfast was a pleasant start, with enough options before heading out. Compared with similar hotels nearby, the value felt solid. I noticed clean linens and a tidy bathroom throughout the stay. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_050",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 7,
+      "title": "Stylish with caveats",
+      "stay_date": "Mar 2026",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "breakfastQuality"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. We tried Cafe Robey, Clever Coyote, The Up Room and Solana, which made it convenient to stay close in the evening. We heard hallway doors and nearby nightlife more than expected. Breakfast was better than expected and helped before a packed day. I would stay again, but only if the rate made sense."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_051",
+      "guest_type": "couple",
+      "rating_10": 9,
+      "title": "Comfortable and convenient",
+      "stay_date": "Jun 2024",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "roomComfort",
+        "cleanliness"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. Compared with similar hotels nearby, the value felt solid. The room felt thoughtfully designed, with enough space around the bed and desk. The bathroom and bedding felt crisp, which made the stay easier to trust. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_052",
+      "guest_type": "family with young children",
+      "rating_10": 7,
+      "title": "Worked well for this trip",
+      "stay_date": "May 2025",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "cleanliness"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. The King Room, 330 sq ft matched the listing and made a clear first impression. Light sleepers may want earplugs because traffic and guests were audible. I noticed clean linens and a tidy bathroom throughout the stay. It worked for this trip, though a few details kept it from being excellent."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_053",
+      "guest_type": "business traveler",
+      "rating_10": 9,
+      "title": "Great base in Chicago",
+      "stay_date": "Jun 2026",
+      "mentioned_attributes": [
+        "roomComfort",
+        "breakfastQuality"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. The bed was comfortable, and the room layout worked well for unpacking and relaxing. Breakfast was better than expected and helped before a packed day. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_054",
+      "guest_type": "business traveler",
+      "rating_10": 8,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Feb 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "wifiReliability",
+        "cleanliness",
+        "noiseLevel"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. The location near Wicker Park restaurants, the United Center, Lincoln Park Zoo and Wrigley Field shaped most of our plans. Breakfast was better than expected and helped before a packed day. Wi-Fi stayed reliable during video calls and evening browsing. I noticed clean linens and a tidy bathroom throughout the stay."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_055",
+      "guest_type": "international tourist",
+      "rating_10": 7,
+      "title": "Convenient but not perfect",
+      "stay_date": "Dec 2024",
+      "mentioned_attributes": [
+        "cleanliness",
+        "noiseLevel"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. The location near Wicker Park restaurants, the United Center, Lincoln Park Zoo and Wrigley Field shaped most of our plans. Housekeeping did a strong job; towels, counters and floors were consistently clean. Light sleepers may want earplugs because traffic and guests were audible. It worked for this trip, though a few details kept it from being excellent."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_056",
+      "guest_type": "conference attendee",
+      "rating_10": 9,
+      "title": "Comfortable and convenient",
+      "stay_date": "Oct 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "breakfastQuality",
+        "valueForMoney",
+        "wifiReliability"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. The room felt clean when we arrived, and the bathroom looked freshly serviced. Breakfast was better than expected and helped before a packed day. I would book again because the price felt reasonable for this part of Chicago. Wi-Fi stayed reliable during video calls and evening browsing."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_057",
+      "guest_type": "parents visiting a student",
+      "rating_10": 10,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Feb 2026",
+      "mentioned_attributes": [
+        "roomComfort",
+        "breakfastQuality",
+        "serviceQuality",
+        "wifiReliability"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. We used Damen station more than expected, and it helped with timing. We slept well, and the linens made the room feel more upscale. The internet connection was steady enough for work, maps and streaming. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_058",
+      "guest_type": "family with young children",
+      "rating_10": 8,
+      "title": "Great base in Chicago",
+      "stay_date": "Mar 2024",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "locationConvenience",
+        "breakfastQuality",
+        "serviceQuality"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. Being near Damen station made the first day easier. The location is fun, but the room was not as quiet as I hoped. Being close to transit saved time, especially when crossing town. Service was polished without feeling stiff, especially at check-in."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_059",
+      "guest_type": "conference attendee",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "Dec 2024",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "breakfastQuality",
+        "noiseLevel",
+        "cleanliness"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. We tried Cafe Robey, Clever Coyote, The Up Room and Solana, which made it convenient to stay close in the evening. For the location and room quality, the stay felt fairly priced. We liked having a real breakfast option on-site instead of searching early. Light sleepers may want earplugs because traffic and guests were audible."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_060",
+      "guest_type": "conference attendee",
+      "rating_10": 8,
+      "title": "Great base in Chicago",
+      "stay_date": "Nov 2025",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "wifiReliability",
+        "breakfastQuality",
+        "valueForMoney"
+      ],
+      "text": "I stayed at The Robey, Chicago, a Member of Design Hotels during a conference week. Wi-Fi connected quickly and did not drop during my stay. Breakfast was a pleasant start, with enough options before heading out. Compared with similar hotels nearby, the value felt solid. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_061",
+      "guest_type": "parents visiting a student",
+      "rating_10": 8,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Jul 2024",
+      "mentioned_attributes": [
+        "cleanliness",
+        "locationConvenience",
+        "noiseLevel",
+        "roomComfort"
+      ],
+      "text": "I stayed at The Robey, Chicago, a Member of Design Hotels during a visit with our student in Chicago. Being close to transit saved time, especially when crossing town. Street noise carried into the room late at night. We slept well, and the linens made the room feel more upscale. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_062",
+      "guest_type": "local staycation guest",
+      "rating_10": 7,
+      "title": "Good stay with trade-offs",
+      "stay_date": "Apr 2025",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "noiseLevel",
+        "cleanliness"
+      ],
+      "text": "I stayed at The Robey, Chicago, a Member of Design Hotels during a local staycation. We used Damen station more than expected, and it helped with timing. The neighborhood was convenient for food, shopping and quick rides. The bathroom and bedding felt crisp, which made the stay easier to trust. It worked for this trip, though a few details kept it from being excellent."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_063",
+      "guest_type": "solo traveler",
+      "rating_10": 8,
+      "title": "Great base in Chicago",
+      "stay_date": "Aug 2025",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "breakfastQuality",
+        "cleanliness"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. We used Damen station more than expected, and it helped with timing. The concierge and front desk made the stay feel well managed. The breakfast service was good, and coffee was easy to get in the morning. The bathroom and bedding felt crisp, which made the stay easier to trust."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_064",
+      "guest_type": "solo traveler",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "Apr 2024",
+      "mentioned_attributes": [
+        "cleanliness",
+        "breakfastQuality"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. The location near Wicker Park restaurants, the United Center, Lincoln Park Zoo and Wrigley Field shaped most of our plans. Housekeeping did a strong job; towels, counters and floors were consistently clean. We liked having a real breakfast option on-site instead of searching early. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_065",
+      "guest_type": "couple",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Apr 2026",
+      "mentioned_attributes": [
+        "roomComfort",
+        "noiseLevel",
+        "serviceQuality"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. Parking was useful, though it added to the planning. We slept well, and the linens made the room feel more upscale. Street noise carried into the room late at night. The concierge and front desk made the stay feel well managed."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_066",
+      "guest_type": "friends on a weekend trip",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Sep 2024",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "serviceQuality"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. We tried Cafe Robey, Clever Coyote, The Up Room and Solana, which made it convenient to stay close in the evening. We liked having a real breakfast option on-site instead of searching early. The front desk was warm and handled check-in quickly. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_067",
+      "guest_type": "solo traveler",
+      "rating_10": 9,
+      "title": "Polished stay",
+      "stay_date": "Feb 2024",
+      "mentioned_attributes": [
+        "cleanliness",
+        "locationConvenience",
+        "roomComfort"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. The hotel details, including rooftop lounges, outdoor pool, fitness center and five restaurants, gave the stay a polished feel. The room felt clean when we arrived, and the bathroom looked freshly serviced. The bed was comfortable, and the room layout worked well for unpacking and relaxing. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_068",
+      "guest_type": "remote worker",
+      "rating_10": 9,
+      "title": "Polished stay",
+      "stay_date": "Jan 2025",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "roomComfort",
+        "cleanliness"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. We used Damen station more than expected, and it helped with timing. The concierge and front desk made the stay feel well managed. The bed was comfortable, and the room layout worked well for unpacking and relaxing. The room felt clean when we arrived, and the bathroom looked freshly serviced."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_069",
+      "guest_type": "remote worker",
+      "rating_10": 9,
+      "title": "Polished stay",
+      "stay_date": "Apr 2024",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "roomComfort"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. The King Room, 330 sq ft matched the listing and made a clear first impression. The hotel delivered enough comfort and convenience to feel like good value. The room felt thoughtfully designed, with enough space around the bed and desk. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_070",
+      "guest_type": "family with young children",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "Aug 2025",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "cleanliness",
+        "valueForMoney"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. The King Room, 330 sq ft matched the listing and made a clear first impression. We could reach most plans without thinking too hard about transportation. Housekeeping did a strong job; towels, counters and floors were consistently clean. I would book again because the price felt reasonable for this part of Chicago."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_071",
+      "guest_type": "conference attendee",
+      "rating_10": 7,
+      "title": "Convenient but not perfect",
+      "stay_date": "May 2026",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "wifiReliability",
+        "noiseLevel"
+      ],
+      "text": "I stayed at The Robey, Chicago, a Member of Design Hotels during a conference week. We tried Cafe Robey, Clever Coyote, The Up Room and Solana, which made it convenient to stay close in the evening. Breakfast was better than expected and helped before a packed day. I had no trouble using the Wi-Fi from the room or lobby. Street noise carried into the room late at night."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_072",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 9,
+      "title": "Comfortable and convenient",
+      "stay_date": "May 2025",
+      "mentioned_attributes": [
+        "roomComfort",
+        "locationConvenience",
+        "valueForMoney"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. Being near Damen station made the first day easier. The bed was comfortable, and the room layout worked well for unpacking and relaxing. Compared with similar hotels nearby, the value felt solid. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_073",
+      "guest_type": "couple",
+      "rating_10": 7,
+      "title": "Nice hotel, a few issues",
+      "stay_date": "Dec 2025",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "noiseLevel"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. The King Room, 330 sq ft matched the listing and made a clear first impression. Service was polished without feeling stiff, especially at check-in. We heard hallway doors and nearby nightlife more than expected. I would stay again, but only if the rate made sense."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_074",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 7,
+      "title": "Stylish with caveats",
+      "stay_date": "Apr 2026",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "roomComfort",
+        "valueForMoney",
+        "noiseLevel"
+      ],
+      "text": "I stayed at The Robey, Chicago, a Member of Design Hotels during a trip with elderly parents. The location made it easy to walk to restaurants, transit and major sights. We slept well, and the linens made the room feel more upscale. For the location and room quality, the stay felt fairly priced. We heard hallway doors and nearby nightlife more than expected."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_075",
+      "guest_type": "couple",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "Jan 2026",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "valueForMoney",
+        "roomComfort",
+        "noiseLevel"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. The location near Wicker Park restaurants, the United Center, Lincoln Park Zoo and Wrigley Field shaped most of our plans. The concierge and front desk made the stay feel well managed. Compared with similar hotels nearby, the value felt solid. The bed was comfortable, and the room layout worked well for unpacking and relaxing."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_076",
+      "guest_type": "solo traveler",
+      "rating_10": 10,
+      "title": "Great base in Chicago",
+      "stay_date": "Jun 2025",
+      "mentioned_attributes": [
+        "roomComfort",
+        "serviceQuality",
+        "cleanliness",
+        "wifiReliability"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. Being near Damen station made the first day easier. The front desk was warm and handled check-in quickly. Wi-Fi stayed reliable during video calls and evening browsing. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_077",
+      "guest_type": "friends on a weekend trip",
+      "rating_10": 9,
+      "title": "Great base in Chicago",
+      "stay_date": "Jun 2025",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "serviceQuality",
+        "breakfastQuality",
+        "cleanliness"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. Service was polished without feeling stiff, especially at check-in. Breakfast was a pleasant start, with enough options before heading out. I noticed clean linens and a tidy bathroom throughout the stay. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_078",
+      "guest_type": "couple",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "Jul 2024",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "roomComfort",
+        "serviceQuality"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. We heard hallway doors and nearby nightlife more than expected. The bed was comfortable, and the room layout worked well for unpacking and relaxing. Staff gave helpful directions and followed up when we asked for extra towels. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_079",
+      "guest_type": "remote worker",
+      "rating_10": 9,
+      "title": "Comfortable and convenient",
+      "stay_date": "May 2024",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "serviceQuality",
+        "cleanliness",
+        "valueForMoney"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. The King Room, 330 sq ft matched the listing and made a clear first impression. Service was polished without feeling stiff, especially at check-in. Housekeeping did a strong job; towels, counters and floors were consistently clean. Compared with similar hotels nearby, the value felt solid."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_080",
+      "guest_type": "couple",
+      "rating_10": 7,
+      "title": "Worked well for this trip",
+      "stay_date": "Aug 2025",
+      "mentioned_attributes": [
+        "roomComfort",
+        "valueForMoney",
+        "noiseLevel"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. Parking was useful, though it added to the planning. The seating and bed were comfortable enough for a two-night stay. We heard hallway doors and nearby nightlife more than expected. I liked the stay overall, with a couple of practical caveats."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_081",
+      "guest_type": "wedding guest",
+      "rating_10": 7,
+      "title": "Convenient but not perfect",
+      "stay_date": "Mar 2024",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "locationConvenience",
+        "noiseLevel"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. Parking was useful, though it added to the planning. We liked having a real breakfast option on-site instead of searching early. Being close to transit saved time, especially when crossing town. The location is fun, but the room was not as quiet as I hoped."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_082",
+      "guest_type": "solo traveler",
+      "rating_10": 10,
+      "title": "Strong city stay",
+      "stay_date": "Mar 2026",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "wifiReliability",
+        "cleanliness",
+        "breakfastQuality"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. We tried Cafe Robey, Clever Coyote, The Up Room and Solana, which made it convenient to stay close in the evening. Wi-Fi connected quickly and did not drop during my stay. The room felt clean when we arrived, and the bathroom looked freshly serviced. We liked having a real breakfast option on-site instead of searching early."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_083",
+      "guest_type": "remote worker",
+      "rating_10": 9,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Dec 2024",
+      "mentioned_attributes": [
+        "cleanliness",
+        "roomComfort",
+        "breakfastQuality"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. Parking was useful, though it added to the planning. Housekeeping did a strong job; towels, counters and floors were consistently clean. The seating and bed were comfortable enough for a two-night stay. Breakfast was better than expected and helped before a packed day."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_084",
+      "guest_type": "conference attendee",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Jan 2024",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "breakfastQuality",
+        "cleanliness"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. Compared with similar hotels nearby, the value felt solid. We liked having a real breakfast option on-site instead of searching early. Housekeeping did a strong job; towels, counters and floors were consistently clean. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_085",
+      "guest_type": "business traveler",
+      "rating_10": 9,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Jul 2025",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "serviceQuality",
+        "wifiReliability"
+      ],
+      "text": "I stayed at The Robey, Chicago, a Member of Design Hotels during a business trip. The King Room, 330 sq ft matched the listing and made a clear first impression. The hotel delivered enough comfort and convenience to feel like good value. I had no trouble using the Wi-Fi from the room or lobby. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_086",
+      "guest_type": "local staycation guest",
+      "rating_10": 9,
+      "title": "Comfortable and convenient",
+      "stay_date": "Jan 2025",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "wifiReliability"
+      ],
+      "text": "I stayed at The Robey, Chicago, a Member of Design Hotels during a local staycation. The hotel details, including rooftop lounges, outdoor pool, fitness center and five restaurants, gave the stay a polished feel. The concierge and front desk made the stay feel well managed. Wi-Fi connected quickly and did not drop during my stay. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_087",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 8,
+      "title": "Polished stay",
+      "stay_date": "Jan 2025",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "valueForMoney"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. The front desk was warm and handled check-in quickly. The hotel delivered enough comfort and convenience to feel like good value. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_088",
+      "guest_type": "couple",
+      "rating_10": 7,
+      "title": "Nice hotel, a few issues",
+      "stay_date": "Feb 2024",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "locationConvenience",
+        "breakfastQuality"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. The King Room, 330 sq ft matched the listing and made a clear first impression. Street noise carried into the room late at night. The neighborhood was convenient for food, shopping and quick rides. The breakfast service was good, and coffee was easy to get in the morning."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_089",
+      "guest_type": "local staycation guest",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "Jun 2025",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "serviceQuality",
+        "breakfastQuality",
+        "cleanliness"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. We heard hallway doors and nearby nightlife more than expected. Breakfast was a pleasant start, with enough options before heading out. The bathroom and bedding felt crisp, which made the stay easier to trust. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_090",
+      "guest_type": "friends on a weekend trip",
+      "rating_10": 7,
+      "title": "Good stay with trade-offs",
+      "stay_date": "Oct 2025",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "noiseLevel",
+        "roomComfort",
+        "breakfastQuality"
+      ],
+      "text": "I stayed at The Robey, Chicago, a Member of Design Hotels during a weekend trip with friends. Being near Damen station made the first day easier. Wi-Fi connected quickly and did not drop during my stay. We heard hallway doors and nearby nightlife more than expected. The seating and bed were comfortable enough for a two-night stay."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_091",
+      "guest_type": "conference attendee",
+      "rating_10": 8,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Sep 2025",
+      "mentioned_attributes": [
+        "roomComfort",
+        "valueForMoney",
+        "serviceQuality",
+        "noiseLevel"
+      ],
+      "text": "I stayed at The Robey, Chicago, a Member of Design Hotels during a conference week. The seating and bed were comfortable enough for a two-night stay. Staff gave helpful directions and followed up when we asked for extra towels. We heard hallway doors and nearby nightlife more than expected. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_092",
+      "guest_type": "remote worker",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "Jun 2024",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "serviceQuality"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. Parking was useful, though it added to the planning. Compared with similar hotels nearby, the value felt solid. Staff gave helpful directions and followed up when we asked for extra towels. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_093",
+      "guest_type": "friends on a weekend trip",
+      "rating_10": 9,
+      "title": "Polished stay",
+      "stay_date": "Nov 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "wifiReliability",
+        "locationConvenience"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. We tried Cafe Robey, Clever Coyote, The Up Room and Solana, which made it convenient to stay close in the evening. Breakfast was a pleasant start, with enough options before heading out. Wi-Fi stayed reliable during video calls and evening browsing. The location made it easy to walk to restaurants, transit and major sights."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_094",
+      "guest_type": "local staycation guest",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "Aug 2024",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "locationConvenience"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. Wi-Fi stayed reliable during video calls and evening browsing. The neighborhood was convenient for food, shopping and quick rides. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_095",
+      "guest_type": "remote worker",
+      "rating_10": 7,
+      "title": "Worked well for this trip",
+      "stay_date": "Apr 2026",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "breakfastQuality"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. Being near Damen station made the first day easier. Street noise carried into the room late at night. The breakfast service was good, and coffee was easy to get in the morning. The positives outweighed the drawbacks, but the hotel is not perfect."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_096",
+      "guest_type": "international tourist",
+      "rating_10": 9,
+      "title": "Polished stay",
+      "stay_date": "Jan 2026",
+      "mentioned_attributes": [
+        "cleanliness",
+        "serviceQuality"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. The King Room, 330 sq ft matched the listing and made a clear first impression. The bathroom and bedding felt crisp, which made the stay easier to trust. Service was polished without feeling stiff, especially at check-in. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_097",
+      "guest_type": "family with young children",
+      "rating_10": 10,
+      "title": "Comfortable and convenient",
+      "stay_date": "Oct 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "wifiReliability",
+        "serviceQuality",
+        "valueForMoney"
+      ],
+      "text": "We booked The Robey, Chicago, a Member of Design Hotels for a short Chicago stay. The hotel details, including rooftop lounges, outdoor pool, fitness center and five restaurants, gave the stay a polished feel. The concierge and front desk made the stay feel well managed. Compared with similar hotels nearby, the value felt solid. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_098",
+      "guest_type": "local staycation guest",
+      "rating_10": 9,
+      "title": "Great base in Chicago",
+      "stay_date": "Mar 2026",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "cleanliness"
+      ],
+      "text": "This was my first time staying at The Robey, Chicago, a Member of Design Hotels. Being near Damen station made the first day easier. Being close to transit saved time, especially when crossing town. The room felt clean when we arrived, and the bathroom looked freshly serviced. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_099",
+      "guest_type": "parents visiting a student",
+      "rating_10": 8,
+      "title": "Polished stay",
+      "stay_date": "Feb 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "wifiReliability"
+      ],
+      "text": "I chose The Robey, Chicago, a Member of Design Hotels because I wanted to be in Wicker Park. The King Room, 330 sq ft matched the listing and made a clear first impression. Breakfast was better than expected and helped before a packed day. The internet connection was steady enough for work, maps and streaming. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "the_robey_chicago",
+      "hotel_name": "The Robey, Chicago, a Member of Design Hotels",
+      "review_id": "the_robey_chicago_100",
+      "guest_type": "remote worker",
+      "rating_10": 8,
+      "title": "Polished stay",
+      "stay_date": "Nov 2025",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "roomComfort",
+        "valueForMoney",
+        "noiseLevel"
+      ],
+      "text": "Our trip brought us to The Robey, Chicago, a Member of Design Hotels for two nights. The King Room, 330 sq ft matched the listing and made a clear first impression. Wi-Fi connected quickly and did not drop during my stay. I would book again because the price felt reasonable for this part of Chicago. We heard hallway doors and nearby nightlife more than expected."
+    }
+  ]
+}

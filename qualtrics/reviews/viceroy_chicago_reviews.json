@@ -1,0 +1,1522 @@
+{
+  "hotel_id": "viceroy_chicago",
+  "hotel_name": "Viceroy Chicago",
+  "ground_truth_attributes": {
+    "cleanliness": "good",
+    "serviceQuality": "good",
+    "roomComfort": "good",
+    "wifiReliability": "good",
+    "noiseLevel": "quiet",
+    "locationConvenience": "convenient",
+    "valueForMoney": "poor",
+    "breakfastQuality": "good"
+  },
+  "reviews": [
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_001",
+      "guest_type": "business traveler",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "Sep 2025",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "noiseLevel",
+        "serviceQuality"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. Being near Clark/Division station made the first day easier. Being close to transit saved time, especially when crossing town. The front desk was warm and handled check-in quickly. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_002",
+      "guest_type": "wedding guest",
+      "rating_10": 7,
+      "title": "Convenient but not perfect",
+      "stay_date": "Jul 2024",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "roomComfort",
+        "breakfastQuality"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. I liked the hotel, but I would compare prices carefully before booking again. The bed was comfortable, and the room layout worked well for unpacking and relaxing. The breakfast service was good, and coffee was easy to get in the morning. I would stay again, but only if the rate made sense."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_003",
+      "guest_type": "local staycation guest",
+      "rating_10": 9,
+      "title": "Comfortable and convenient",
+      "stay_date": "Aug 2024",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "roomComfort"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. Being close to transit saved time, especially when crossing town. The seating and bed were comfortable enough for a two-night stay. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_004",
+      "guest_type": "conference attendee",
+      "rating_10": 8,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Jun 2026",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "roomComfort",
+        "breakfastQuality"
+      ],
+      "text": "I stayed at Viceroy Chicago during a conference week. I had no trouble using the Wi-Fi from the room or lobby. The room felt thoughtfully designed, with enough space around the bed and desk. We liked having a real breakfast option on-site instead of searching early. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_005",
+      "guest_type": "solo traveler",
+      "rating_10": 7,
+      "title": "Nice hotel, a few issues",
+      "stay_date": "Jun 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "valueForMoney",
+        "noiseLevel"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. The room felt clean when we arrived, and the bathroom looked freshly serviced. The room was quiet at night, even with the hotel in a busy part of the city. The positives outweighed the drawbacks, but the hotel is not perfect."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_006",
+      "guest_type": "friends on a weekend trip",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "Apr 2026",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "roomComfort",
+        "noiseLevel",
+        "valueForMoney"
+      ],
+      "text": "I stayed at Viceroy Chicago during a weekend trip with friends. The concierge and front desk made the stay feel well managed. The room was quiet at night, even with the hotel in a busy part of the city. Value was the main drawback, especially for a short stay. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_007",
+      "guest_type": "remote worker",
+      "rating_10": 10,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Oct 2024",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "breakfastQuality",
+        "serviceQuality",
+        "roomComfort"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. Being near Clark/Division station made the first day easier. Wi-Fi stayed reliable during video calls and evening browsing. Breakfast was a pleasant start, with enough options before heading out. Service was polished without feeling stiff, especially at check-in."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_008",
+      "guest_type": "international tourist",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Aug 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "roomComfort"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. Breakfast was better than expected and helped before a packed day. The seating and bed were comfortable enough for a two-night stay. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_009",
+      "guest_type": "international tourist",
+      "rating_10": 8,
+      "title": "Great base in Chicago",
+      "stay_date": "Jul 2024",
+      "mentioned_attributes": [
+        "roomComfort",
+        "wifiReliability"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. We used Clark/Division station more than expected, and it helped with timing. We slept well, and the linens made the room feel more upscale. I had no trouble using the Wi-Fi from the room or lobby. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_010",
+      "guest_type": "couple",
+      "rating_10": 9,
+      "title": "Comfortable and convenient",
+      "stay_date": "Aug 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "noiseLevel",
+        "roomComfort"
+      ],
+      "text": "I stayed at Viceroy Chicago during a couples trip. We tried Somerset and the rooftop bar, which made it convenient to stay close in the evening. The room felt clean when we arrived, and the bathroom looked freshly serviced. The room felt thoughtfully designed, with enough space around the bed and desk. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_011",
+      "guest_type": "remote worker",
+      "rating_10": 8,
+      "title": "Polished stay",
+      "stay_date": "Oct 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "breakfastQuality"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. The location near Magnificent Mile, Oak Street Beach, Navy Pier and Millennium Park shaped most of our plans. The bathroom and bedding felt crisp, which made the stay easier to trust. Breakfast was a pleasant start, with enough options before heading out. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_012",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 9,
+      "title": "Comfortable and convenient",
+      "stay_date": "Jun 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "cleanliness",
+        "roomComfort"
+      ],
+      "text": "I stayed at Viceroy Chicago during a trip with elderly parents. The modern guest room with lounge seating matched the listing and made a clear first impression. Breakfast was better than expected and helped before a packed day. The bathroom and bedding felt crisp, which made the stay easier to trust. The bed was comfortable, and the room layout worked well for unpacking and relaxing."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_013",
+      "guest_type": "conference attendee",
+      "rating_10": 10,
+      "title": "Great base in Chicago",
+      "stay_date": "Nov 2024",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "breakfastQuality",
+        "roomComfort",
+        "wifiReliability"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. Parking was useful, though it added to the planning. Noise was not an issue, which mattered because we had early plans. The room felt thoughtfully designed, with enough space around the bed and desk. I had no trouble using the Wi-Fi from the room or lobby."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_014",
+      "guest_type": "couple",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "Sep 2025",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "wifiReliability"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. We tried Somerset and the rooftop bar, which made it convenient to stay close in the evening. Staff gave helpful directions and followed up when we asked for extra towels. I had no trouble using the Wi-Fi from the room or lobby. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_015",
+      "guest_type": "conference attendee",
+      "rating_10": 9,
+      "title": "Polished stay",
+      "stay_date": "Feb 2026",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "cleanliness",
+        "noiseLevel"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. We used Clark/Division station more than expected, and it helped with timing. The location made it easy to walk to restaurants, transit and major sights. Noise was not an issue, which mattered because we had early plans. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_016",
+      "guest_type": "business traveler",
+      "rating_10": 7,
+      "title": "Good stay with trade-offs",
+      "stay_date": "Apr 2025",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "valueForMoney",
+        "roomComfort",
+        "wifiReliability"
+      ],
+      "text": "I stayed at Viceroy Chicago during a business trip. The modern guest room with lounge seating matched the listing and made a clear first impression. Service was polished without feeling stiff, especially at check-in. Value was the main drawback, especially for a short stay. The room felt thoughtfully designed, with enough space around the bed and desk."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_017",
+      "guest_type": "parents visiting a student",
+      "rating_10": 10,
+      "title": "Great base in Chicago",
+      "stay_date": "Dec 2024",
+      "mentioned_attributes": [
+        "cleanliness",
+        "roomComfort",
+        "breakfastQuality"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. The modern guest room with lounge seating matched the listing and made a clear first impression. The room felt clean when we arrived, and the bathroom looked freshly serviced. We slept well, and the linens made the room feel more upscale. We liked having a real breakfast option on-site instead of searching early."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_018",
+      "guest_type": "wedding guest",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "Aug 2025",
+      "mentioned_attributes": [
+        "roomComfort",
+        "locationConvenience",
+        "cleanliness"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. We tried Somerset and the rooftop bar, which made it convenient to stay close in the evening. We slept well, and the linens made the room feel more upscale. We could reach most plans without thinking too hard about transportation. Housekeeping did a strong job; towels, counters and floors were consistently clean."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_019",
+      "guest_type": "conference attendee",
+      "rating_10": 10,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Aug 2025",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "noiseLevel",
+        "wifiReliability",
+        "cleanliness"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. Staff gave helpful directions and followed up when we asked for extra towels. The room was quiet at night, even with the hotel in a busy part of the city. Wi-Fi connected quickly and did not drop during my stay. I noticed clean linens and a tidy bathroom throughout the stay."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_020",
+      "guest_type": "business traveler",
+      "rating_10": 8,
+      "title": "Great base in Chicago",
+      "stay_date": "May 2026",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "serviceQuality",
+        "wifiReliability"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. The room was quiet at night, even with the hotel in a busy part of the city. Service was polished without feeling stiff, especially at check-in. Wi-Fi stayed reliable during video calls and evening browsing. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_021",
+      "guest_type": "remote worker",
+      "rating_10": 6,
+      "title": "Nice hotel, a few issues",
+      "stay_date": "May 2025",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "locationConvenience"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. The modern guest room with lounge seating matched the listing and made a clear first impression. The final price felt high once parking and extras were included. The neighborhood was convenient for food, shopping and quick rides. I liked the stay overall, with a couple of practical caveats."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_022",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 9,
+      "title": "Great base in Chicago",
+      "stay_date": "Sep 2025",
+      "mentioned_attributes": [
+        "roomComfort",
+        "wifiReliability",
+        "locationConvenience",
+        "breakfastQuality"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. Parking was useful, though it added to the planning. The seating and bed were comfortable enough for a two-night stay. I had no trouble using the Wi-Fi from the room or lobby. Being close to transit saved time, especially when crossing town."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_023",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "Jan 2025",
+      "mentioned_attributes": [
+        "roomComfort",
+        "cleanliness",
+        "noiseLevel"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. We slept well, and the linens made the room feel more upscale. I noticed clean linens and a tidy bathroom throughout the stay. The room blocked city noise better than I expected. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_024",
+      "guest_type": "remote worker",
+      "rating_10": 9,
+      "title": "Great base in Chicago",
+      "stay_date": "Feb 2024",
+      "mentioned_attributes": [
+        "cleanliness",
+        "wifiReliability",
+        "roomComfort"
+      ],
+      "text": "I stayed at Viceroy Chicago during a remote-work stay. I noticed clean linens and a tidy bathroom throughout the stay. Wi-Fi stayed reliable during video calls and evening browsing. We slept well, and the linens made the room feel more upscale. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_025",
+      "guest_type": "solo traveler",
+      "rating_10": 7,
+      "title": "Nice hotel, a few issues",
+      "stay_date": "Jan 2026",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "noiseLevel",
+        "wifiReliability"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. It was a nice stay, but the rate felt steep for what we received. Noise was not an issue, which mattered because we had early plans. I had no trouble using the Wi-Fi from the room or lobby. I would stay again, but only if the rate made sense."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_026",
+      "guest_type": "couple",
+      "rating_10": 8,
+      "title": "Polished stay",
+      "stay_date": "Nov 2025",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "breakfastQuality",
+        "cleanliness",
+        "valueForMoney"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. The modern guest room with lounge seating matched the listing and made a clear first impression. The front desk was warm and handled check-in quickly. The breakfast service was good, and coffee was easy to get in the morning. The room felt clean when we arrived, and the bathroom looked freshly serviced."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_027",
+      "guest_type": "international tourist",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "May 2025",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "cleanliness",
+        "breakfastQuality"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. Noise was not an issue, which mattered because we had early plans. Breakfast was better than expected and helped before a packed day. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_028",
+      "guest_type": "solo traveler",
+      "rating_10": 10,
+      "title": "Great base in Chicago",
+      "stay_date": "Apr 2026",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "noiseLevel",
+        "breakfastQuality",
+        "cleanliness"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. Being near Clark/Division station made the first day easier. The front desk was warm and handled check-in quickly. The room was quiet at night, even with the hotel in a busy part of the city. The breakfast service was good, and coffee was easy to get in the morning."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_029",
+      "guest_type": "parents visiting a student",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "Dec 2024",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "noiseLevel"
+      ],
+      "text": "I stayed at Viceroy Chicago during a visit with our student in Chicago. Parking was useful, though it added to the planning. Wi-Fi connected quickly and did not drop during my stay. The room blocked city noise better than I expected. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_030",
+      "guest_type": "couple",
+      "rating_10": 7,
+      "title": "Good stay with trade-offs",
+      "stay_date": "Jan 2024",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "valueForMoney",
+        "noiseLevel"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. Wi-Fi connected quickly and did not drop during my stay. I liked the hotel, but I would compare prices carefully before booking again. Noise was not an issue, which mattered because we had early plans. I liked the stay overall, with a couple of practical caveats."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_031",
+      "guest_type": "international tourist",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Sep 2024",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "locationConvenience"
+      ],
+      "text": "I stayed at Viceroy Chicago during a first sightseeing trip to Chicago. Being near Clark/Division station made the first day easier. The front desk was warm and handled check-in quickly. We could reach most plans without thinking too hard about transportation. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_032",
+      "guest_type": "friends on a weekend trip",
+      "rating_10": 8,
+      "title": "Great base in Chicago",
+      "stay_date": "Aug 2025",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "serviceQuality",
+        "noiseLevel"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. Staff gave helpful directions and followed up when we asked for extra towels. Noise was not an issue, which mattered because we had early plans. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_033",
+      "guest_type": "wedding guest",
+      "rating_10": 10,
+      "title": "Polished stay",
+      "stay_date": "Feb 2026",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "wifiReliability",
+        "cleanliness",
+        "noiseLevel"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. Parking was useful, though it added to the planning. I had no trouble using the Wi-Fi from the room or lobby. Noise was not an issue, which mattered because we had early plans. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_034",
+      "guest_type": "wedding guest",
+      "rating_10": 7,
+      "title": "Stylish with caveats",
+      "stay_date": "Jun 2026",
+      "mentioned_attributes": [
+        "cleanliness",
+        "valueForMoney",
+        "locationConvenience"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. The modern guest room with lounge seating matched the listing and made a clear first impression. I liked the hotel, but I would compare prices carefully before booking again. Being close to transit saved time, especially when crossing town. I liked the stay overall, with a couple of practical caveats."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_035",
+      "guest_type": "couple",
+      "rating_10": 7,
+      "title": "Convenient but not perfect",
+      "stay_date": "Jul 2024",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "valueForMoney",
+        "locationConvenience"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. The location near Magnificent Mile, Oak Street Beach, Navy Pier and Millennium Park shaped most of our plans. The internet connection was steady enough for work, maps and streaming. The final price felt high once parking and extras were included. The neighborhood was convenient for food, shopping and quick rides."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_036",
+      "guest_type": "parents visiting a student",
+      "rating_10": 10,
+      "title": "Great base in Chicago",
+      "stay_date": "Aug 2025",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "wifiReliability",
+        "serviceQuality",
+        "locationConvenience"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. The location near Magnificent Mile, Oak Street Beach, Navy Pier and Millennium Park shaped most of our plans. The internet connection was steady enough for work, maps and streaming. Being close to transit saved time, especially when crossing town. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_037",
+      "guest_type": "friends on a weekend trip",
+      "rating_10": 8,
+      "title": "Great base in Chicago",
+      "stay_date": "Mar 2024",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "noiseLevel",
+        "roomComfort"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. Parking was useful, though it added to the planning. The location made it easy to walk to restaurants, transit and major sights. We slept well, and the linens made the room feel more upscale. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_038",
+      "guest_type": "conference attendee",
+      "rating_10": 8,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Jan 2026",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "serviceQuality",
+        "cleanliness"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. The location near Magnificent Mile, Oak Street Beach, Navy Pier and Millennium Park shaped most of our plans. Hallway noise was minimal, and we slept without interruptions. I noticed clean linens and a tidy bathroom throughout the stay. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_039",
+      "guest_type": "couple",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "Apr 2026",
+      "mentioned_attributes": [
+        "cleanliness",
+        "roomComfort"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. Being near Clark/Division station made the first day easier. The room felt clean when we arrived, and the bathroom looked freshly serviced. The bed was comfortable, and the room layout worked well for unpacking and relaxing. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_040",
+      "guest_type": "local staycation guest",
+      "rating_10": 8,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Jan 2026",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "roomComfort",
+        "valueForMoney"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. Breakfast was better than expected and helped before a packed day. We slept well, and the linens made the room feel more upscale. I liked the hotel, but I would compare prices carefully before booking again. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_041",
+      "guest_type": "solo traveler",
+      "rating_10": 10,
+      "title": "Polished stay",
+      "stay_date": "Jan 2026",
+      "mentioned_attributes": [
+        "cleanliness",
+        "serviceQuality",
+        "locationConvenience"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. I noticed clean linens and a tidy bathroom throughout the stay. Service was polished without feeling stiff, especially at check-in. The neighborhood was convenient for food, shopping and quick rides."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_042",
+      "guest_type": "remote worker",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "Jan 2026",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "serviceQuality",
+        "locationConvenience"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. Being near Clark/Division station made the first day easier. The internet connection was steady enough for work, maps and streaming. The front desk was warm and handled check-in quickly. The location made it easy to walk to restaurants, transit and major sights."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_043",
+      "guest_type": "couple",
+      "rating_10": 9,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Sep 2025",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "cleanliness",
+        "breakfastQuality",
+        "serviceQuality"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. Wi-Fi stayed reliable during video calls and evening browsing. The bathroom and bedding felt crisp, which made the stay easier to trust. The front desk was warm and handled check-in quickly. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_044",
+      "guest_type": "local staycation guest",
+      "rating_10": 9,
+      "title": "Great base in Chicago",
+      "stay_date": "Jun 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "locationConvenience",
+        "noiseLevel"
+      ],
+      "text": "I stayed at Viceroy Chicago during a local staycation. I noticed clean linens and a tidy bathroom throughout the stay. Being close to transit saved time, especially when crossing town. Noise was not an issue, which mattered because we had early plans. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_045",
+      "guest_type": "remote worker",
+      "rating_10": 9,
+      "title": "Great base in Chicago",
+      "stay_date": "Oct 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "locationConvenience",
+        "cleanliness",
+        "noiseLevel"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. Parking was useful, though it added to the planning. Breakfast was better than expected and helped before a packed day. The room felt clean when we arrived, and the bathroom looked freshly serviced. Hallway noise was minimal, and we slept without interruptions."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_046",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 9,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Aug 2024",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "serviceQuality",
+        "breakfastQuality",
+        "roomComfort"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. We could reach most plans without thinking too hard about transportation. The front desk was warm and handled check-in quickly. We liked having a real breakfast option on-site instead of searching early. We slept well, and the linens made the room feel more upscale."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_047",
+      "guest_type": "international tourist",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "Dec 2024",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "cleanliness",
+        "locationConvenience",
+        "noiseLevel"
+      ],
+      "text": "I stayed at Viceroy Chicago during a first sightseeing trip to Chicago. Breakfast was a pleasant start, with enough options before heading out. The room felt clean when we arrived, and the bathroom looked freshly serviced. We could reach most plans without thinking too hard about transportation. The room was quiet at night, even with the hotel in a busy part of the city."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_048",
+      "guest_type": "parents visiting a student",
+      "rating_10": 9,
+      "title": "Great base in Chicago",
+      "stay_date": "Sep 2025",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "breakfastQuality"
+      ],
+      "text": "I stayed at Viceroy Chicago during a visit with our student in Chicago. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. I had no trouble using the Wi-Fi from the room or lobby. Breakfast was better than expected and helped before a packed day. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_049",
+      "guest_type": "business traveler",
+      "rating_10": 8,
+      "title": "Great base in Chicago",
+      "stay_date": "Dec 2024",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "serviceQuality"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. The location near Magnificent Mile, Oak Street Beach, Navy Pier and Millennium Park shaped most of our plans. We could reach most plans without thinking too hard about transportation. Service was polished without feeling stiff, especially at check-in. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_050",
+      "guest_type": "conference attendee",
+      "rating_10": 8,
+      "title": "Great base in Chicago",
+      "stay_date": "Sep 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "valueForMoney",
+        "cleanliness",
+        "locationConvenience"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. It was a nice stay, but the rate felt steep for what we received. Being close to transit saved time, especially when crossing town. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_051",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 7,
+      "title": "Nice hotel, a few issues",
+      "stay_date": "Sep 2025",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "valueForMoney"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. Parking was useful, though it added to the planning. The neighborhood was convenient for food, shopping and quick rides. It was a nice stay, but the rate felt steep for what we received. I would stay again, but only if the rate made sense."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_052",
+      "guest_type": "conference attendee",
+      "rating_10": 9,
+      "title": "Polished stay",
+      "stay_date": "Oct 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "noiseLevel",
+        "roomComfort"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. We used Clark/Division station more than expected, and it helped with timing. Breakfast was better than expected and helped before a packed day. Noise was not an issue, which mattered because we had early plans. The seating and bed were comfortable enough for a two-night stay."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_053",
+      "guest_type": "conference attendee",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "May 2025",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "roomComfort",
+        "locationConvenience",
+        "valueForMoney"
+      ],
+      "text": "I stayed at Viceroy Chicago during a conference week. Parking was useful, though it added to the planning. The room was quiet at night, even with the hotel in a busy part of the city. Being close to transit saved time, especially when crossing town. Value was the main drawback, especially for a short stay."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_054",
+      "guest_type": "international tourist",
+      "rating_10": 8,
+      "title": "Great base in Chicago",
+      "stay_date": "Oct 2025",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "valueForMoney",
+        "breakfastQuality",
+        "roomComfort"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. The room blocked city noise better than I expected. It was a nice stay, but the rate felt steep for what we received. We liked having a real breakfast option on-site instead of searching early."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_055",
+      "guest_type": "friends on a weekend trip",
+      "rating_10": 7,
+      "title": "Good stay with trade-offs",
+      "stay_date": "Jul 2024",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "noiseLevel"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. The modern guest room with lounge seating matched the listing and made a clear first impression. I liked the hotel, but I would compare prices carefully before booking again. The room was quiet at night, even with the hotel in a busy part of the city. The positives outweighed the drawbacks, but the hotel is not perfect."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_056",
+      "guest_type": "local staycation guest",
+      "rating_10": 7,
+      "title": "Nice hotel, a few issues",
+      "stay_date": "Jan 2026",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "valueForMoney"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. Being near Clark/Division station made the first day easier. The internet connection was steady enough for work, maps and streaming. Value was the main drawback, especially for a short stay. I would stay again, but only if the rate made sense."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_057",
+      "guest_type": "friends on a weekend trip",
+      "rating_10": 9,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "May 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "locationConvenience",
+        "noiseLevel"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. Parking was useful, though it added to the planning. The breakfast service was good, and coffee was easy to get in the morning. We could reach most plans without thinking too hard about transportation. The room was quiet at night, even with the hotel in a busy part of the city."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_058",
+      "guest_type": "business traveler",
+      "rating_10": 7,
+      "title": "Convenient but not perfect",
+      "stay_date": "Jan 2025",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "locationConvenience"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. The final price felt high once parking and extras were included. The location made it easy to walk to restaurants, transit and major sights. The positives outweighed the drawbacks, but the hotel is not perfect."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_059",
+      "guest_type": "remote worker",
+      "rating_10": 10,
+      "title": "Great base in Chicago",
+      "stay_date": "Jun 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "locationConvenience",
+        "serviceQuality",
+        "noiseLevel"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. Breakfast was better than expected and helped before a packed day. The location made it easy to walk to restaurants, transit and major sights. The front desk was warm and handled check-in quickly. Hallway noise was minimal, and we slept without interruptions."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_060",
+      "guest_type": "business traveler",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "Jul 2024",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "locationConvenience"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. I had no trouble using the Wi-Fi from the room or lobby. We could reach most plans without thinking too hard about transportation. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_061",
+      "guest_type": "wedding guest",
+      "rating_10": 9,
+      "title": "Polished stay",
+      "stay_date": "Apr 2024",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "breakfastQuality"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. Parking was useful, though it added to the planning. Service was polished without feeling stiff, especially at check-in. We liked having a real breakfast option on-site instead of searching early. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_062",
+      "guest_type": "family with young children",
+      "rating_10": 9,
+      "title": "Great base in Chicago",
+      "stay_date": "Mar 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "locationConvenience"
+      ],
+      "text": "I stayed at Viceroy Chicago during a family trip with young children. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. We liked having a real breakfast option on-site instead of searching early. The neighborhood was convenient for food, shopping and quick rides. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_063",
+      "guest_type": "solo traveler",
+      "rating_10": 8,
+      "title": "Polished stay",
+      "stay_date": "Apr 2026",
+      "mentioned_attributes": [
+        "roomComfort",
+        "cleanliness",
+        "wifiReliability",
+        "valueForMoney"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. The location near Magnificent Mile, Oak Street Beach, Navy Pier and Millennium Park shaped most of our plans. Wi-Fi stayed reliable during video calls and evening browsing. It was a nice stay, but the rate felt steep for what we received. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_064",
+      "guest_type": "couple",
+      "rating_10": 9,
+      "title": "Strong city stay",
+      "stay_date": "Feb 2026",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "locationConvenience"
+      ],
+      "text": "I stayed at Viceroy Chicago during a couples trip. Wi-Fi connected quickly and did not drop during my stay. The location made it easy to walk to restaurants, transit and major sights. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_065",
+      "guest_type": "conference attendee",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Jun 2025",
+      "mentioned_attributes": [
+        "wifiReliability",
+        "roomComfort",
+        "cleanliness"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. Wi-Fi stayed reliable during video calls and evening browsing. The room felt thoughtfully designed, with enough space around the bed and desk. The bathroom and bedding felt crisp, which made the stay easier to trust. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_066",
+      "guest_type": "conference attendee",
+      "rating_10": 7,
+      "title": "Good stay with trade-offs",
+      "stay_date": "Apr 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "valueForMoney"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. We tried Somerset and the rooftop bar, which made it convenient to stay close in the evening. Housekeeping did a strong job; towels, counters and floors were consistently clean. Value was the main drawback, especially for a short stay. I liked the stay overall, with a couple of practical caveats."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_067",
+      "guest_type": "local staycation guest",
+      "rating_10": 7,
+      "title": "Good stay with trade-offs",
+      "stay_date": "Sep 2024",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "locationConvenience"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. The modern guest room with lounge seating matched the listing and made a clear first impression. I liked the hotel, but I would compare prices carefully before booking again. We could reach most plans without thinking too hard about transportation. The positives outweighed the drawbacks, but the hotel is not perfect."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_068",
+      "guest_type": "wedding guest",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Feb 2026",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "breakfastQuality",
+        "locationConvenience",
+        "valueForMoney"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. The breakfast service was good, and coffee was easy to get in the morning. The neighborhood was convenient for food, shopping and quick rides. It was a nice stay, but the rate felt steep for what we received. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_069",
+      "guest_type": "couple",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Feb 2025",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "roomComfort",
+        "cleanliness"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. We tried Somerset and the rooftop bar, which made it convenient to stay close in the evening. The bed was comfortable, and the room layout worked well for unpacking and relaxing. The room felt clean when we arrived, and the bathroom looked freshly serviced. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_070",
+      "guest_type": "parents visiting a student",
+      "rating_10": 7,
+      "title": "Stylish with caveats",
+      "stay_date": "May 2026",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "cleanliness",
+        "breakfastQuality",
+        "roomComfort"
+      ],
+      "text": "I stayed at Viceroy Chicago during a visit with our student in Chicago. Being near Clark/Division station made the first day easier. We liked having a real breakfast option on-site instead of searching early. The seating and bed were comfortable enough for a two-night stay. I would stay again, but only if the rate made sense."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_071",
+      "guest_type": "family with young children",
+      "rating_10": 9,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Apr 2026",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "wifiReliability",
+        "roomComfort"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. The room blocked city noise better than I expected. I had no trouble using the Wi-Fi from the room or lobby. The room felt thoughtfully designed, with enough space around the bed and desk. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_072",
+      "guest_type": "local staycation guest",
+      "rating_10": 9,
+      "title": "Comfortable and convenient",
+      "stay_date": "Mar 2024",
+      "mentioned_attributes": [
+        "roomComfort",
+        "cleanliness",
+        "breakfastQuality",
+        "noiseLevel"
+      ],
+      "text": "I stayed at Viceroy Chicago during a local staycation. The bed was comfortable, and the room layout worked well for unpacking and relaxing. Housekeeping did a strong job; towels, counters and floors were consistently clean. The room was quiet at night, even with the hotel in a busy part of the city. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_073",
+      "guest_type": "international tourist",
+      "rating_10": 9,
+      "title": "Comfortable and convenient",
+      "stay_date": "Aug 2024",
+      "mentioned_attributes": [
+        "cleanliness",
+        "roomComfort",
+        "locationConvenience",
+        "noiseLevel"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. The room felt clean when we arrived, and the bathroom looked freshly serviced. Being close to transit saved time, especially when crossing town. The room blocked city noise better than I expected. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_074",
+      "guest_type": "conference attendee",
+      "rating_10": 10,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Jan 2024",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "locationConvenience",
+        "wifiReliability",
+        "noiseLevel"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. Being near Clark/Division station made the first day easier. The concierge and front desk made the stay feel well managed. We could reach most plans without thinking too hard about transportation. Wi-Fi stayed reliable during video calls and evening browsing."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_075",
+      "guest_type": "wedding guest",
+      "rating_10": 8,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Nov 2024",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "noiseLevel"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. The location near Magnificent Mile, Oak Street Beach, Navy Pier and Millennium Park shaped most of our plans. The location made it easy to walk to restaurants, transit and major sights. The room blocked city noise better than I expected. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_076",
+      "guest_type": "wedding guest",
+      "rating_10": 9,
+      "title": "Comfortable and convenient",
+      "stay_date": "May 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "locationConvenience",
+        "noiseLevel"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. Being near Clark/Division station made the first day easier. Breakfast was a pleasant start, with enough options before heading out. The neighborhood was convenient for food, shopping and quick rides. Noise was not an issue, which mattered because we had early plans."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_077",
+      "guest_type": "international tourist",
+      "rating_10": 8,
+      "title": "Easy choice for the neighborhood",
+      "stay_date": "Apr 2024",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "wifiReliability",
+        "roomComfort"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. We used Clark/Division station more than expected, and it helped with timing. The breakfast service was good, and coffee was easy to get in the morning. Wi-Fi stayed reliable during video calls and evening browsing. The seating and bed were comfortable enough for a two-night stay."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_078",
+      "guest_type": "solo traveler",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "Nov 2025",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "breakfastQuality",
+        "roomComfort",
+        "valueForMoney"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. We tried Somerset and the rooftop bar, which made it convenient to stay close in the evening. Being close to transit saved time, especially when crossing town. We liked having a real breakfast option on-site instead of searching early. We slept well, and the linens made the room feel more upscale."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_079",
+      "guest_type": "business traveler",
+      "rating_10": 8,
+      "title": "Polished stay",
+      "stay_date": "Nov 2024",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "wifiReliability",
+        "valueForMoney",
+        "roomComfort"
+      ],
+      "text": "I stayed at Viceroy Chicago during a business trip. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. The neighborhood was convenient for food, shopping and quick rides. The seating and bed were comfortable enough for a two-night stay. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_080",
+      "guest_type": "parents visiting a student",
+      "rating_10": 10,
+      "title": "Great base in Chicago",
+      "stay_date": "Feb 2024",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "locationConvenience",
+        "roomComfort",
+        "breakfastQuality"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. The room blocked city noise better than I expected. The room felt thoughtfully designed, with enough space around the bed and desk. Breakfast was a pleasant start, with enough options before heading out. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_081",
+      "guest_type": "parents visiting a student",
+      "rating_10": 8,
+      "title": "Great base in Chicago",
+      "stay_date": "Feb 2024",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "serviceQuality",
+        "breakfastQuality",
+        "roomComfort"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. The modern guest room with lounge seating matched the listing and made a clear first impression. I liked the hotel, but I would compare prices carefully before booking again. Staff gave helpful directions and followed up when we asked for extra towels. The breakfast service was good, and coffee was easy to get in the morning."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_082",
+      "guest_type": "wedding guest",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Mar 2026",
+      "mentioned_attributes": [
+        "noiseLevel",
+        "breakfastQuality"
+      ],
+      "text": "I stayed at Viceroy Chicago during a wedding weekend. The location near Magnificent Mile, Oak Street Beach, Navy Pier and Millennium Park shaped most of our plans. The room blocked city noise better than I expected. We liked having a real breakfast option on-site instead of searching early. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_083",
+      "guest_type": "conference attendee",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "Feb 2024",
+      "mentioned_attributes": [
+        "cleanliness",
+        "wifiReliability"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. We used Clark/Division station more than expected, and it helped with timing. The bathroom and bedding felt crisp, which made the stay easier to trust. The internet connection was steady enough for work, maps and streaming. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_084",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 9,
+      "title": "Great base in Chicago",
+      "stay_date": "May 2026",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "wifiReliability"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. Service was polished without feeling stiff, especially at check-in. Wi-Fi connected quickly and did not drop during my stay. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_085",
+      "guest_type": "friends on a weekend trip",
+      "rating_10": 10,
+      "title": "Comfortable and convenient",
+      "stay_date": "May 2026",
+      "mentioned_attributes": [
+        "cleanliness",
+        "wifiReliability",
+        "serviceQuality",
+        "locationConvenience"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. Housekeeping did a strong job; towels, counters and floors were consistently clean. Wi-Fi stayed reliable during video calls and evening browsing. Service was polished without feeling stiff, especially at check-in."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_086",
+      "guest_type": "business traveler",
+      "rating_10": 7,
+      "title": "Worked well for this trip",
+      "stay_date": "Jan 2024",
+      "mentioned_attributes": [
+        "cleanliness",
+        "wifiReliability",
+        "valueForMoney"
+      ],
+      "text": "We booked Viceroy Chicago for a short Chicago stay. The location near Magnificent Mile, Oak Street Beach, Navy Pier and Millennium Park shaped most of our plans. I had no trouble using the Wi-Fi from the room or lobby. It was a nice stay, but the rate felt steep for what we received. It worked for this trip, though a few details kept it from being excellent."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_087",
+      "guest_type": "remote worker",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Oct 2024",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "valueForMoney",
+        "wifiReliability"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. The concierge and front desk made the stay feel well managed. I liked the hotel, but I would compare prices carefully before booking again. Wi-Fi connected quickly and did not drop during my stay. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_088",
+      "guest_type": "conference attendee",
+      "rating_10": 9,
+      "title": "Great base in Chicago",
+      "stay_date": "Jul 2024",
+      "mentioned_attributes": [
+        "cleanliness",
+        "breakfastQuality",
+        "locationConvenience",
+        "wifiReliability"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. The modern guest room with lounge seating matched the listing and made a clear first impression. The breakfast service was good, and coffee was easy to get in the morning. The location made it easy to walk to restaurants, transit and major sights. The internet connection was steady enough for work, maps and streaming."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_089",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "Dec 2024",
+      "mentioned_attributes": [
+        "valueForMoney",
+        "wifiReliability",
+        "locationConvenience",
+        "roomComfort"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. We used Clark/Division station more than expected, and it helped with timing. It was a nice stay, but the rate felt steep for what we received. Wi-Fi stayed reliable during video calls and evening browsing. The location made it easy to walk to restaurants, transit and major sights."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_090",
+      "guest_type": "international tourist",
+      "rating_10": 7,
+      "title": "Convenient but not perfect",
+      "stay_date": "Feb 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "wifiReliability",
+        "valueForMoney",
+        "breakfastQuality"
+      ],
+      "text": "I stayed at Viceroy Chicago during a first sightseeing trip to Chicago. The room felt clean when we arrived, and the bathroom looked freshly serviced. Value was the main drawback, especially for a short stay. The breakfast service was good, and coffee was easy to get in the morning. I would stay again, but only if the rate made sense."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_091",
+      "guest_type": "local staycation guest",
+      "rating_10": 7,
+      "title": "Good stay with trade-offs",
+      "stay_date": "Apr 2024",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "valueForMoney",
+        "locationConvenience",
+        "serviceQuality"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. Breakfast was better than expected and helped before a packed day. I liked the hotel, but I would compare prices carefully before booking again. The neighborhood was convenient for food, shopping and quick rides. Service was polished without feeling stiff, especially at check-in."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_092",
+      "guest_type": "solo traveler",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "Nov 2025",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "locationConvenience"
+      ],
+      "text": "I stayed at Viceroy Chicago during a solo visit. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. Breakfast was better than expected and helped before a packed day. The location made it easy to walk to restaurants, transit and major sights. For a city stay, the hotel worked very well."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_093",
+      "guest_type": "international tourist",
+      "rating_10": 7,
+      "title": "Worked well for this trip",
+      "stay_date": "Mar 2026",
+      "mentioned_attributes": [
+        "roomComfort",
+        "wifiReliability",
+        "valueForMoney"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. The bed was comfortable, and the room layout worked well for unpacking and relaxing. Wi-Fi connected quickly and did not drop during my stay. It was a nice stay, but the rate felt steep for what we received. I would stay again, but only if the rate made sense."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_094",
+      "guest_type": "traveler with elderly parents",
+      "rating_10": 9,
+      "title": "Comfortable and convenient",
+      "stay_date": "Apr 2025",
+      "mentioned_attributes": [
+        "locationConvenience",
+        "noiseLevel",
+        "cleanliness"
+      ],
+      "text": "I chose Viceroy Chicago because I wanted to be in Gold Coast. We tried Somerset and the rooftop bar, which made it convenient to stay close in the evening. Being close to transit saved time, especially when crossing town. The room blocked city noise better than I expected. Housekeeping did a strong job; towels, counters and floors were consistently clean."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_095",
+      "guest_type": "business traveler",
+      "rating_10": 10,
+      "title": "Great base in Chicago",
+      "stay_date": "Aug 2024",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "roomComfort",
+        "wifiReliability",
+        "noiseLevel"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. The location near Magnificent Mile, Oak Street Beach, Navy Pier and Millennium Park shaped most of our plans. The breakfast service was good, and coffee was easy to get in the morning. We slept well, and the linens made the room feel more upscale. Hallway noise was minimal, and we slept without interruptions."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_096",
+      "guest_type": "solo traveler",
+      "rating_10": 8,
+      "title": "Great base in Chicago",
+      "stay_date": "May 2024",
+      "mentioned_attributes": [
+        "breakfastQuality",
+        "serviceQuality"
+      ],
+      "text": "I stayed at Viceroy Chicago during a solo visit. The modern guest room with lounge seating matched the listing and made a clear first impression. We liked having a real breakfast option on-site instead of searching early. Service was polished without feeling stiff, especially at check-in. It was an easy hotel to recommend for this kind of trip."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_097",
+      "guest_type": "international tourist",
+      "rating_10": 8,
+      "title": "Strong city stay",
+      "stay_date": "Dec 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "locationConvenience",
+        "serviceQuality"
+      ],
+      "text": "I stayed at Viceroy Chicago during a first sightseeing trip to Chicago. Housekeeping did a strong job; towels, counters and floors were consistently clean. The location made it easy to walk to restaurants, transit and major sights. Service was polished without feeling stiff, especially at check-in. I left feeling the stay did what I needed it to do."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_098",
+      "guest_type": "conference attendee",
+      "rating_10": 8,
+      "title": "Great base in Chicago",
+      "stay_date": "Dec 2025",
+      "mentioned_attributes": [
+        "roomComfort",
+        "noiseLevel"
+      ],
+      "text": "This was my first time staying at Viceroy Chicago. The hotel details, including seasonal rooftop pool, fitness center, rooftop bar and two restaurants, gave the stay a polished feel. The seating and bed were comfortable enough for a two-night stay. Noise was not an issue, which mattered because we had early plans. Overall, I would stay again for the convenience and comfort."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_099",
+      "guest_type": "conference attendee",
+      "rating_10": 7,
+      "title": "Worked well for this trip",
+      "stay_date": "Mar 2026",
+      "mentioned_attributes": [
+        "serviceQuality",
+        "valueForMoney"
+      ],
+      "text": "Our trip brought us to Viceroy Chicago for two nights. The location near Magnificent Mile, Oak Street Beach, Navy Pier and Millennium Park shaped most of our plans. Staff gave helpful directions and followed up when we asked for extra towels. I liked the hotel, but I would compare prices carefully before booking again. I would stay again, but only if the rate made sense."
+    },
+    {
+      "hotel_id": "viceroy_chicago",
+      "hotel_name": "Viceroy Chicago",
+      "review_id": "viceroy_chicago_100",
+      "guest_type": "parents visiting a student",
+      "rating_10": 8,
+      "title": "Comfortable and convenient",
+      "stay_date": "May 2025",
+      "mentioned_attributes": [
+        "cleanliness",
+        "serviceQuality",
+        "locationConvenience",
+        "valueForMoney"
+      ],
+      "text": "I stayed at Viceroy Chicago during a visit with our student in Chicago. The room felt clean when we arrived, and the bathroom looked freshly serviced. The concierge and front desk made the stay feel well managed. The final price felt high once parking and extras were included. For a city stay, the hotel worked very well."
+    }
+  ]
+}
