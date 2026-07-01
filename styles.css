@@ -1019,6 +1019,67 @@ body{
   border-top:1px solid var(--line);
   padding-top:12px;
 }
+.modal__scroll > .reviews{
+  margin-top:0;
+  border-top:1px solid var(--line);
+  padding:18px 16px 20px;
+  background:#fff;
+}
+.modal__scroll > .reviews .reviews__head h3{
+  font-size:24px;
+  line-height:1.2;
+  color:#1a1a1a;
+}
+.reviews__tools{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  border:1px solid #d9e5ff;
+  background:#f7faff;
+  border-radius:10px;
+  padding:8px;
+  margin-bottom:10px;
+}
+.reviews__count{
+  color:#1e2f4d;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.3;
+}
+.reviews__actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.review-action{
+  border:1px solid #b8cef8;
+  background:#fff;
+  color:var(--brand);
+  border-radius:6px;
+  min-height:32px;
+  padding:6px 10px;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.review-action:hover{background:#eef5ff}
+.review-action:focus-visible{outline:2px solid var(--brand2); outline-offset:2px}
+.review-action--quiet{
+  color:#1e2f4d;
+  border-color:var(--line);
+}
+.reviews__list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  max-height:620px;
+  overflow:auto;
+  padding-right:4px;
+  scrollbar-gutter:stable;
+}
 .review{
   border:1px solid var(--line);
   border-radius:14px;
@@ -1026,6 +1087,7 @@ body{
   background:#fff;
   margin-top:10px;
 }
+.reviews__list .review{margin-top:0}
 .review:first-of-type{margin-top:0}
 .review__meta{display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12px; color:var(--muted)}
 .review__quote{margin-top:8px; font-size:12px; color:#1c2a40; line-height:1.45}
@@ -1057,4 +1119,7 @@ body{
   .area-grid{grid-template-columns:1fr}
   .amenity-details-head{flex-direction:column}
   .amenity-detail-grid{grid-template-columns:1fr}
+  .reviews__tools{align-items:flex-start; flex-direction:column}
+  .reviews__actions{justify-content:flex-start}
+  .reviews__list{max-height:520px}
 }
