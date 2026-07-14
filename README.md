@@ -1,21 +1,18 @@
 # Mock hotel site — deployment + tracking
 
-## Deploy the site (so others can use it without code)
+## Live site
 
-This project is a static website (HTML/CSS/JS). You can host it on any static host:
+**https://jessica-leee.github.io/mock-hotel-site**
 
-- **Netlify** (easiest): drag-and-drop the `mock_hotel_site/` folder in the Netlify UI.
-- **Vercel**: import the folder as a static project.
-- **GitHub Pages**: put these files in a repo and enable Pages.
+Hosted on [GitHub Pages](https://pages.github.com/) from the `main` branch. Pushes to `main` update the live site automatically.
 
-After deploy you’ll get a public URL like `https://your-study-site.netlify.app`.
+## Study URLs
 
-## Open the two Chicago versions
+- **Survey (entry):** https://jessica-leee.github.io/mock-hotel-site/
+- **No reviews:** https://jessica-leee.github.io/mock-hotel-site/hotels-no-reviews.html
+- **With reviews:** https://jessica-leee.github.io/mock-hotel-site/hotels-with-reviews.html
 
-- **No reviews:** `hotels-no-reviews.html`
-- **With reviews:** `hotels-with-reviews.html`
-
-`index.html` currently opens the no-review version. Hotel details are text-only; hotel photos and galleries are not rendered.
+`index.html` is the survey entry page. After the survey, participants are routed to one of the Chicago hotel pages. Hotel details are text-only; hotel photos and galleries are not rendered.
 
 The no-review page is labeled as Phase 1 browsing and uses the relisted-hotel cover story from the experiment design. The review page is labeled as the Phase 2 Full Reviews Control condition and does not show an AI summary.
 
@@ -63,7 +60,7 @@ After you change `google-apps-script.gs`, use **Deploy → Manage deployments �
 
 ### Troubleshooting (empty sheet)
 
-1. **`events` tab** — If this stays empty, the site is not reaching your Web App (wrong `/exec` URL in Netlify build, ad blocker, or Apps Script errors). In Apps Script, open **Executions** after you use the site; you should see `doPost` runs.
+1. **`events` tab** — If this stays empty, the site is not reaching your Web App (wrong `/exec` URL in `index.html`, ad blocker, or Apps Script errors). In Apps Script, open **Executions** after you use the site; you should see `doPost` runs.
 2. **`Completed_hotel_visits` tab** — Rows appear only when a participant **closes a hotel detail modal** (not from scrolling the main results list alone). Open a hotel → close it (✕ or backdrop); then check the tab within a few seconds.
 3. **Script must write to the correct spreadsheet** — Prefer creating the script via **Extensions → Apps Script** inside your Sheet. If the project is standalone, set Script property **`SPREADSHEET_ID`** to the Sheet ID from the URL (`/d/<ID>/edit`).
 
