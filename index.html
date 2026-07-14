@@ -3,92 +3,544 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Chicago hotel search - no reviews</title>
+    <title>Hotel booking survey</title>
     <!-- Streaming to Google Sheets (Apps Script Web App). -->
     <meta
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbxPojbcbSKbiB6nxHdYp1DYE8_en_Ugq1EyaieEN_H2j8kD67VOIv0qzbxk28rUNxx50Q/exec"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260701-8" />
+    <link rel="stylesheet" href="./styles.css?v=20260713-6" />
   </head>
-  <body data-review-version="without">
-
+  <body data-survey-page="true">
     <header class="booking-header" aria-label="Site header">
       <div class="booking-header__inner">
         <div class="booking-logo">BookNow</div>
-        <div class="booking-header__links" aria-label="Travel categories">
-          <span class="booking-nav-pill is-active">Stays</span>
-          <span class="booking-nav-pill">Chicago</span>
+        <div class="booking-header__links" aria-label="Study stage">
+          <span class="booking-nav-pill is-active">Survey</span>
+          <span class="booking-nav-pill">Chicago hotel task</span>
         </div>
       </div>
     </header>
 
-    <section class="search-hero" aria-label="Search summary">
-      <div class="search-box">
-        <div class="search-field">
-          <span>Destination</span>
-          <strong>Chicago, Illinois</strong>
+    <main class="survey-shell" aria-label="Hotel booking survey">
+      <section class="survey-card">
+        <div class="survey-progress" aria-live="polite">
+          <span id="surveyStepLabel">Question 1 of 8</span>
+          <div class="survey-progress__bar" aria-hidden="true">
+            <span id="surveyProgressFill"></span>
+          </div>
         </div>
-        <div class="search-field">
-          <span>Dates</span>
-          <strong>2-night stay</strong>
-        </div>
-        <div class="search-field">
-          <span>Occupancy</span>
-          <strong>1 room, 1 adult</strong>
-        </div>
-        <button class="search-submit" type="button">Search</button>
-      </div>
-    </section>
 
-<main class="app">
-      <div class="layout">
-
-        <aside class="filters booking-sidebar" aria-label="Filter results">
-          <h2 class="h2">Filter by:</h2>
-          <div class="filter">
-            <div class="filter__label">City</div>
-            <div class="filter__value">Chicago</div>
+        <form id="surveyForm" class="survey-form">
+          <div id="surveyQuestion"></div>
+          <div class="survey-actions">
+            <button id="surveyBack" class="btn2" type="button">Back</button>
+            <button id="surveySubmit" class="btn" type="submit">Submit</button>
           </div>
-          <div class="filter">
-            <div class="filter__label">Property class</div>
-            <div class="filter__value">4-star to 5-star</div>
-          </div>
-          <div class="filter">
-            <div class="filter__label">Price range</div>
-            <div class="filter__value">$289-$309 per night</div>
-          </div>
-          <div class="filter">
-            <div class="filter__label">Popular filters</div>
-            <div class="filter__value">Free WiFi, fitness center, restaurant</div>
-          </div>
-          <div class="filter">
-            <div class="filter__label">Neighborhoods</div>
-            <div class="filter__value">Loop, Gold Coast, Wicker Park, West Loop</div>
-          </div>
-        </aside>
-
-<section class="content" aria-label="Search results">
-          <div class="content__head">
-            <h1 class="h1">Chicago: 6 properties found</h1>
-            <div class="sort">
-              <label class="sort__label" for="sortSelect">Sort</label>
-              <select id="sortSelect" class="sort__select">
-                <option value="recommended">Recommended</option>
-                <option value="class_high">Hotel class (high to low)</option>
-                <option value="name">Name (A to Z)</option>
-              </select>
-            </div>
-          </div>
-
-          <div id="results" class="results"></div>
-        </section>
-      </div>
+        </form>
+      </section>
     </main>
 
-    <div id="modalRoot" class="modal-root" aria-hidden="true"></div>
-
     <script src="./tracking.js"></script>
-    <script src="./app.js?v=20260701-8"></script>
+    <script>
+      (function () {
+        const STORAGE_KEY = "mock_hotel_survey_v1";
+        const SURVEY_EVENT_STORAGE_KEY = "mock_hotel_survey_events_v1";
+        const params = new URLSearchParams(location.search);
+        const prolificId = params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "";
+        const hotelQuestionnaireMode = params.get("survey_stage") === "hotel_questionnaire" || (location.hash || "").startsWith("#hq");
+
+        const hotels = [
+          { id: "pendry-chicago", name: "Pendry Chicago" },
+          { id: "viceroy-chicago", name: "Viceroy Chicago" },
+          { id: "the-robey-chicago", name: "The Robey, Chicago, a Member of Design Hotels" },
+          { id: "the-emily-hotel", name: "The Emily Hotel" },
+          { id: "nobu-hotel-chicago", name: "Nobu Hotel Chicago" },
+          { id: "arlo-chicago", name: "Arlo Chicago" }
+        ];
+
+        const likelihoodRows = [
+          ["clean", "Clean"],
+          ["good_service_quality", "Good Service quality"],
+          ["comfortable_rooms", "Comfortable rooms"],
+          ["reliable_wifi", "Reliable Wi-Fi"],
+          ["low_noise_level", "Low noise level"],
+          ["convenient_location", "Convenient location"],
+          ["good_value_for_money", "Good value for money"],
+          ["high_quality_breakfast", "High-quality breakfast"]
+        ];
+
+        const attributeRows = [
+          ["cleanliness", "Cleanliness"],
+          ["service_quality", "Service quality"],
+          ["room_comfort", "Room comfort"],
+          ["wifi_reliability", "Wi-Fi reliability"],
+          ["noise_level", "Noise level"],
+          ["location_convenience", "Location convenience"],
+          ["value_for_money", "Value for money"],
+          ["breakfast_quality", "Breakfast quality"]
+        ];
+
+        const matrixConfigs = {
+          likelihood: {
+            title: hotel => `Based on browsing <strong>${escapeHtml(hotel.name)}</strong>, select how likely you think the hotel has each attribute`,
+            rows: likelihoodRows,
+            columns: [
+              ["extremely_unlikely", "Extremely<br>unlikely"],
+              ["somewhat_unlikely", "Somewhat<br>unlikely"],
+              ["neither", "Neither likely<br>nor unlikely"],
+              ["somewhat_likely", "Somewhat likely"],
+              ["extremely_likely", "Extremely likely"]
+            ]
+          },
+          belief: {
+            title: hotel => `Based on browsing <strong>${escapeHtml(hotel.name)}</strong>, select your current belief for each attribute.`,
+            rows: attributeRows,
+            columns: [
+              ["yes_positive", "Yes / Positive"],
+              ["no_negative", "No / Negative"]
+            ]
+          },
+          confidence: {
+            title: () => "How confident are you in each rating above?",
+            rows: attributeRows,
+            columns: [
+              ["low", "low"],
+              ["medium", "medium"],
+              ["high", "high"]
+            ]
+          }
+        };
+
+        const scenarios = [
+          {
+            id: "business_conference",
+            title: "Trip Scenario: Business Conference",
+            description: "You are booking for yourself as a business traveler attending a multi-day conference. Duration: 3 nights. Budget: up to $200/night. You need reliable internet, minimal noise, and easy access to the conference venue.",
+            rows: [
+              ["Cleanliness", "2 moderately important", false],
+              ["Service quality", "2 - moderately important", false],
+              ["Room comfort", "2 - moderately important", false],
+              ["Wi-Fi reliability", "3 - most important", true],
+              ["Noise level", "3 - most important", true],
+              ["Location convenience", "3 - most important", true],
+              ["Value for money", "1 - moderately important", false],
+              ["Breakfast quality", "1 - least important", false]
+            ]
+          },
+          {
+            id: "family_vacation",
+            title: "Trip Scenario: Family Vacation",
+            description: "You are booking for yourself, your spouse, and two young children (ages 5 and 8). Duration: 4 nights. Budget: up to $180/night. Safety and comfort for the children are the top priority.",
+            rows: [
+              ["Cleanliness", "3 - most important", true],
+              ["Service quality", "2 - moderately important", false],
+              ["Room comfort", "3 - most important", true],
+              ["Wi-Fi reliability", "2 - moderately important", false],
+              ["Noise level", "2 - moderately important", false],
+              ["Location convenience", "2 - moderately important", false],
+              ["Value for money", "2 - moderately important", false],
+              ["Breakfast quality", "2 - moderately important", false]
+            ]
+          },
+          {
+            id: "romantic_getaway",
+            title: "Trip Scenario: Romantic Getaway",
+            description: "You are booking for yourself and your partner for a romantic weekend trip. Duration: 2 nights. Budget: up to $220/night. You want a relaxing, comfortable, and memorable experience.",
+            rows: [
+              ["Cleanliness", "2 - moderately important", false],
+              ["Service quality", "3 - most important", true],
+              ["Room comfort", "3 - most important", true],
+              ["Wi-Fi reliability", "1 - least important", false],
+              ["Noise level", "3 - most important", true],
+              ["Location convenience", "2 - moderately important", false],
+              ["Value for money", "2 - moderately important", false],
+              ["Breakfast quality", "2 - moderately important", false]
+            ]
+          },
+          {
+            id: "solo_city_exploration",
+            title: "Trip Scenario: Solo City Exploration",
+            description: "You are booking for yourself as a solo leisure traveler. Duration: 3 nights. Budget: up to $150/night. You will be out most of the day and need a comfortable, well-located base.",
+            rows: [
+              ["Cleanliness", "2 - moderately important", false],
+              ["Service quality", "2 - moderately important", false],
+              ["Room comfort", "2 - moderately important", false],
+              ["Wi-Fi reliability", "2 - moderately important", false],
+              ["Noise level", "2 - moderately important", false],
+              ["Location convenience", "3 - most important", true],
+              ["Value for money", "3 - most important", true],
+              ["Breakfast quality", "1 - least important", false]
+            ]
+          },
+          {
+            id: "friends_group_trip",
+            title: "Trip Scenario: Friends Group Trip",
+            description: "You are booking for yourself and three close friends for a social weekend. Duration: 3 nights. Budget: up to $160/night. You want a lively, central location to enjoy the city together.",
+            rows: [
+              ["Cleanliness", "2 - moderately important", false],
+              ["Service quality", "2 - moderately important", false],
+              ["Room comfort", "2 - moderately important", false],
+              ["Wi-Fi reliability", "2 - moderately important", false],
+              ["Noise level", "2 - moderately important", false],
+              ["Location convenience", "3 - most important", true],
+              ["Value for money", "2 - moderately important", false],
+              ["Breakfast quality", "2 - moderately important", false]
+            ]
+          },
+          {
+            id: "elderly_parents",
+            title: "Trip Scenario: Visit with Elderly Parents",
+            description: "You are booking for your elderly parents (both in their 70s, with limited mobility). Duration: 4 nights. Budget: up to $190/night. Comfort, accessibility, and attentive service are top priorities.",
+            rows: [
+              ["Cleanliness", "2 - moderately important", false],
+              ["Service quality", "3 - most important", true],
+              ["Room comfort", "3 - most important", true],
+              ["Wi-Fi reliability", "1 - least important", false],
+              ["Noise level", "3 - most important", true],
+              ["Location convenience", "2 - moderately important", false],
+              ["Value for money", "2 - moderately important", false],
+              ["Breakfast quality", "2 - moderately important", false]
+            ]
+          }
+        ];
+
+        const pages = [
+          { id: "prolific_id", type: "prolific" },
+          { id: "hotel_attributes_prior", type: "attributes" },
+          ...scenarios.map(scenario => ({ id: scenario.id, type: "scenario", scenario })),
+          { id: "browse_intro", type: "browseIntro" }
+        ];
+
+        const hotelQuestionnairePages = hotels.flatMap(hotel => [
+          { id: `hotelq_${hotel.id}_likelihood`, type: "hotelMatrix", matrix: "likelihood", hotel },
+          { id: `hotelq_${hotel.id}_belief`, type: "hotelMatrix", matrix: "belief", hotel },
+          { id: `hotelq_${hotel.id}_confidence`, type: "hotelMatrix", matrix: "confidence", hotel }
+        ]);
+
+        function activePages() {
+          return hotelQuestionnaireMode ? hotelQuestionnairePages : pages;
+        }
+
+        function getState() {
+          try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { answers: {} }; }
+          catch (_) { return { answers: {} }; }
+        }
+
+        function setState(state) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function getSurveyEvents() {
+          try { return JSON.parse(localStorage.getItem(SURVEY_EVENT_STORAGE_KEY)) || []; }
+          catch (_) { return []; }
+        }
+
+        function setSurveyEvents(events) {
+          localStorage.setItem(SURVEY_EVENT_STORAGE_KEY, JSON.stringify(events));
+          sessionStorage.setItem(SURVEY_EVENT_STORAGE_KEY, JSON.stringify(events));
+        }
+
+        function getMeta(name) {
+          const meta = document.querySelector(`meta[name="${name}"]`);
+          return meta && meta.getAttribute("content") ? meta.getAttribute("content").trim() : "";
+        }
+
+        function prolificMeta(state) {
+          return {
+            prolific_pid: (state && state.prolific_id) || prolificId || params.get("PROLIFIC_PID") || params.get("prolific_pid") || "",
+            study_id: params.get("STUDY_ID") || params.get("study_id") || "",
+            session_id: params.get("SESSION_ID") || params.get("session_id") || ""
+          };
+        }
+
+        function streamSurveyEvent(entry, state) {
+          const streamUrl = getMeta("tracking-stream-url") || params.get("stream") || "";
+          if (!streamUrl) return;
+          const payload = {
+            page_url: location.href,
+            phase: "survey",
+            cond: "none",
+            reason: entry.event_type,
+            prolific: prolificMeta(state),
+            events: [entry]
+          };
+          const body = JSON.stringify(payload);
+          try {
+            if (navigator.sendBeacon) {
+              navigator.sendBeacon(streamUrl, new Blob([body], { type: "text/plain" }));
+              return;
+            }
+          } catch (_) {
+            /* fall through to fetch */
+          }
+          try {
+            fetch(streamUrl, { method: "POST", mode: "no-cors", keepalive: true, body });
+          } catch (_) {
+            /* streaming is optional */
+          }
+        }
+
+        function logSurveyEvent(page, answer, state) {
+          const entry = {
+            event_type: "survey_submit",
+            element_id: page.id,
+            timestamp: Date.now(),
+            value: {
+              answer,
+              survey_page: page.type || "transition"
+            }
+          };
+          const events = getSurveyEvents();
+          events.push(entry);
+          setSurveyEvents(events);
+          streamSurveyEvent(entry, state);
+        }
+
+        function escapeHtml(value) {
+          return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        }
+
+        function currentIndex() {
+          const pageSet = activePages();
+          const pattern = hotelQuestionnaireMode ? /^#hq(\d+)$/ : /^#q(\d+)$/;
+          const match = (location.hash || "").match(pattern);
+          const index = match ? Number(match[1]) - 1 : 0;
+          return Math.min(Math.max(index, 0), pageSet.length - 1);
+        }
+
+        function pageUrl(index) {
+          const query = location.search || (prolificId ? "?PROLIFIC_PID=" + encodeURIComponent(prolificId) : "");
+          return location.pathname + query + (hotelQuestionnaireMode ? "#hq" : "#q") + (index + 1);
+        }
+
+        function setQuestionHtml(html) {
+          document.getElementById("surveyQuestion").innerHTML = html;
+        }
+
+        function scenarioTable(rows) {
+          return `
+            <div class="preference-table" role="table" aria-label="Attribute preference profile">
+              ${rows.map(row => `
+                <div class="preference-row${row[2] ? " is-top" : ""}" role="row">
+                  <div role="cell">${row[2] ? "<strong>" + escapeHtml(row[0]) + "</strong>" : escapeHtml(row[0])}</div>
+                  <div role="cell">${row[2] ? "<strong>" + escapeHtml(row[1]) + "</strong>" : escapeHtml(row[1])}</div>
+                </div>
+              `).join("")}
+            </div>
+          `;
+        }
+
+        function matrixHtml(page, savedAnswer) {
+          const config = matrixConfigs[page.matrix];
+          const values = (savedAnswer && savedAnswer.values) || {};
+          return `
+            <h1 class="survey-title survey-title--matrix">${config.title(page.hotel)}</h1>
+            <div class="survey-matrix-wrap">
+              <table class="survey-matrix">
+                <thead>
+                  <tr>
+                    <th scope="col"></th>
+                    ${config.columns.map(column => `<th scope="col">${column[1]}</th>`).join("")}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${config.rows.map(row => `
+                    <tr>
+                      <th scope="row">${escapeHtml(row[1])}</th>
+                      ${config.columns.map(column => {
+                        const inputId = `${page.id}_${row[0]}_${column[0]}`;
+                        const checked = values[row[0]] === column[0] ? " checked" : "";
+                        return `
+                          <td>
+                            <label class="survey-radio" for="${escapeHtml(inputId)}">
+                              <input id="${escapeHtml(inputId)}" type="radio" name="${escapeHtml(row[0])}" value="${escapeHtml(column[0])}" required${checked} />
+                              <span>${column[1].replace(/<br>/g, " ")}</span>
+                            </label>
+                          </td>
+                        `;
+                      }).join("")}
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          `;
+        }
+
+        function render() {
+          const index = currentIndex();
+          const pageSet = activePages();
+          const page = pageSet[index];
+          const state = getState();
+          const answer = state.answers[page.id] || {};
+          const stepLabel = document.getElementById("surveyStepLabel");
+          const fill = document.getElementById("surveyProgressFill");
+          const back = document.getElementById("surveyBack");
+          const submit = document.getElementById("surveySubmit");
+          const card = document.querySelector(".survey-card");
+
+          if (hotelQuestionnaireMode) {
+            stepLabel.textContent = `Hotel questionnaire ${index + 1} of ${pageSet.length}`;
+          } else {
+            const questionCount = 8;
+            const displayedStep = Math.min(index + 1, questionCount);
+            stepLabel.textContent = page.type === "browseIntro" ? "Next: Browse Hotel Listings" : "Question " + displayedStep + " of " + questionCount;
+          }
+          fill.style.width = (Math.min(index + 1, pageSet.length) / pageSet.length * 100) + "%";
+          back.hidden = index === 0;
+          submit.textContent = page.type === "browseIntro" ? "Start hotel browsing" : index === pageSet.length - 1 && hotelQuestionnaireMode ? "Continue to reviews" : "Submit";
+          if (card) {
+            card.classList.toggle("survey-card--scenario", page.type === "scenario");
+            card.classList.toggle("survey-card--matrix", page.type === "hotelMatrix");
+          }
+
+          if (page.type === "prolific") {
+            const value = answer.value || prolificId;
+            setQuestionHtml(`
+              <h1 class="survey-title">What is your Prolific ID?</h1>
+              <p class="survey-copy">Please note that this response should auto-fill with the correct ID.</p>
+              <label class="survey-field">
+                <span>Prolific ID</span>
+                <input id="answerInput" name="prolific_id" type="text" value="${escapeHtml(value)}" required autocomplete="off" ${prolificId ? "readonly" : ""} />
+              </label>
+            `);
+          } else if (page.type === "attributes") {
+            setQuestionHtml(`
+              <h1 class="survey-title">Before seeing your preference profile</h1>
+              <p class="survey-copy">Please list all hotel attributes you would consider when choosing a hotel for travel. Separate them with commas.</p>
+              <label class="survey-field">
+                <span>Hotel attributes</span>
+                <textarea id="answerInput" name="attributes" required placeholder="cleanliness, location">${escapeHtml(answer.value || "")}</textarea>
+              </label>
+            `);
+          } else if (page.type === "scenario") {
+            const scenario = page.scenario;
+            setQuestionHtml(`
+              <h1 class="survey-title survey-title--scenario">${escapeHtml(scenario.title)}</h1>
+              <p class="survey-copy">${escapeHtml(scenario.description)}</p>
+              <div class="survey-divider"></div>
+              <div class="survey-profile">
+                <h2>Your Attribute Preference Profile</h2>
+                <p>Importance scale: 1 = least important, 2 = moderately important, 3 = most important. <strong>Bold</strong> = top priorities for this trip.</p>
+                ${scenarioTable(scenario.rows)}
+              </div>
+              <label class="survey-check">
+                <input id="answerInput" type="checkbox" required ${answer.value ? "checked" : ""} />
+                <span>I have read this trip scenario and preference profile.</span>
+              </label>
+            `);
+          } else if (page.type === "hotelMatrix") {
+            setQuestionHtml(matrixHtml(page, answer));
+          } else {
+            setQuestionHtml(`
+              <h1 class="survey-title">Next: Browse Hotel Listings</h1>
+              <p class="survey-copy">You will now visit the hotel browsing platform to view 6 hotel listings. Browse each hotel carefully - examine photos, amenities, and descriptions.</p>
+              <p class="survey-copy">First you will see listings without reviews. After that, you will continue to the version with full reviews.</p>
+            `);
+          }
+        }
+
+        function saveAnswer(page) {
+          const state = getState();
+          state.prolific_id = state.prolific_id || prolificId;
+          state.updated_at = new Date().toISOString();
+          state.answers = state.answers || {};
+          if (page.type === "prolific") {
+            const value = document.getElementById("answerInput").value.trim();
+            state.prolific_id = value;
+            state.answers[page.id] = { value, submitted_at: state.updated_at };
+          } else if (page.type === "attributes") {
+            const value = document.getElementById("answerInput").value.trim();
+            state.answers[page.id] = {
+              value,
+              attributes: value.split(",").map(item => item.trim()).filter(Boolean),
+              submitted_at: state.updated_at
+            };
+          } else if (page.type === "scenario") {
+            state.answers[page.id] = {
+              value: true,
+              scenario_id: page.scenario.id,
+              submitted_at: state.updated_at
+            };
+          } else if (page.type === "hotelMatrix") {
+            const config = matrixConfigs[page.matrix];
+            const values = {};
+            config.rows.forEach(row => {
+              const selected = document.querySelector(`input[name="${row[0]}"]:checked`);
+              values[row[0]] = selected ? selected.value : "";
+            });
+            state.answers[page.id] = {
+              hotel_id: page.hotel.id,
+              hotel_name: page.hotel.name,
+              matrix: page.matrix,
+              values,
+              submitted_at: state.updated_at
+            };
+          }
+          setState(state);
+          logSurveyEvent(page, state.answers[page.id], state);
+          return state;
+        }
+
+        function goToHotelBrowsing(state) {
+          const nextParams = new URLSearchParams(location.search || "");
+          const pid = (state && state.prolific_id) || prolificId || "";
+          if (pid) nextParams.set("PROLIFIC_PID", pid);
+          nextParams.set("survey_stage", "no_reviews");
+          logSurveyEvent({ id: "browse_intro", type: "transition" }, { value: "start_hotel_browsing" }, state || getState());
+          location.href = "hotels-no-reviews.html?" + nextParams.toString();
+        }
+
+        function goToReviewBrowsing(state) {
+          const nextParams = new URLSearchParams(location.search || "");
+          const pid = (state && state.prolific_id) || prolificId || "";
+          if (pid) nextParams.set("PROLIFIC_PID", pid);
+          nextParams.set("survey_stage", "with_reviews");
+          logSurveyEvent({ id: "hotel_questionnaire_complete", type: "transition" }, { value: "start_review_browsing" }, state || getState());
+          location.href = "hotels-with-reviews.html?" + nextParams.toString();
+        }
+
+        document.getElementById("surveyForm").addEventListener("submit", function (event) {
+          event.preventDefault();
+          const index = currentIndex();
+          const pageSet = activePages();
+          const page = pageSet[index];
+          if (page.type === "browseIntro") {
+            goToHotelBrowsing(getState());
+            return;
+          }
+          const state = saveAnswer(page);
+          if (hotelQuestionnaireMode && index === pageSet.length - 1) {
+            goToReviewBrowsing(state);
+            return;
+          }
+          const next = Math.min(index + 1, pageSet.length - 1);
+          history.pushState(null, "", pageUrl(next));
+          render();
+          window.scrollTo({ top: 0, behavior: "auto" });
+        });
+
+        document.getElementById("surveyBack").addEventListener("click", function () {
+          const previous = Math.max(currentIndex() - 1, 0);
+          history.pushState(null, "", pageUrl(previous));
+          render();
+          window.scrollTo({ top: 0, behavior: "auto" });
+        });
+
+        window.addEventListener("popstate", render);
+
+        if (!location.hash || (hotelQuestionnaireMode && !/^#hq\d+$/.test(location.hash)) || (!hotelQuestionnaireMode && !/^#q\d+$/.test(location.hash))) {
+          history.replaceState(null, "", pageUrl(0));
+        }
+        render();
+      })();
+    </script>
   </body>
 </html>
