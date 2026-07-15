@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbxPojbcbSKbiB6nxHdYp1DYE8_en_Ugq1EyaieEN_H2j8kD67VOIv0qzbxk28rUNxx50Q/exec"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260713-6" />
+    <link rel="stylesheet" href="./styles.css?v=20260714-1" />
   </head>
   <body data-survey-page="true">
     <header class="booking-header" aria-label="Site header">
@@ -25,7 +25,7 @@
     <main class="survey-shell" aria-label="Hotel booking survey">
       <section class="survey-card">
         <div class="survey-progress" aria-live="polite">
-          <span id="surveyStepLabel">Question 1 of 8</span>
+          <span id="surveyStepLabel">Question 1 of 3</span>
           <div class="survey-progress__bar" aria-hidden="true">
             <span id="surveyProgressFill"></span>
           </div>
@@ -49,6 +49,7 @@
         const params = new URLSearchParams(location.search);
         const prolificId = params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "";
         const hotelQuestionnaireMode = params.get("survey_stage") === "hotel_questionnaire" || (location.hash || "").startsWith("#hq");
+        const ASSIGNED_ATTRIBUTE_COUNT = 3;
 
         const hotels = [
           { id: "pendry-chicago", name: "Pendry Chicago" },
@@ -59,32 +60,21 @@
           { id: "arlo-chicago", name: "Arlo Chicago" }
         ];
 
-        const likelihoodRows = [
-          ["clean", "Clean"],
-          ["good_service_quality", "Good Service quality"],
-          ["comfortable_rooms", "Comfortable rooms"],
-          ["reliable_wifi", "Reliable Wi-Fi"],
-          ["low_noise_level", "Low noise level"],
-          ["convenient_location", "Convenient location"],
-          ["good_value_for_money", "Good value for money"],
-          ["high_quality_breakfast", "High-quality breakfast"]
-        ];
-
-        const attributeRows = [
-          ["cleanliness", "Cleanliness"],
-          ["service_quality", "Service quality"],
-          ["room_comfort", "Room comfort"],
-          ["wifi_reliability", "Wi-Fi reliability"],
-          ["noise_level", "Noise level"],
-          ["location_convenience", "Location convenience"],
-          ["value_for_money", "Value for money"],
-          ["breakfast_quality", "Breakfast quality"]
+        const attributePool = [
+          { id: "cleanliness", label: "Cleanliness", likelihoodId: "clean", likelihoodLabel: "Clean" },
+          { id: "service_quality", label: "Service quality", likelihoodId: "good_service_quality", likelihoodLabel: "Good Service quality" },
+          { id: "room_comfort", label: "Room comfort", likelihoodId: "comfortable_rooms", likelihoodLabel: "Comfortable rooms" },
+          { id: "wifi_reliability", label: "Wi-Fi reliability", likelihoodId: "reliable_wifi", likelihoodLabel: "Reliable Wi-Fi" },
+          { id: "noise_level", label: "Noise level", likelihoodId: "low_noise_level", likelihoodLabel: "Low noise level" },
+          { id: "location_convenience", label: "Location convenience", likelihoodId: "convenient_location", likelihoodLabel: "Convenient location" },
+          { id: "value_for_money", label: "Value for money", likelihoodId: "good_value_for_money", likelihoodLabel: "Good value for money" },
+          { id: "breakfast_quality", label: "Breakfast quality", likelihoodId: "high_quality_breakfast", likelihoodLabel: "High-quality breakfast" }
         ];
 
         const matrixConfigs = {
           likelihood: {
             title: hotel => `Based on browsing <strong>${escapeHtml(hotel.name)}</strong>, select how likely you think the hotel has each attribute`,
-            rows: likelihoodRows,
+            rows: () => selectedAttributeRows("likelihood"),
             columns: [
               ["extremely_unlikely", "Extremely<br>unlikely"],
               ["somewhat_unlikely", "Somewhat<br>unlikely"],
@@ -95,7 +85,7 @@
           },
           belief: {
             title: hotel => `Based on browsing <strong>${escapeHtml(hotel.name)}</strong>, select your current belief for each attribute.`,
-            rows: attributeRows,
+            rows: () => selectedAttributeRows("attribute"),
             columns: [
               ["yes_positive", "Yes / Positive"],
               ["no_negative", "No / Negative"]
@@ -103,7 +93,7 @@
           },
           confidence: {
             title: () => "How confident are you in each rating above?",
-            rows: attributeRows,
+            rows: () => selectedAttributeRows("attribute"),
             columns: [
               ["low", "low"],
               ["medium", "medium"],
@@ -205,21 +195,24 @@
           }
         ];
 
-        const pages = [
-          { id: "prolific_id", type: "prolific" },
-          { id: "hotel_attributes_prior", type: "attributes" },
-          ...scenarios.map(scenario => ({ id: scenario.id, type: "scenario", scenario })),
-          { id: "browse_intro", type: "browseIntro" }
-        ];
-
         const hotelQuestionnairePages = hotels.flatMap(hotel => [
           { id: `hotelq_${hotel.id}_likelihood`, type: "hotelMatrix", matrix: "likelihood", hotel },
           { id: `hotelq_${hotel.id}_belief`, type: "hotelMatrix", matrix: "belief", hotel },
           { id: `hotelq_${hotel.id}_confidence`, type: "hotelMatrix", matrix: "confidence", hotel }
         ]);
 
+        function standardPages() {
+          const scenario = assignedScenario();
+          return [
+            { id: "prolific_id", type: "prolific" },
+            { id: "hotel_attributes_prior", type: "attributes" },
+            { id: scenario.id, type: "scenario", scenario },
+            { id: "browse_intro", type: "browseIntro" }
+          ];
+        }
+
         function activePages() {
-          return hotelQuestionnaireMode ? hotelQuestionnairePages : pages;
+          return hotelQuestionnaireMode ? hotelQuestionnairePages : standardPages();
         }
 
         function getState() {
@@ -230,6 +223,91 @@
         function setState(state) {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
           sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function randomInteger(max) {
+          if (max <= 0) return 0;
+          try {
+            if (window.crypto && window.crypto.getRandomValues) {
+              const array = new Uint32Array(1);
+              window.crypto.getRandomValues(array);
+              return array[0] % max;
+            }
+          } catch (_) {
+            /* fall through to Math.random */
+          }
+          return Math.floor(Math.random() * max);
+        }
+
+        function shuffled(items) {
+          const copy = items.slice();
+          for (let i = copy.length - 1; i > 0; i -= 1) {
+            const j = randomInteger(i + 1);
+            const temp = copy[i];
+            copy[i] = copy[j];
+            copy[j] = temp;
+          }
+          return copy;
+        }
+
+        function ensureRandomization() {
+          const state = getState();
+          const assignment = state.assignment || {};
+          let changed = false;
+
+          if (!scenarios.some(scenario => scenario.id === assignment.scenario_id)) {
+            const scenario = scenarios[randomInteger(scenarios.length)];
+            assignment.scenario_id = scenario.id;
+            assignment.scenario_title = scenario.title;
+            changed = true;
+          }
+
+          const validAttributeIds = new Set(attributePool.map(attribute => attribute.id));
+          const assignedAttributeIds = Array.isArray(assignment.attribute_ids)
+            ? assignment.attribute_ids.filter(id => validAttributeIds.has(id))
+            : [];
+          if (assignedAttributeIds.length !== ASSIGNED_ATTRIBUTE_COUNT) {
+            assignment.attribute_ids = shuffled(attributePool.map(attribute => attribute.id)).slice(0, ASSIGNED_ATTRIBUTE_COUNT);
+            assignment.attribute_labels = assignment.attribute_ids.map(id => {
+              const attribute = attributePool.find(item => item.id === id);
+              return attribute ? attribute.label : id;
+            });
+            changed = true;
+          } else {
+            assignment.attribute_ids = assignedAttributeIds;
+            assignment.attribute_labels = assignedAttributeIds.map(id => {
+              const attribute = attributePool.find(item => item.id === id);
+              return attribute ? attribute.label : id;
+            });
+          }
+
+          if (!assignment.assigned_at) {
+            assignment.assigned_at = new Date().toISOString();
+            changed = true;
+          }
+
+          if (changed) {
+            state.assignment = assignment;
+            state.updated_at = new Date().toISOString();
+            setState(state);
+          }
+          return assignment;
+        }
+
+        function assignedScenario() {
+          const assignment = ensureRandomization();
+          return scenarios.find(scenario => scenario.id === assignment.scenario_id) || scenarios[0];
+        }
+
+        function selectedAttributeRows(kind) {
+          const assignment = ensureRandomization();
+          const attributes = (assignment.attribute_ids || [])
+            .map(id => attributePool.find(attribute => attribute.id === id))
+            .filter(Boolean);
+          return attributes.map(attribute => kind === "likelihood"
+            ? [attribute.likelihoodId, attribute.likelihoodLabel]
+            : [attribute.id, attribute.label]
+          );
         }
 
         function getSurveyEvents() {
@@ -289,7 +367,8 @@
             timestamp: Date.now(),
             value: {
               answer,
-              survey_page: page.type || "transition"
+              survey_page: page.type || "transition",
+              assignment: state && state.assignment ? state.assignment : null
             }
           };
           const events = getSurveyEvents();
@@ -339,6 +418,7 @@
 
         function matrixHtml(page, savedAnswer) {
           const config = matrixConfigs[page.matrix];
+          const rows = typeof config.rows === "function" ? config.rows() : config.rows;
           const values = (savedAnswer && savedAnswer.values) || {};
           return `
             <h1 class="survey-title survey-title--matrix">${config.title(page.hotel)}</h1>
@@ -351,7 +431,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  ${config.rows.map(row => `
+                  ${rows.map(row => `
                     <tr>
                       <th scope="row">${escapeHtml(row[1])}</th>
                       ${config.columns.map(column => {
@@ -389,7 +469,7 @@
           if (hotelQuestionnaireMode) {
             stepLabel.textContent = `Hotel questionnaire ${index + 1} of ${pageSet.length}`;
           } else {
-            const questionCount = 8;
+            const questionCount = pageSet.filter(item => item.type !== "browseIntro").length;
             const displayedStep = Math.min(index + 1, questionCount);
             stepLabel.textContent = page.type === "browseIntro" ? "Next: Browse Hotel Listings" : "Question " + displayedStep + " of " + questionCount;
           }
@@ -449,8 +529,10 @@
 
         function saveAnswer(page) {
           const state = getState();
+          const assignment = ensureRandomization();
           state.prolific_id = state.prolific_id || prolificId;
           state.updated_at = new Date().toISOString();
+          state.assignment = assignment;
           state.answers = state.answers || {};
           if (page.type === "prolific") {
             const value = document.getElementById("answerInput").value.trim();
@@ -467,12 +549,14 @@
             state.answers[page.id] = {
               value: true,
               scenario_id: page.scenario.id,
+              scenario_title: page.scenario.title,
               submitted_at: state.updated_at
             };
           } else if (page.type === "hotelMatrix") {
             const config = matrixConfigs[page.matrix];
+            const rows = typeof config.rows === "function" ? config.rows() : config.rows;
             const values = {};
-            config.rows.forEach(row => {
+            rows.forEach(row => {
               const selected = document.querySelector(`input[name="${row[0]}"]:checked`);
               values[row[0]] = selected ? selected.value : "";
             });
@@ -480,6 +564,8 @@
               hotel_id: page.hotel.id,
               hotel_name: page.hotel.name,
               matrix: page.matrix,
+              assigned_attribute_ids: assignment.attribute_ids || [],
+              assigned_attribute_labels: assignment.attribute_labels || [],
               values,
               submitted_at: state.updated_at
             };
