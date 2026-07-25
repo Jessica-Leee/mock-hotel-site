@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbxPojbcbSKbiB6nxHdYp1DYE8_en_Ugq1EyaieEN_H2j8kD67VOIv0qzbxk28rUNxx50Q/exec"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260725-11" />
+    <link rel="stylesheet" href="./styles.css?v=20260725-12" />
   </head>
   <body data-survey-page="true">
     <header class="booking-header" aria-label="Site header">
@@ -281,8 +281,7 @@
           { id: "post_review_reveal", type: "actualReveal" },
           { id: "post_review_satisfaction", type: "likert7" },
           { id: "post_review_switch", type: "switchChoice" },
-          { id: "post_review_switch_confidence", type: "rangeConfidence" },
-          { id: "post_review_surprise", type: "attributeSurprise" }
+          { id: "post_review_confidence_surprise", type: "confidenceSurprise" }
         ];
 
         function standardPages() {
@@ -683,6 +682,16 @@
           `;
         }
 
+        function confidenceSurpriseHtml(savedAnswer) {
+          const confidenceValue = savedAnswer && savedAnswer.switch_confidence ? savedAnswer.switch_confidence : "50";
+          const surpriseValues = savedAnswer && savedAnswer.surprise_values ? savedAnswer.surprise_values : {};
+          return `
+            ${confidenceRangeHtml({ value: confidenceValue })}
+            <div class="survey-divider"></div>
+            ${attributeSurpriseHtml({ values: surpriseValues })}
+          `;
+        }
+
         function render() {
           const index = currentIndex();
           const pageSet = activePages();
@@ -767,6 +776,8 @@
             setQuestionHtml(confidenceRangeHtml(answer));
           } else if (page.type === "attributeSurprise") {
             setQuestionHtml(attributeSurpriseHtml(answer));
+          } else if (page.type === "confidenceSurprise") {
+            setQuestionHtml(confidenceSurpriseHtml(answer));
           } else {
             setQuestionHtml(`
               <h1 class="survey-title">Next: Browse Hotel Listings</h1>
@@ -870,6 +881,20 @@
               hotel_id: chosenHotel().id,
               hotel_name: chosenHotel().name,
               values,
+              submitted_at: state.updated_at
+            };
+          } else if (page.type === "confidenceSurprise") {
+            const confidenceInput = document.querySelector(`input[name="switch_confidence"]`);
+            const values = {};
+            attributePool.forEach(attribute => {
+              const input = document.querySelector(`input[name="${attribute.id}"]`);
+              values[attribute.id] = input ? input.value : "";
+            });
+            state.answers[page.id] = {
+              hotel_id: chosenHotel().id,
+              hotel_name: chosenHotel().name,
+              switch_confidence: confidenceInput ? confidenceInput.value : "",
+              surprise_values: values,
               submitted_at: state.updated_at
             };
           }
