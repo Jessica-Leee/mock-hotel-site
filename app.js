@@ -2,11 +2,13 @@
   const STORAGE_KEY = "mock_hotel_logs_v2";
   const UI_STATE_KEY = "mock_hotel_ui_state_v1";
   const HOTEL_VIEW_STATE_KEY = "mock_hotel_no_review_views_v1";
+  const HOTEL_ORDER_STATE_KEY = "mock_hotel_visible_order_v1";
   const NO_REVIEW_VIEW_SECONDS = 30;
 
   let activeHotelSession = null;
   let modalScrollCleanup = null;
   let randomizedVisibleHotelIds = null;
+  let balancedVisibleReviewCount = null;
   let noReviewTimer = null;
   const REVIEW_INITIAL_VISIBLE = 12;
   const REVIEW_BATCH_VISIBLE = 24;
@@ -10298,6 +10300,28 @@
     return `${HOTEL_VIEW_STATE_KEY}:${participantStorageSuffix()}`;
   }
 
+  function hotelOrderStorageKey() {
+    return `${HOTEL_ORDER_STATE_KEY}:${participantStorageSuffix()}`;
+  }
+
+  function persistedVisibleHotelIds() {
+    const required = requiredHotelIds();
+    const requiredSet = new Set(required);
+    const stored = safeJsonParse(localStorage.getItem(hotelOrderStorageKey()), []);
+    const validStored = Array.isArray(stored)
+      ? stored.filter(id => requiredSet.has(id))
+      : [];
+
+    if (validStored.length === required.length && new Set(validStored).size === required.length) {
+      return validStored;
+    }
+
+    const nextOrder = shuffled(required);
+    localStorage.setItem(hotelOrderStorageKey(), JSON.stringify(nextOrder));
+    logEvent("hotel_order_randomized", { hotelIds: nextOrder });
+    return nextOrder;
+  }
+
   function getHotelViewState() {
     const state = safeJsonParse(localStorage.getItem(hotelViewStorageKey()), {}) || {};
     return {
@@ -10357,9 +10381,10 @@
     return requiredHotelIds().every(id => viewed.has(id));
   }
 
-  function markNoReviewHotelViewed(hotelId) {
+  function markNoReviewHotelViewed(hotelId, reason = "view_complete") {
     const state = getHotelViewState();
     const viewed = new Set(state.viewedHotelIds);
+    if (viewed.has(hotelId)) return;
     viewed.add(hotelId);
     state.viewedHotelIds = Array.from(viewed);
     if (state.deadlines) delete state.deadlines[hotelId];
@@ -10367,7 +10392,7 @@
     setHotelViewState(state);
     logEvent("no_review_hotel_view_complete", {
       hotelId,
-      reason: "timer_finished",
+      reason,
       viewedCount: state.viewedHotelIds.length,
       requiredCount: requiredHotelIds().length
     });
@@ -11505,10 +11530,25 @@
 
   function visibleHotels() {
     if (!randomizedVisibleHotelIds) {
-      randomizedVisibleHotelIds = shuffled(requiredHotelIds());
+      randomizedVisibleHotelIds = persistedVisibleHotelIds();
     }
     const hotelById = new Map(HOTELS.map(hotel => [hotel.id, hotel]));
     return randomizedVisibleHotelIds.map(id => hotelById.get(id)).filter(Boolean);
+  }
+
+  function balancedReviewCount() {
+    if (balancedVisibleReviewCount !== null) return balancedVisibleReviewCount;
+    const counts = requiredHotelIds()
+      .map(id => exactReviewsFor(id).length)
+      .filter(count => count > 0);
+    balancedVisibleReviewCount = counts.length ? Math.min(...counts) : 0;
+    return balancedVisibleReviewCount;
+  }
+
+  function balancedReviews(hotel) {
+    const reviews = Array.isArray(hotel.reviews) ? hotel.reviews : [];
+    const limit = balancedReviewCount();
+    return limit > 0 ? reviews.slice(0, limit) : reviews;
   }
 
   function renderVersionLinks() {
@@ -11556,13 +11596,13 @@
       box.innerHTML = unlocked ? `
         <div>
           <strong>Hotel questions unlocked:</strong>
-          You have viewed all 3 hotel detail popups for the required time.
+          You have opened all 3 hotel detail popups.
         </div>
         <button class="btn study-flow__btn" type="button" data-flow-continue="${escapeXml(href)}">Continue to hotel questions</button>
       ` : `
         <div>
           <strong>Hotel questions locked:</strong>
-          Open each of the 3 hotel detail popups and view it for 30 seconds. You cannot reopen a hotel after its 30-second view is complete.
+          Open each of the 3 hotel detail popups. You may close a popup whenever you are done; each popup has a maximum viewing time of 30 seconds and cannot be reopened after closing or timing out.
           <div class="study-flow__note">Completed ${formatCount(viewedCount)} of ${formatCount(required.length)} hotel popups.</div>
         </div>
         <button class="btn study-flow__btn" type="button" disabled>Continue to hotel questions</button>
@@ -11616,19 +11656,12 @@
         </div>
       `;
 
-      const tags = visibleTags(h);
       const isCompletedNoReviewView = !state.showReviews && completedNoReviewViews.has(h.id);
 
       card.innerHTML = `
         <div class="card__body">
           <div>
             <h3 class="hotel-title">${escapeXml(h.name)}</h3>
-            <div class="listing-meta">${escapeXml(h.locationScoreText || "")}</div>
-            <div class="booking-roomline">One selected room option available for this mock listing</div>
-            ${tags.length ? `<div>${tags.map(t => `<span class="pill2">${escapeXml(t)}</span>`).join("")}</div>` : ""}
-            <div class="amenities">
-              ${h.amenities.slice(0, 4).map(a => amenityChipHtml(a)).join("")}
-            </div>
           </div>
 
           <div class="priceBox priceBox--text">
@@ -11808,7 +11841,7 @@
   }
 
   function reviewsHtml(hotel) {
-    const reviews = Array.isArray(hotel.reviews) ? hotel.reviews : [];
+    const reviews = balancedReviews(hotel);
     const total = reviews.length;
     const initialVisible = total;
     return `
@@ -11927,7 +11960,7 @@
           <button class="xbtn" type="button" data-close="1" aria-label="Close">x</button>
         </div>
         <div class="modal-timer" data-no-review-timer>
-          This hotel popup is limited to 30 seconds total. After time runs out, it will close and cannot be viewed again.
+          You may close this popup whenever you are done. Maximum viewing time: 30 seconds. After time runs out, it will close and cannot be viewed again.
         </div>
 
         <div class="modal__scroll" id="hotelModalScroll" data-hotel-scroll="1">
@@ -12003,11 +12036,11 @@
       const remainingMs = Math.max(0, deadline - Date.now());
       const remainingSeconds = Math.ceil(remainingMs / 1000);
       if (timerEl) {
-        timerEl.textContent = `This hotel popup is limited to ${remainingSeconds} seconds total. After time runs out, it will close and cannot be viewed again.`;
+        timerEl.textContent = `You may close this popup whenever you are done. Maximum viewing time remaining: ${remainingSeconds} seconds.`;
       }
       if (remainingMs <= 0) {
         clearNoReviewTimer();
-        markNoReviewHotelViewed(hotelId);
+        markNoReviewHotelViewed(hotelId, "time_limit_reached");
         closeModal("time_limit");
         renderResults();
       }
@@ -12132,8 +12165,15 @@
   function closeModal(source) {
     const root = document.getElementById("modalRoot");
     if (!root.classList.contains("is-open")) return;
+    let shouldRenderAfterClose = false;
 
     if (activeHotelSession) {
+      const page = pageState();
+      if (!page.showReviews && !viewedHotelSet().has(activeHotelSession.hotelId)) {
+        markNoReviewHotelViewed(activeHotelSession.hotelId, source === "time_limit" ? "time_limit_reached" : "closed_before_time_limit");
+        shouldRenderAfterClose = true;
+      }
+
       logEvent("hotel_page_time", {
         hotelId: activeHotelSession.hotelId,
         durationMs: Date.now() - activeHotelSession.startedAt,
@@ -12157,6 +12197,7 @@
     document.body.style.overflow = "";
     if ((location.hash || "").startsWith("#hotel/") || (location.hash || "").startsWith("#map/")) location.hash = "#results";
     logEvent("close_modal", { source });
+    if (shouldRenderAfterClose) renderResults();
   }
 
   function wireGlobalHandlers() {
