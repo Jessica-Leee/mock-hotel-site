@@ -88,6 +88,9 @@ body{
   width:min(1160px, 100%);
   box-shadow:none;
 }
+.survey-card--reveal{
+  width:min(980px, 100%);
+}
 .survey-progress{
   display:grid;
   grid-template-columns:auto minmax(160px, 1fr);
@@ -311,6 +314,95 @@ body{
   height:18px;
   margin:1px 0 0;
   accent-color:#0071c2;
+}
+.survey-option-list{
+  margin-top:24px;
+  display:grid;
+  gap:14px;
+}
+.survey-option{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  color:#555;
+  font-size:18px;
+  line-height:1.35;
+  cursor:pointer;
+}
+.survey-option input{
+  width:20px;
+  height:20px;
+  margin:0;
+  accent-color:#0071c2;
+}
+.survey-reveal{
+  border-left:7px solid #f59e0b;
+  border-radius:8px;
+  background:#fff8e6;
+  padding:24px;
+}
+.survey-reveal .survey-title{
+  color:#7c3f10;
+}
+.actual-attr-table{
+  margin-top:18px;
+  display:grid;
+  border:1px solid #ead8a6;
+  border-radius:8px;
+  overflow:hidden;
+  background:#fff;
+}
+.actual-attr-row{
+  display:grid;
+  grid-template-columns:minmax(220px, 1fr) minmax(160px, 220px);
+  border-top:1px solid #f0e2ba;
+}
+.actual-attr-row:first-child{
+  border-top:0;
+}
+.actual-attr-row > div{
+  padding:10px 12px;
+  color:#1f2937;
+  font-size:14px;
+}
+.actual-attr-row > div + div{
+  border-left:1px solid #f0e2ba;
+}
+.actual-attr-row--head{
+  background:#fff3cf;
+  font-weight:850;
+}
+.survey-range-list{
+  margin-top:26px;
+  display:grid;
+  gap:18px;
+}
+.survey-range{
+  margin-top:24px;
+  display:grid;
+  grid-template-columns:minmax(180px, 260px) minmax(240px, 1fr) 44px;
+  gap:16px;
+  align-items:center;
+  color:#555;
+  font-size:16px;
+  line-height:1.35;
+}
+.survey-range--row{
+  margin-top:0;
+}
+.survey-range input[type="range"]{
+  width:100%;
+  accent-color:#0071c2;
+}
+.survey-range output{
+  color:#1f2937;
+  font-weight:800;
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.survey-complete{
+  text-align:center;
+  padding:36px 0 24px;
 }
 .survey-actions{
   border-top:1px solid #e6eaf2;
@@ -1578,6 +1670,14 @@ body{
   .survey-progress{grid-template-columns:1fr;gap:8px}
   .survey-title{font-size:23px}
   .survey-title--matrix{font-size:20px}
+  .survey-reveal{padding:18px}
+  .actual-attr-row{grid-template-columns:1fr}
+  .actual-attr-row > div + div{
+    border-left:0;
+    border-top:1px solid #f0e2ba;
+  }
+  .survey-range{grid-template-columns:1fr 1fr auto; gap:8px}
+  .survey-range span{grid-column:1 / -1}
   .preference-row{grid-template-columns:1fr}
   .preference-row > div + div{
     border-left:0;

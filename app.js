@@ -2,6 +2,7 @@
   const STORAGE_KEY = "mock_hotel_logs_v2";
   const UI_STATE_KEY = "mock_hotel_ui_state_v1";
   const HOTEL_VIEW_STATE_KEY = "mock_hotel_no_review_views_v1";
+  const HOTEL_REVIEW_VIEW_STATE_KEY = "mock_hotel_review_views_v1";
   const HOTEL_ORDER_STATE_KEY = "mock_hotel_visible_order_v1";
   const NO_REVIEW_VIEW_SECONDS = 30;
 
@@ -10300,6 +10301,10 @@
     return `${HOTEL_VIEW_STATE_KEY}:${participantStorageSuffix()}`;
   }
 
+  function hotelReviewViewStorageKey() {
+    return `${HOTEL_REVIEW_VIEW_STATE_KEY}:${participantStorageSuffix()}`;
+  }
+
   function hotelOrderStorageKey() {
     return `${HOTEL_ORDER_STATE_KEY}:${participantStorageSuffix()}`;
   }
@@ -10333,6 +10338,18 @@
 
   function setHotelViewState(state) {
     localStorage.setItem(hotelViewStorageKey(), JSON.stringify(state || {}));
+  }
+
+  function getHotelReviewViewState() {
+    const state = safeJsonParse(localStorage.getItem(hotelReviewViewStorageKey()), {}) || {};
+    return {
+      viewedHotelIds: Array.isArray(state.viewedHotelIds) ? state.viewedHotelIds.filter(Boolean) : [],
+      updatedAt: state.updatedAt || ""
+    };
+  }
+
+  function setHotelReviewViewState(state) {
+    localStorage.setItem(hotelReviewViewStorageKey(), JSON.stringify(state || {}));
   }
 
   function finalizeExpiredNoReviewViews() {
@@ -10372,12 +10389,21 @@
     return new Set(getHotelViewState().viewedHotelIds);
   }
 
+  function viewedReviewHotelSet() {
+    return new Set(getHotelReviewViewState().viewedHotelIds);
+  }
+
   function requiredHotelIds() {
     return Array.from(VISIBLE_HOTEL_IDS);
   }
 
   function noReviewViewingComplete() {
     const viewed = viewedHotelSet();
+    return requiredHotelIds().every(id => viewed.has(id));
+  }
+
+  function reviewViewingComplete() {
+    const viewed = viewedReviewHotelSet();
     return requiredHotelIds().every(id => viewed.has(id));
   }
 
@@ -10391,6 +10417,22 @@
     state.updatedAt = new Date().toISOString();
     setHotelViewState(state);
     logEvent("no_review_hotel_view_complete", {
+      hotelId,
+      reason,
+      viewedCount: state.viewedHotelIds.length,
+      requiredCount: requiredHotelIds().length
+    });
+  }
+
+  function markReviewHotelViewed(hotelId, reason = "review_modal_closed") {
+    const state = getHotelReviewViewState();
+    const viewed = new Set(state.viewedHotelIds);
+    if (viewed.has(hotelId)) return;
+    viewed.add(hotelId);
+    state.viewedHotelIds = Array.from(viewed);
+    state.updatedAt = new Date().toISOString();
+    setHotelReviewViewState(state);
+    logEvent("review_hotel_view_complete", {
       hotelId,
       reason,
       viewedCount: state.viewedHotelIds.length,
@@ -11581,11 +11623,24 @@
     box.className = "study-flow";
 
     if (state.showReviews) {
-      box.innerHTML = `
+      const href = `index.html${surveyQueryString("post_review")}#pr1`;
+      const viewed = viewedReviewHotelSet();
+      const required = requiredHotelIds();
+      const viewedCount = required.filter(id => viewed.has(id)).length;
+      const unlocked = viewedCount >= required.length;
+      box.innerHTML = unlocked ? `
         <div>
-          <strong>Browsing stage 2:</strong>
-          You are now viewing the same 3 hotel listings with guest reviews.
+          <strong>Post-review questions unlocked:</strong>
+          You have opened review popups for all 3 hotels.
         </div>
+        <button class="btn study-flow__btn" type="button" data-flow-continue="${escapeXml(href)}">Continue to post-review questions</button>
+      ` : `
+        <div>
+          <strong>Post-review questions locked:</strong>
+          Open the review popup for each of the 3 hotels before continuing.
+          <div class="study-flow__note">Completed ${formatCount(viewedCount)} of ${formatCount(required.length)} review popups.</div>
+        </div>
+        <button class="btn study-flow__btn" type="button" disabled>Continue to post-review questions</button>
       `;
     } else {
       const href = `index.html${surveyQueryString("hotel_questionnaire")}#hq1`;
@@ -11642,11 +11697,12 @@
       card.setAttribute("data-hotel-id", h.id);
 
       const score10 = bookingScore(h.guestRating);
+      const displayedReviewCount = state.showReviews ? balancedReviews(h).length : h.guestReviewCount;
       const scoreBox = state.showReviews ? `
         <div class="booking-scoreline">
           <div>
             <div class="booking-scoreword">${escapeXml(bookingScoreWord(score10))}</div>
-            <div class="booking-reviewcount">${formatCount(h.guestReviewCount)} reviews</div>
+            <div class="booking-reviewcount">${formatCount(displayedReviewCount)} reviews</div>
           </div>
           <div class="booking-score">${escapeXml(score10)}</div>
         </div>
@@ -12171,6 +12227,10 @@
       const page = pageState();
       if (!page.showReviews && !viewedHotelSet().has(activeHotelSession.hotelId)) {
         markNoReviewHotelViewed(activeHotelSession.hotelId, source === "time_limit" ? "time_limit_reached" : "closed_before_time_limit");
+        shouldRenderAfterClose = true;
+      }
+      if (page.showReviews && !viewedReviewHotelSet().has(activeHotelSession.hotelId)) {
+        markReviewHotelViewed(activeHotelSession.hotelId, "review_modal_closed");
         shouldRenderAfterClose = true;
       }
 
