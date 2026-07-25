@@ -1,9 +1,13 @@
 (() => {
   const STORAGE_KEY = "mock_hotel_logs_v2";
   const UI_STATE_KEY = "mock_hotel_ui_state_v1";
+  const HOTEL_VIEW_STATE_KEY = "mock_hotel_no_review_views_v1";
+  const NO_REVIEW_VIEW_SECONDS = 30;
 
   let activeHotelSession = null;
   let modalScrollCleanup = null;
+  let randomizedVisibleHotelIds = null;
+  let noReviewTimer = null;
   const REVIEW_INITIAL_VISIBLE = 12;
   const REVIEW_BATCH_VISIBLE = 24;
 
@@ -10260,6 +10264,135 @@
     try { return JSON.parse(s); } catch (_) { return fallback; }
   }
 
+  function randomInteger(max) {
+    if (max <= 0) return 0;
+    try {
+      if (window.crypto && window.crypto.getRandomValues) {
+        const array = new Uint32Array(1);
+        window.crypto.getRandomValues(array);
+        return array[0] % max;
+      }
+    } catch (_) {
+      /* fall through to Math.random */
+    }
+    return Math.floor(Math.random() * max);
+  }
+
+  function shuffled(items) {
+    const copy = items.slice();
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+      const j = randomInteger(i + 1);
+      const temp = copy[i];
+      copy[i] = copy[j];
+      copy[j] = temp;
+    }
+    return copy;
+  }
+
+  function participantStorageSuffix() {
+    const params = new URLSearchParams(location.search || "");
+    return params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "anonymous";
+  }
+
+  function hotelViewStorageKey() {
+    return `${HOTEL_VIEW_STATE_KEY}:${participantStorageSuffix()}`;
+  }
+
+  function getHotelViewState() {
+    const state = safeJsonParse(localStorage.getItem(hotelViewStorageKey()), {}) || {};
+    return {
+      viewedHotelIds: Array.isArray(state.viewedHotelIds) ? state.viewedHotelIds.filter(Boolean) : [],
+      deadlines: state.deadlines && typeof state.deadlines === "object" ? state.deadlines : {},
+      updatedAt: state.updatedAt || ""
+    };
+  }
+
+  function setHotelViewState(state) {
+    localStorage.setItem(hotelViewStorageKey(), JSON.stringify(state || {}));
+  }
+
+  function finalizeExpiredNoReviewViews() {
+    const state = getHotelViewState();
+    const viewed = new Set(state.viewedHotelIds);
+    const deadlines = state.deadlines || {};
+    const newlyCompleted = [];
+    const now = Date.now();
+
+    requiredHotelIds().forEach(id => {
+      const deadline = Number(deadlines[id] || 0);
+      if (deadline && deadline <= now && !viewed.has(id)) {
+        viewed.add(id);
+        newlyCompleted.push(id);
+      }
+      if (deadline && deadline <= now) delete deadlines[id];
+    });
+
+    if (!newlyCompleted.length) return;
+
+    state.viewedHotelIds = Array.from(viewed);
+    state.deadlines = deadlines;
+    state.updatedAt = new Date().toISOString();
+    setHotelViewState(state);
+    newlyCompleted.forEach(hotelId => {
+      logEvent("no_review_hotel_view_complete", {
+        hotelId,
+        reason: "deadline_expired",
+        viewedCount: state.viewedHotelIds.length,
+        requiredCount: requiredHotelIds().length
+      });
+    });
+  }
+
+  function viewedHotelSet() {
+    finalizeExpiredNoReviewViews();
+    return new Set(getHotelViewState().viewedHotelIds);
+  }
+
+  function requiredHotelIds() {
+    return Array.from(VISIBLE_HOTEL_IDS);
+  }
+
+  function noReviewViewingComplete() {
+    const viewed = viewedHotelSet();
+    return requiredHotelIds().every(id => viewed.has(id));
+  }
+
+  function markNoReviewHotelViewed(hotelId) {
+    const state = getHotelViewState();
+    const viewed = new Set(state.viewedHotelIds);
+    viewed.add(hotelId);
+    state.viewedHotelIds = Array.from(viewed);
+    if (state.deadlines) delete state.deadlines[hotelId];
+    state.updatedAt = new Date().toISOString();
+    setHotelViewState(state);
+    logEvent("no_review_hotel_view_complete", {
+      hotelId,
+      reason: "timer_finished",
+      viewedCount: state.viewedHotelIds.length,
+      requiredCount: requiredHotelIds().length
+    });
+  }
+
+  function ensureNoReviewDeadline(hotelId) {
+    const state = getHotelViewState();
+    if (state.viewedHotelIds.includes(hotelId)) return 0;
+
+    const existingDeadline = Number((state.deadlines || {})[hotelId] || 0);
+    if (existingDeadline > Date.now()) return existingDeadline;
+    if (existingDeadline && existingDeadline <= Date.now()) {
+      markNoReviewHotelViewed(hotelId);
+      return 0;
+    }
+
+    const deadline = Date.now() + (NO_REVIEW_VIEW_SECONDS * 1000);
+    state.deadlines = state.deadlines || {};
+    state.deadlines[hotelId] = deadline;
+    state.updatedAt = new Date().toISOString();
+    setHotelViewState(state);
+    logEvent("no_review_hotel_timer_started", { hotelId, seconds: NO_REVIEW_VIEW_SECONDS });
+    return deadline;
+  }
+
   function getLogs() {
     return safeJsonParse(localStorage.getItem(STORAGE_KEY), []) || [];
   }
@@ -11359,7 +11492,11 @@
   }
 
   function visibleHotels() {
-    return HOTELS.filter(hotel => VISIBLE_HOTEL_IDS.has(hotel.id));
+    if (!randomizedVisibleHotelIds) {
+      randomizedVisibleHotelIds = shuffled(requiredHotelIds());
+    }
+    const hotelById = new Map(HOTELS.map(hotel => [hotel.id, hotel]));
+    return randomizedVisibleHotelIds.map(id => hotelById.get(id)).filter(Boolean);
   }
 
   function renderVersionLinks() {
@@ -11378,11 +11515,16 @@
   }
 
   function renderStudyFlowCta() {
-    const head = document.querySelector(".content__head");
-    if (!head || document.getElementById("studyFlowCta")) return;
+    const results = document.getElementById("results");
+    if (!results) return;
 
     const state = pageState();
-    const box = document.createElement("div");
+    let box = document.getElementById("studyFlowCta");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "studyFlowCta";
+      results.insertAdjacentElement("afterend", box);
+    }
     box.id = "studyFlowCta";
     box.className = "study-flow";
 
@@ -11395,16 +11537,25 @@
       `;
     } else {
       const href = `index.html${surveyQueryString("hotel_questionnaire")}#hq1`;
-      box.innerHTML = `
+      const viewed = viewedHotelSet();
+      const required = requiredHotelIds();
+      const viewedCount = required.filter(id => viewed.has(id)).length;
+      const unlocked = viewedCount >= required.length;
+      box.innerHTML = unlocked ? `
         <div>
-          <strong>Browsing stage 1:</strong>
-          View all 3 hotel listings without guest reviews. When you are finished, answer the hotel questions before continuing to full reviews.
+          <strong>Hotel questions unlocked:</strong>
+          You have viewed all 3 hotel detail popups for the required time.
         </div>
-        <a class="btn study-flow__btn" href="${escapeXml(href)}">Continue to hotel questions</a>
+        <button class="btn study-flow__btn" type="button" data-flow-continue="${escapeXml(href)}">Continue to hotel questions</button>
+      ` : `
+        <div>
+          <strong>Hotel questions locked:</strong>
+          Open each of the 3 hotel detail popups and view it for 30 seconds. You cannot reopen a hotel after its 30-second view is complete.
+          <div class="study-flow__note">Completed ${formatCount(viewedCount)} of ${formatCount(required.length)} hotel popups.</div>
+        </div>
+        <button class="btn study-flow__btn" type="button" disabled>Continue to hotel questions</button>
       `;
     }
-
-    head.insertAdjacentElement("afterend", box);
   }
 
   function renderResults() {
@@ -11429,6 +11580,7 @@
     }
 
     const hotels = visibleHotels();
+    const completedNoReviewViews = state.showReviews ? new Set() : viewedHotelSet();
     const results = document.getElementById("results");
     results.innerHTML = "";
 
@@ -11453,6 +11605,7 @@
       `;
 
       const tags = visibleTags(h);
+      const isCompletedNoReviewView = !state.showReviews && completedNoReviewViews.has(h.id);
 
       card.innerHTML = `
         <div class="card__body">
@@ -11473,7 +11626,9 @@
               <div class="per">per night - comparable study rate</div>
             </div>
             <div class="cta">
-              <button class="btn" type="button" data-open="${h.id}">${state.showReviews ? "Read reviews" : "View details"}</button>
+              ${isCompletedNoReviewView
+                ? `<button class="btn" type="button" disabled>Viewed</button>`
+                : `<button class="btn" type="button" data-open="${h.id}">${state.showReviews ? "Read reviews" : "View details"}</button>`}
             </div>
           </div>
         </div>
@@ -11481,6 +11636,7 @@
 
       results.appendChild(card);
     }
+    renderStudyFlowCta();
   }
 
   function ratingBreakdownRows(hotel) {
@@ -11709,6 +11865,9 @@
           </div>
           <button class="xbtn" type="button" data-close="1" aria-label="Close">x</button>
         </div>
+        <div class="modal-timer" data-no-review-timer>
+          This hotel popup is limited to 30 seconds total. After time runs out, it will close and cannot be viewed again.
+        </div>
 
         <div class="modal__scroll" id="hotelModalScroll" data-hotel-scroll="1">
           <div class="modal__grid${state.showReviews ? "" : " modal__grid--single"}">
@@ -11760,10 +11919,54 @@
     `;
   }
 
+  function clearNoReviewTimer() {
+    if (noReviewTimer) {
+      clearInterval(noReviewTimer);
+      noReviewTimer = null;
+    }
+  }
+
+  function startNoReviewTimer(hotelId) {
+    clearNoReviewTimer();
+    const root = document.getElementById("modalRoot");
+    const timerEl = root.querySelector("[data-no-review-timer]");
+    const deadline = ensureNoReviewDeadline(hotelId);
+    if (!deadline) {
+      closeModal("already_viewed");
+      renderResults();
+      return;
+    }
+
+    const tick = () => {
+      const remainingMs = Math.max(0, deadline - Date.now());
+      const remainingSeconds = Math.ceil(remainingMs / 1000);
+      if (timerEl) {
+        timerEl.textContent = `This hotel popup is limited to ${remainingSeconds} seconds total. After time runs out, it will close and cannot be viewed again.`;
+      }
+      if (remainingMs <= 0) {
+        clearNoReviewTimer();
+        markNoReviewHotelViewed(hotelId);
+        closeModal("time_limit");
+        renderResults();
+      }
+    };
+
+    tick();
+    noReviewTimer = window.setInterval(tick, 250);
+  }
+
   function openHotelModal(hotelId, source) {
     const hotel = HOTELS.find(h => h.id === hotelId);
     if (!hotel) {
       if ((location.hash || "").startsWith("#hotel/")) location.hash = "#results";
+      return;
+    }
+
+    const page = pageState();
+    if (!page.showReviews && viewedHotelSet().has(hotelId)) {
+      logEvent("no_review_hotel_reopen_blocked", { hotelId, source });
+      if ((location.hash || "").startsWith("#hotel/")) location.hash = "#results";
+      renderResults();
       return;
     }
 
@@ -11784,6 +11987,7 @@
 
     const root = document.getElementById("modalRoot");
     if (typeof modalScrollCleanup === "function") modalScrollCleanup();
+    clearNoReviewTimer();
 
     root.setAttribute("data-active-hotel", hotelId);
     root.removeAttribute("data-active-map");
@@ -11791,9 +11995,10 @@
     root.classList.add("is-open");
     root.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
-    location.hash = "#hotel/" + hotelId;
+    const targetHash = "#hotel/" + hotelId;
+    if (location.hash !== targetHash) location.hash = targetHash;
 
-    logEvent("open_hotel", { hotelId, source, reviews: pageState().showReviews });
+    logEvent("open_hotel", { hotelId, source, reviews: page.showReviews });
 
     const scrollEl = root.querySelector("[data-hotel-scroll='1']");
     if (scrollEl) {
@@ -11819,6 +12024,8 @@
       a.addEventListener("mouseenter", () => logEvent("amenity_hover", { hotelId, amenity: a.getAttribute("data-amenity") }));
       a.addEventListener("click", () => logEvent("amenity_click", { hotelId, amenity: a.getAttribute("data-amenity") }));
     });
+
+    if (!page.showReviews) startNoReviewTimer(hotelId);
 
     const reviews = root.querySelector("#reviews");
     if (reviews) {
@@ -11878,6 +12085,7 @@
     }
 
     if (typeof modalScrollCleanup === "function") modalScrollCleanup();
+    clearNoReviewTimer();
 
     root.classList.remove("is-open");
     root.removeAttribute("data-active-hotel");
@@ -11927,6 +12135,14 @@
       const close = e.target && e.target.closest && e.target.closest("[data-close='1']");
       if (close) {
         closeModal("click");
+        return;
+      }
+
+      const flowContinue = e.target && e.target.closest && e.target.closest("[data-flow-continue]");
+      if (flowContinue) {
+        const href = flowContinue.getAttribute("data-flow-continue");
+        logEvent("study_flow_continue", { href, phase: pageState().phase });
+        location.replace(href);
       }
     });
 
@@ -11954,6 +12170,8 @@
       const h = location.hash || "";
       if (h.startsWith("#hotel/")) {
         const id = h.split("/")[1];
+        const modalRoot = document.getElementById("modalRoot");
+        if (modalRoot && modalRoot.classList.contains("is-open") && modalRoot.getAttribute("data-active-hotel") === id) return;
         openHotelModal(id, "deeplink");
       }
       if (h.startsWith("#map/")) {
