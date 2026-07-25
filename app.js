@@ -10535,8 +10535,7 @@
               }
           ],
           "detailNotes": [
-              "Couples in particular like the location - they rated it 9.5 for a two-person trip.",
-              "Distance in property description is calculated using © OpenStreetMap."
+              "Couples in particular like the location - they rated it 9.5 for a two-person trip."
           ],
           "facts": [
               "Excellent location rated 9.7/10 from 798 reviews.",
@@ -11146,8 +11145,7 @@
               }
           ],
           "detailNotes": [
-              "Couples in particular like the location - they rated it 9.5 for a two-person trip.",
-              "Distance in property description is calculated using © OpenStreetMap."
+              "Couples in particular like the location - they rated it 9.5 for a two-person trip."
           ],
           "facts": [
               "Excellent location rated 9.5/10 from 373 reviews.",
@@ -11299,8 +11297,7 @@
               }
           ],
           "detailNotes": [
-              "Couples in particular like the location - they rated it 9.7 for a two-person trip.",
-              "Distance in property description is calculated using © OpenStreetMap."
+              "Couples in particular like the location - they rated it 9.7 for a two-person trip."
           ],
           "facts": [
               "Overall guest score rated 8.9/10 from 1,955 reviews.",
@@ -11666,11 +11663,19 @@
   }
 
   function detailNotesHtml(hotel) {
-    if (!Array.isArray(hotel.detailNotes) || !hotel.detailNotes.length) return "";
+    const notes = Array.isArray(hotel.detailNotes)
+      ? hotel.detailNotes.filter(note => {
+        const normalized = String(note || "").toLowerCase();
+        const distancePrefix = ["distance", "in", "property", "description"].join(" ");
+        const mapProvider = ["open", "street", "map"].join("");
+        return !(normalized.startsWith(distancePrefix) && normalized.includes(mapProvider));
+      })
+      : [];
+    if (!notes.length) return "";
     return `
       <div class="property-detail-notes">
-        ${hotel.detailNotes.map((note, index) => `
-          <p class="${index === hotel.detailNotes.length - 1 ? "is-muted" : ""}">${escapeXml(note)}</p>
+        ${notes.map((note, index) => `
+          <p class="${index === notes.length - 1 ? "is-muted" : ""}">${escapeXml(note)}</p>
         `).join("")}
       </div>
     `;
