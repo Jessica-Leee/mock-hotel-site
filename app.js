@@ -11259,6 +11259,11 @@
           "reviews": exactReviewsFor("arlo-chicago")
       }
   ];
+  const VISIBLE_HOTEL_IDS = new Set([
+    "pendry-chicago",
+    "nobu-hotel-chicago",
+    "arlo-chicago"
+  ]);
 
   function formatCount(n) {
     return Number(n || 0).toLocaleString();
@@ -11348,7 +11353,7 @@
   }
 
   function bySort(value) {
-    const hotels = HOTELS.slice();
+    const hotels = HOTELS.filter(hotel => VISIBLE_HOTEL_IDS.has(hotel.id));
     if (value === "class_high") hotels.sort((a, b) => b.stars - a.stars || a.name.localeCompare(b.name));
     if (value === "name") hotels.sort((a, b) => a.name.localeCompare(b.name));
     return hotels;
@@ -11382,7 +11387,7 @@
       box.innerHTML = `
         <div>
           <strong>Browsing stage 2:</strong>
-          You are now viewing the same 6 hotel listings with guest reviews.
+          You are now viewing the same 3 hotel listings with guest reviews.
         </div>
       `;
     } else {
@@ -11390,7 +11395,7 @@
       box.innerHTML = `
         <div>
           <strong>Browsing stage 1:</strong>
-          View all 6 hotel listings without guest reviews. When you are finished, answer the hotel questions before continuing to full reviews.
+          View all 3 hotel listings without guest reviews. When you are finished, answer the hotel questions before continuing to full reviews.
         </div>
         <a class="btn study-flow__btn" href="${escapeXml(href)}">Continue to hotel questions</a>
       `;
