@@ -34,7 +34,6 @@
         <form id="surveyForm" class="survey-form">
           <div id="surveyQuestion"></div>
           <div class="survey-actions">
-            <button id="surveyBack" class="btn2" type="button">Back</button>
             <button id="surveySubmit" class="btn" type="submit">Submit</button>
           </div>
         </form>
@@ -462,7 +461,6 @@
           const answer = state.answers[page.id] || {};
           const stepLabel = document.getElementById("surveyStepLabel");
           const fill = document.getElementById("surveyProgressFill");
-          const back = document.getElementById("surveyBack");
           const submit = document.getElementById("surveySubmit");
           const card = document.querySelector(".survey-card");
 
@@ -474,7 +472,6 @@
             stepLabel.textContent = page.type === "browseIntro" ? "Next: Browse Hotel Listings" : "Question " + displayedStep + " of " + questionCount;
           }
           fill.style.width = (Math.min(index + 1, pageSet.length) / pageSet.length * 100) + "%";
-          back.hidden = index === 0;
           submit.textContent = page.type === "browseIntro" ? "Start hotel browsing" : index === pageSet.length - 1 && hotelQuestionnaireMode ? "Continue to reviews" : "Submit";
           if (card) {
             card.classList.toggle("survey-card--scenario", page.type === "scenario");
@@ -609,13 +606,6 @@
           }
           const next = Math.min(index + 1, pageSet.length - 1);
           history.pushState(null, "", pageUrl(next));
-          render();
-          window.scrollTo({ top: 0, behavior: "auto" });
-        });
-
-        document.getElementById("surveyBack").addEventListener("click", function () {
-          const previous = Math.max(currentIndex() - 1, 0);
-          history.pushState(null, "", pageUrl(previous));
           render();
           window.scrollTo({ top: 0, behavior: "auto" });
         });
