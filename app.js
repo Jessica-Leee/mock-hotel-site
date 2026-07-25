@@ -10501,18 +10501,22 @@
           ],
           "amenities": [
               "Non-smoking rooms",
-              "Room service",
               "Facilities for disabled guests",
-              "4 restaurants",
+              "Room service",
               "Fitness center",
-              "Private parking",
+              "4 restaurants",
               "Free Wifi",
+              "Private Parking",
               "24-hour front desk",
-              "Tea/Coffee maker in all rooms",
-              "Good breakfast"
+              "Tea/Coffee Maker in All Rooms",
+              "Good Breakfast"
           ],
           "about": "Pendry Chicago is located in Chicago city center on North Michigan Avenue, with easy access to key attractions, restaurants, transit and the lakefront. Rooms include private bathrooms, air-conditioning, city or river views, mini-bars and flat-screen TVs.",
           "aboutSections": [
+              {
+                  "title": "Exceptional facilities",
+                  "text": "Guests enjoy a fitness center, free bicycles, terrace, restaurant, bar, and complimentary WiFi. Additional amenities include a lounge, games room, and electric vehicle charging station."
+              },
               {
                   "title": "Prime location",
                   "text": "Pendry Chicago is located in Chicago city center, offering easy access to key attractions. Ohio Street Beach is a 19-minute walk away, while the Art Institute of Chicago lies less than 0.6 mi from the hotel."
@@ -10523,16 +10527,16 @@
               },
               {
                   "title": "Dining experience",
-                  "text": "The modern, romantic restaurant serves French and American cuisines for lunch, dinner, high tea and cocktails. Breakfast is available as an American a la carte."
+                  "text": "The modern, romantic restaurant serves French and American cuisines for lunch, dinner, high tea, and cocktails. Breakfast is available as an American à la carte."
               },
               {
                   "title": "Nearby activities",
                   "text": "Guests can participate in bike tours, visit an ice-skating rink, or engage in kayaking or canoeing. Midway International Airport is 11 mi away."
-              },
-              {
-                  "title": "Exceptional facilities",
-                  "text": "Guests enjoy a fitness center, free bicycles, terrace, restaurant, bar and complimentary WiFi. Additional amenities include a lounge, games room and electric vehicle charging station."
               }
+          ],
+          "detailNotes": [
+              "Couples in particular like the location - they rated it 9.5 for a two-person trip.",
+              "Distance in property description is calculated using © OpenStreetMap."
           ],
           "facts": [
               "Excellent location rated 9.7/10 from 798 reviews.",
@@ -10552,12 +10556,13 @@
           "guestRating": 4.85,
           "guestReviewCount": 798,
           "ratingBreakdown": {
-              "Location": 4.85,
-              "Rooms": 4.6,
-              "Value": 4.2,
-              "Cleanliness": 4.7,
-              "Service": 4.5,
-              "Sleep Quality": 4.3
+              "Staff": 4.6,
+              "Facilities": 4.45,
+              "Cleanliness": 4.6,
+              "Comfort": 4.7,
+              "Value for money": 4.1,
+              "Location": 4.8,
+              "Free Wifi": 4.35
           },
           "areaInfo": [
               {
@@ -11430,6 +11435,7 @@
   }
 
   function visibleAboutSections(hotel) {
+    if (hotel.id === "pendry-chicago") return hotel.aboutSections || [];
     return (hotel.aboutSections || []).filter(section => !isLocationInfoText(`${section.title || ""} ${section.text || ""}`));
   }
 
@@ -11650,6 +11656,46 @@
     `).join("");
   }
 
+  function detailNotesHtml(hotel) {
+    if (!Array.isArray(hotel.detailNotes) || !hotel.detailNotes.length) return "";
+    return `
+      <div class="property-detail-notes">
+        ${hotel.detailNotes.map((note, index) => `
+          <p class="${index === hotel.detailNotes.length - 1 ? "is-muted" : ""}">${escapeXml(note)}</p>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function categoryBarsHtml(hotel) {
+    const b = hotel.ratingBreakdown;
+    if (!b) return "";
+    const entries = Object.keys(b).map(key => {
+      const score = Number(bookingScore(b[key]));
+      const width = Math.max(0, Math.min(100, score * 10));
+      return { key, score: score.toFixed(1), width };
+    });
+    if (!entries.length) return "";
+    return `
+      <div class="section property-category-section" data-track-section="guest_rating_categories">
+        <h3>Categories:</h3>
+        <div class="category-bars">
+          ${entries.map(item => `
+            <div class="category-bar">
+              <div class="category-bar__head">
+                <span>${escapeXml(item.key)}</span>
+                <strong>${escapeXml(item.score)}</strong>
+              </div>
+              <div class="category-bar__track" aria-hidden="true">
+                <span style="width:${item.width}%"></span>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
   function reviewStatusText(visible, total) {
     return "";
   }
@@ -11801,6 +11847,7 @@
             </div>
           `).join("")}
         </div>
+        ${detailNotesHtml(hotel)}
       </div>
     `;
   }
@@ -11890,6 +11937,7 @@
                   ${hotel.amenities.map(a => amenityChipHtml(a)).join("")}
                 </div>
               </div>
+              ${hotel.id === "pendry-chicago" ? categoryBarsHtml(hotel) : ""}
             </div>
 
             ${state.showReviews ? `
