@@ -11118,13 +11118,13 @@
               "Indoor swimming pool",
               "Non-smoking rooms",
               "Facilities for disabled guests",
-              "Fitness center",
               "Room service",
+              "Fitness center",
               "2 restaurants",
-              "Free WiFi",
-              "Tea/Coffee maker in all rooms",
+              "Free Wifi",
+              "Tea/Coffee Maker in All Rooms",
               "Bar",
-              "Good breakfast"
+              "Good Breakfast"
           ],
           "about": "Nobu Hotel Chicago offers luxurious rooms with private bathrooms, free WiFi and modern amenities in Chicago's West Loop. Guests can use the sauna, fitness center, indoor swimming pool and steam room, with Japanese and Asian dining on site.",
           "aboutSections": [
@@ -11145,6 +11145,10 @@
                   "text": "The hotel offers a 24-hour front desk, concierge and room service. Additional amenities include a paid shuttle, car hire and paid off-site private parking."
               }
           ],
+          "detailNotes": [
+              "Couples in particular like the location - they rated it 9.5 for a two-person trip.",
+              "Distance in property description is calculated using © OpenStreetMap."
+          ],
           "facts": [
               "Excellent location rated 9.5/10 from 373 reviews.",
               "Room option: Yubune King, 439 sq ft, 1 king bed.",
@@ -11162,12 +11166,13 @@
           "guestRating": 4.75,
           "guestReviewCount": 373,
           "ratingBreakdown": {
-              "Location": 4.75,
-              "Rooms": 4.4,
-              "Value": 3.9,
-              "Cleanliness": 4.6,
-              "Service": 4.5,
-              "Sleep Quality": 4.2
+              "Staff": 4.6,
+              "Facilities": 4.55,
+              "Cleanliness": 4.75,
+              "Comfort": 4.8,
+              "Value for money": 4.35,
+              "Location": 4.7,
+              "Free Wifi": 4.2
           },
           "areaInfo": [
               {
@@ -11937,7 +11942,7 @@
                   ${hotel.amenities.map(a => amenityChipHtml(a)).join("")}
                 </div>
               </div>
-              ${hotel.id === "pendry-chicago" ? categoryBarsHtml(hotel) : ""}
+              ${["pendry-chicago", "nobu-hotel-chicago"].includes(hotel.id) ? categoryBarsHtml(hotel) : ""}
             </div>
 
             ${state.showReviews ? `
