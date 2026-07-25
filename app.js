@@ -11512,10 +11512,6 @@
     return (hotel.aboutSections || []).filter(section => !isLocationInfoText(`${section.title || ""} ${section.text || ""}`));
   }
 
-  function previewAboutSections(hotel) {
-    return (hotel.aboutSections || []).filter(section => !isLocationInfoText(`${section.title || ""} ${section.text || ""}`));
-  }
-
   function displayFact(item) {
     const text = String(item || "");
     const ratingMatch = text.match(/^Tripadvisor lists a ([\d.]+)\/5 traveler rating from ([\d,]+) reviews\.$/);
@@ -11710,7 +11706,11 @@
           </div>
           <div class="booking-score">${escapeXml(score10)}</div>
         </div>
-      ` : "";
+      ` : `
+        <div class="booking-no-score">
+          <strong>Guest reviews hidden</strong>
+        </div>
+      `;
 
       const isCompletedNoReviewView = !state.showReviews && completedNoReviewViews.has(h.id);
 
@@ -11742,23 +11742,13 @@
   }
 
   function hotelListingPreviewHtml(hotel) {
-    const sections = previewAboutSections(hotel).slice(0, 2);
-    const amenities = (hotel.amenities || []).slice(0, 5);
+    const tags = visibleTags(hotel);
     return `
-      <div class="hotel-preview">
-        ${hotel.locationScoreText ? `<div class="listing-meta">${escapeXml(hotel.locationScoreText)}</div>` : ""}
-        ${sections.length ? `
-          <div class="hotel-preview__copy">
-            ${sections.map(section => `
-              <p><strong>${escapeXml(section.title)}:</strong> ${escapeXml(section.text)}</p>
-            `).join("")}
-          </div>
-        ` : ""}
-        ${amenities.length ? `
-          <div class="hotel-preview__amenities" aria-label="Preview amenities">
-            ${amenities.map(item => `<span>${escapeXml(item)}</span>`).join("")}
-          </div>
-        ` : ""}
+      ${hotel.locationScoreText ? `<div class="listing-meta">${escapeXml(hotel.locationScoreText)}</div>` : ""}
+      <div class="booking-roomline">One selected room option available for this mock listing</div>
+      ${tags.length ? `<div>${tags.map(t => `<span class="pill2">${escapeXml(t)}</span>`).join("")}</div>` : ""}
+      <div class="amenities">
+        ${(hotel.amenities || []).slice(0, 4).map(a => amenityChipHtml(a)).join("")}
       </div>
     `;
   }
