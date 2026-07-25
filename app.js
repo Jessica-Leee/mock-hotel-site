@@ -11265,15 +11265,15 @@
           ],
           "amenities": [
               "Non-smoking rooms",
-              "Room service",
               "Facilities for disabled guests",
-              "Restaurant",
+              "Room service",
               "Fitness center",
-              "Parking",
+              "Restaurant",
               "Free Wifi",
+              "Parking",
               "24-hour front desk",
               "Bar",
-              "Good breakfast"
+              "Very Good Breakfast"
           ],
           "about": "A Chicago Loop hotel less than a 5-minute walk from Millennium Park and Cloud Gate, with a fitness center, on-site restaurant and rooms with desks, flat-screen TVs, private bathrooms and fridges.",
           "aboutSections": [
@@ -11298,6 +11298,10 @@
                   "text": "Chicago Symphony Orchestra and Shops at Northbridge are less than a 10-minute walk away. DePaul University is less than 0.6 mi from Arlo Chicago, while Chicago Board of Trade Building is a 12-minute walk from the property."
               }
           ],
+          "detailNotes": [
+              "Couples in particular like the location - they rated it 9.7 for a two-person trip.",
+              "Distance in property description is calculated using © OpenStreetMap."
+          ],
           "facts": [
               "Overall guest score rated 8.9/10 from 1,955 reviews.",
               "Excellent location rated 9.7/10 from guest reviews.",
@@ -11318,13 +11322,13 @@
           "guestRating": 4.45,
           "guestReviewCount": 1955,
           "ratingBreakdown": {
-              "Staff": 4.6,
+              "Staff": 4.65,
               "Facilities": 4.55,
               "Cleanliness": 4.65,
-              "Comfort": 4.7,
+              "Comfort": 4.65,
               "Value for money": 4.3,
               "Location": 4.85,
-              "Free WiFi": 4.55
+              "Free Wifi": 4.55
           },
           "areaInfo": [
               {
@@ -11942,7 +11946,7 @@
                   ${hotel.amenities.map(a => amenityChipHtml(a)).join("")}
                 </div>
               </div>
-              ${["pendry-chicago", "nobu-hotel-chicago"].includes(hotel.id) ? categoryBarsHtml(hotel) : ""}
+              ${["pendry-chicago", "nobu-hotel-chicago", "arlo-chicago"].includes(hotel.id) ? categoryBarsHtml(hotel) : ""}
             </div>
 
             ${state.showReviews ? `
