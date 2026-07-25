@@ -1,9 +1,16 @@
 (() => {
   const STORAGE_KEY = "mock_hotel_logs_v2";
   const UI_STATE_KEY = "mock_hotel_ui_state_v1";
+  const HOTEL_VIEW_STATE_KEY = "mock_hotel_no_review_views_v1";
+  const HOTEL_REVIEW_VIEW_STATE_KEY = "mock_hotel_review_views_v1";
+  const HOTEL_ORDER_STATE_KEY = "mock_hotel_visible_order_v1";
+  const NO_REVIEW_VIEW_SECONDS = 30;
 
   let activeHotelSession = null;
   let modalScrollCleanup = null;
+  let randomizedVisibleHotelIds = null;
+  let balancedVisibleReviewCount = null;
+  let noReviewTimer = null;
   const REVIEW_INITIAL_VISIBLE = 12;
   const REVIEW_BATCH_VISIBLE = 24;
 
@@ -10260,6 +10267,199 @@
     try { return JSON.parse(s); } catch (_) { return fallback; }
   }
 
+  function randomInteger(max) {
+    if (max <= 0) return 0;
+    try {
+      if (window.crypto && window.crypto.getRandomValues) {
+        const array = new Uint32Array(1);
+        window.crypto.getRandomValues(array);
+        return array[0] % max;
+      }
+    } catch (_) {
+      /* fall through to Math.random */
+    }
+    return Math.floor(Math.random() * max);
+  }
+
+  function shuffled(items) {
+    const copy = items.slice();
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+      const j = randomInteger(i + 1);
+      const temp = copy[i];
+      copy[i] = copy[j];
+      copy[j] = temp;
+    }
+    return copy;
+  }
+
+  function participantStorageSuffix() {
+    const params = new URLSearchParams(location.search || "");
+    return params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "anonymous";
+  }
+
+  function hotelViewStorageKey() {
+    return `${HOTEL_VIEW_STATE_KEY}:${participantStorageSuffix()}`;
+  }
+
+  function hotelReviewViewStorageKey() {
+    return `${HOTEL_REVIEW_VIEW_STATE_KEY}:${participantStorageSuffix()}`;
+  }
+
+  function hotelOrderStorageKey() {
+    return `${HOTEL_ORDER_STATE_KEY}:${participantStorageSuffix()}`;
+  }
+
+  function persistedVisibleHotelIds() {
+    const required = requiredHotelIds();
+    const requiredSet = new Set(required);
+    const stored = safeJsonParse(localStorage.getItem(hotelOrderStorageKey()), []);
+    const validStored = Array.isArray(stored)
+      ? stored.filter(id => requiredSet.has(id))
+      : [];
+
+    if (validStored.length === required.length && new Set(validStored).size === required.length) {
+      return validStored;
+    }
+
+    const nextOrder = shuffled(required);
+    localStorage.setItem(hotelOrderStorageKey(), JSON.stringify(nextOrder));
+    logEvent("hotel_order_randomized", { hotelIds: nextOrder });
+    return nextOrder;
+  }
+
+  function getHotelViewState() {
+    const state = safeJsonParse(localStorage.getItem(hotelViewStorageKey()), {}) || {};
+    return {
+      viewedHotelIds: Array.isArray(state.viewedHotelIds) ? state.viewedHotelIds.filter(Boolean) : [],
+      deadlines: state.deadlines && typeof state.deadlines === "object" ? state.deadlines : {},
+      updatedAt: state.updatedAt || ""
+    };
+  }
+
+  function setHotelViewState(state) {
+    localStorage.setItem(hotelViewStorageKey(), JSON.stringify(state || {}));
+  }
+
+  function getHotelReviewViewState() {
+    const state = safeJsonParse(localStorage.getItem(hotelReviewViewStorageKey()), {}) || {};
+    return {
+      viewedHotelIds: Array.isArray(state.viewedHotelIds) ? state.viewedHotelIds.filter(Boolean) : [],
+      updatedAt: state.updatedAt || ""
+    };
+  }
+
+  function setHotelReviewViewState(state) {
+    localStorage.setItem(hotelReviewViewStorageKey(), JSON.stringify(state || {}));
+  }
+
+  function finalizeExpiredNoReviewViews() {
+    const state = getHotelViewState();
+    const viewed = new Set(state.viewedHotelIds);
+    const deadlines = state.deadlines || {};
+    const newlyCompleted = [];
+    const now = Date.now();
+
+    requiredHotelIds().forEach(id => {
+      const deadline = Number(deadlines[id] || 0);
+      if (deadline && deadline <= now && !viewed.has(id)) {
+        viewed.add(id);
+        newlyCompleted.push(id);
+      }
+      if (deadline && deadline <= now) delete deadlines[id];
+    });
+
+    if (!newlyCompleted.length) return;
+
+    state.viewedHotelIds = Array.from(viewed);
+    state.deadlines = deadlines;
+    state.updatedAt = new Date().toISOString();
+    setHotelViewState(state);
+    newlyCompleted.forEach(hotelId => {
+      logEvent("no_review_hotel_view_complete", {
+        hotelId,
+        reason: "deadline_expired",
+        viewedCount: state.viewedHotelIds.length,
+        requiredCount: requiredHotelIds().length
+      });
+    });
+  }
+
+  function viewedHotelSet() {
+    finalizeExpiredNoReviewViews();
+    return new Set(getHotelViewState().viewedHotelIds);
+  }
+
+  function viewedReviewHotelSet() {
+    return new Set(getHotelReviewViewState().viewedHotelIds);
+  }
+
+  function requiredHotelIds() {
+    return Array.from(VISIBLE_HOTEL_IDS);
+  }
+
+  function noReviewViewingComplete() {
+    const viewed = viewedHotelSet();
+    return requiredHotelIds().every(id => viewed.has(id));
+  }
+
+  function reviewViewingComplete() {
+    const viewed = viewedReviewHotelSet();
+    return requiredHotelIds().every(id => viewed.has(id));
+  }
+
+  function markNoReviewHotelViewed(hotelId, reason = "view_complete") {
+    const state = getHotelViewState();
+    const viewed = new Set(state.viewedHotelIds);
+    if (viewed.has(hotelId)) return;
+    viewed.add(hotelId);
+    state.viewedHotelIds = Array.from(viewed);
+    if (state.deadlines) delete state.deadlines[hotelId];
+    state.updatedAt = new Date().toISOString();
+    setHotelViewState(state);
+    logEvent("no_review_hotel_view_complete", {
+      hotelId,
+      reason,
+      viewedCount: state.viewedHotelIds.length,
+      requiredCount: requiredHotelIds().length
+    });
+  }
+
+  function markReviewHotelViewed(hotelId, reason = "review_modal_closed") {
+    const state = getHotelReviewViewState();
+    const viewed = new Set(state.viewedHotelIds);
+    if (viewed.has(hotelId)) return;
+    viewed.add(hotelId);
+    state.viewedHotelIds = Array.from(viewed);
+    state.updatedAt = new Date().toISOString();
+    setHotelReviewViewState(state);
+    logEvent("review_hotel_view_complete", {
+      hotelId,
+      reason,
+      viewedCount: state.viewedHotelIds.length,
+      requiredCount: requiredHotelIds().length
+    });
+  }
+
+  function ensureNoReviewDeadline(hotelId) {
+    const state = getHotelViewState();
+    if (state.viewedHotelIds.includes(hotelId)) return 0;
+
+    const existingDeadline = Number((state.deadlines || {})[hotelId] || 0);
+    if (existingDeadline > Date.now()) return existingDeadline;
+    if (existingDeadline && existingDeadline <= Date.now()) {
+      markNoReviewHotelViewed(hotelId);
+      return 0;
+    }
+
+    const deadline = Date.now() + (NO_REVIEW_VIEW_SECONDS * 1000);
+    state.deadlines = state.deadlines || {};
+    state.deadlines[hotelId] = deadline;
+    state.updatedAt = new Date().toISOString();
+    setHotelViewState(state);
+    logEvent("no_review_hotel_timer_started", { hotelId, seconds: NO_REVIEW_VIEW_SECONDS });
+    return deadline;
+  }
+
   function getLogs() {
     return safeJsonParse(localStorage.getItem(STORAGE_KEY), []) || [];
   }
@@ -10368,18 +10568,22 @@
           ],
           "amenities": [
               "Non-smoking rooms",
-              "Room service",
               "Facilities for disabled guests",
-              "4 restaurants",
+              "Room service",
               "Fitness center",
-              "Private parking",
+              "4 restaurants",
               "Free Wifi",
+              "Private Parking",
               "24-hour front desk",
-              "Tea/Coffee maker in all rooms",
-              "Good breakfast"
+              "Tea/Coffee Maker in All Rooms",
+              "Good Breakfast"
           ],
           "about": "Pendry Chicago is located in Chicago city center on North Michigan Avenue, with easy access to key attractions, restaurants, transit and the lakefront. Rooms include private bathrooms, air-conditioning, city or river views, mini-bars and flat-screen TVs.",
           "aboutSections": [
+              {
+                  "title": "Exceptional facilities",
+                  "text": "Guests enjoy a fitness center, free bicycles, terrace, restaurant, bar, and complimentary WiFi. Additional amenities include a lounge, games room, and electric vehicle charging station."
+              },
               {
                   "title": "Prime location",
                   "text": "Pendry Chicago is located in Chicago city center, offering easy access to key attractions. Ohio Street Beach is a 19-minute walk away, while the Art Institute of Chicago lies less than 0.6 mi from the hotel."
@@ -10390,16 +10594,15 @@
               },
               {
                   "title": "Dining experience",
-                  "text": "The modern, romantic restaurant serves French and American cuisines for lunch, dinner, high tea and cocktails. Breakfast is available as an American a la carte."
+                  "text": "The modern, romantic restaurant serves French and American cuisines for lunch, dinner, high tea, and cocktails. Breakfast is available as an American à la carte."
               },
               {
                   "title": "Nearby activities",
                   "text": "Guests can participate in bike tours, visit an ice-skating rink, or engage in kayaking or canoeing. Midway International Airport is 11 mi away."
-              },
-              {
-                  "title": "Exceptional facilities",
-                  "text": "Guests enjoy a fitness center, free bicycles, terrace, restaurant, bar and complimentary WiFi. Additional amenities include a lounge, games room and electric vehicle charging station."
               }
+          ],
+          "detailNotes": [
+              "Couples in particular like the location - they rated it 9.5 for a two-person trip."
           ],
           "facts": [
               "Excellent location rated 9.7/10 from 798 reviews.",
@@ -10419,12 +10622,13 @@
           "guestRating": 4.85,
           "guestReviewCount": 798,
           "ratingBreakdown": {
-              "Location": 4.85,
-              "Rooms": 4.6,
-              "Value": 4.2,
-              "Cleanliness": 4.7,
-              "Service": 4.5,
-              "Sleep Quality": 4.3
+              "Staff": 4.6,
+              "Facilities": 4.45,
+              "Cleanliness": 4.6,
+              "Comfort": 4.7,
+              "Value for money": 4.1,
+              "Location": 4.8,
+              "Free Wifi": 4.35
           },
           "areaInfo": [
               {
@@ -10980,13 +11184,13 @@
               "Indoor swimming pool",
               "Non-smoking rooms",
               "Facilities for disabled guests",
-              "Fitness center",
               "Room service",
+              "Fitness center",
               "2 restaurants",
-              "Free WiFi",
-              "Tea/Coffee maker in all rooms",
+              "Free Wifi",
+              "Tea/Coffee Maker in All Rooms",
               "Bar",
-              "Good breakfast"
+              "Good Breakfast"
           ],
           "about": "Nobu Hotel Chicago offers luxurious rooms with private bathrooms, free WiFi and modern amenities in Chicago's West Loop. Guests can use the sauna, fitness center, indoor swimming pool and steam room, with Japanese and Asian dining on site.",
           "aboutSections": [
@@ -11007,6 +11211,9 @@
                   "text": "The hotel offers a 24-hour front desk, concierge and room service. Additional amenities include a paid shuttle, car hire and paid off-site private parking."
               }
           ],
+          "detailNotes": [
+              "Couples in particular like the location - they rated it 9.5 for a two-person trip."
+          ],
           "facts": [
               "Excellent location rated 9.5/10 from 373 reviews.",
               "Room option: Yubune King, 439 sq ft, 1 king bed.",
@@ -11024,12 +11231,13 @@
           "guestRating": 4.75,
           "guestReviewCount": 373,
           "ratingBreakdown": {
-              "Location": 4.75,
-              "Rooms": 4.4,
-              "Value": 3.9,
-              "Cleanliness": 4.6,
-              "Service": 4.5,
-              "Sleep Quality": 4.2
+              "Staff": 4.6,
+              "Facilities": 4.55,
+              "Cleanliness": 4.75,
+              "Comfort": 4.8,
+              "Value for money": 4.35,
+              "Location": 4.7,
+              "Free Wifi": 4.2
           },
           "areaInfo": [
               {
@@ -11122,15 +11330,15 @@
           ],
           "amenities": [
               "Non-smoking rooms",
-              "Room service",
               "Facilities for disabled guests",
-              "Restaurant",
+              "Room service",
               "Fitness center",
-              "Parking",
+              "Restaurant",
               "Free Wifi",
+              "Parking",
               "24-hour front desk",
               "Bar",
-              "Good breakfast"
+              "Very Good Breakfast"
           ],
           "about": "A Chicago Loop hotel less than a 5-minute walk from Millennium Park and Cloud Gate, with a fitness center, on-site restaurant and rooms with desks, flat-screen TVs, private bathrooms and fridges.",
           "aboutSections": [
@@ -11155,6 +11363,9 @@
                   "text": "Chicago Symphony Orchestra and Shops at Northbridge are less than a 10-minute walk away. DePaul University is less than 0.6 mi from Arlo Chicago, while Chicago Board of Trade Building is a 12-minute walk from the property."
               }
           ],
+          "detailNotes": [
+              "Couples in particular like the location - they rated it 9.7 for a two-person trip."
+          ],
           "facts": [
               "Overall guest score rated 8.9/10 from 1,955 reviews.",
               "Excellent location rated 9.7/10 from guest reviews.",
@@ -11175,13 +11386,13 @@
           "guestRating": 4.45,
           "guestReviewCount": 1955,
           "ratingBreakdown": {
-              "Staff": 4.6,
+              "Staff": 4.65,
               "Facilities": 4.55,
               "Cleanliness": 4.65,
-              "Comfort": 4.7,
+              "Comfort": 4.65,
               "Value for money": 4.3,
               "Location": 4.85,
-              "Free WiFi": 4.55
+              "Free Wifi": 4.55
           },
           "areaInfo": [
               {
@@ -11259,6 +11470,11 @@
           "reviews": exactReviewsFor("arlo-chicago")
       }
   ];
+  const VISIBLE_HOTEL_IDS = new Set([
+    "pendry-chicago",
+    "nobu-hotel-chicago",
+    "arlo-chicago"
+  ]);
 
   function formatCount(n) {
     return Number(n || 0).toLocaleString();
@@ -11277,28 +11493,35 @@
     return "Pleasant";
   }
 
+  const LOCATION_INFO_RE = /\b(location|nearby|attractions?|airport|beach|station|subway|metro|train|transit|walking|walkable|walk|mile|mi\b|ft\b|address|michigan avenue|loop|west loop|wicker park|gold coast|river north|streeterville|magnificent mile|fulton market|millennium|cloud gate|navy pier|willis tower|united center|art institute|state\/lake|ogilvie|clark\/division|morgan|damen)\b/i;
+
+  function isLocationInfoText(value) {
+    return LOCATION_INFO_RE.test(String(value || ""));
+  }
+
+  function visibleTags(hotel) {
+    return (hotel.tags || []).filter(tag => !isLocationInfoText(tag));
+  }
+
+  function visibleFacts(hotel) {
+    return (hotel.facts || []).filter(fact => !isLocationInfoText(fact));
+  }
+
+  function visibleAboutSections(hotel) {
+    if (hotel.id === "pendry-chicago") return hotel.aboutSections || [];
+    return (hotel.aboutSections || []).filter(section => !isLocationInfoText(`${section.title || ""} ${section.text || ""}`));
+  }
+
   function displayFact(item) {
     const text = String(item || "");
     const ratingMatch = text.match(/^Tripadvisor lists a ([\d.]+)\/5 traveler rating from ([\d,]+) reviews\.$/);
     if (ratingMatch) return `Guest rating: ${bookingScore(ratingMatch[1])}/10 from ${ratingMatch[2]} reviews.`;
     return text
-      .replace(/^Tripadvisor classifies the property as /, "Hotel class: ")
-      .replace(/^Tripadvisor lists the address as /, "Address: ")
+      .replace(/^Tripadvisor classifies the property as /, "")
+      .replace(/^Tripadvisor lists the address as /, "")
       .replace(/^Tripadvisor lists the style as /, "Style: ")
       .replace(/^Tripadvisor lists /, "Property details: ")
       .replace(/^Tripadvisor notes /, "Property details: ");
-  }
-
-  function hotelMapQuery(hotel) {
-    return `${hotel.name}, ${hotel.address}, Chicago, Illinois`;
-  }
-
-  function hotelMapUrl(hotel) {
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotelMapQuery(hotel))}`;
-  }
-
-  function hotelMapEmbedUrl(hotel) {
-    return `https://maps.google.com/maps?q=${encodeURIComponent(hotelMapQuery(hotel))}&output=embed`;
   }
 
   function scrollIntoModalView(target, offset = 12) {
@@ -11347,11 +11570,27 @@
     return `${n}-star`;
   }
 
-  function bySort(value) {
-    const hotels = HOTELS.slice();
-    if (value === "class_high") hotels.sort((a, b) => b.stars - a.stars || a.name.localeCompare(b.name));
-    if (value === "name") hotels.sort((a, b) => a.name.localeCompare(b.name));
-    return hotels;
+  function visibleHotels() {
+    if (!randomizedVisibleHotelIds) {
+      randomizedVisibleHotelIds = persistedVisibleHotelIds();
+    }
+    const hotelById = new Map(HOTELS.map(hotel => [hotel.id, hotel]));
+    return randomizedVisibleHotelIds.map(id => hotelById.get(id)).filter(Boolean);
+  }
+
+  function balancedReviewCount() {
+    if (balancedVisibleReviewCount !== null) return balancedVisibleReviewCount;
+    const counts = requiredHotelIds()
+      .map(id => exactReviewsFor(id).length)
+      .filter(count => count > 0);
+    balancedVisibleReviewCount = counts.length ? Math.min(...counts) : 0;
+    return balancedVisibleReviewCount;
+  }
+
+  function balancedReviews(hotel) {
+    const reviews = Array.isArray(hotel.reviews) ? hotel.reviews : [];
+    const limit = balancedReviewCount();
+    return limit > 0 ? reviews.slice(0, limit) : reviews;
   }
 
   function renderVersionLinks() {
@@ -11370,33 +11609,60 @@
   }
 
   function renderStudyFlowCta() {
-    const head = document.querySelector(".content__head");
-    if (!head || document.getElementById("studyFlowCta")) return;
+    const results = document.getElementById("results");
+    if (!results) return;
 
     const state = pageState();
-    const box = document.createElement("div");
+    let box = document.getElementById("studyFlowCta");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "studyFlowCta";
+      results.insertAdjacentElement("afterend", box);
+    }
     box.id = "studyFlowCta";
     box.className = "study-flow";
 
     if (state.showReviews) {
-      box.innerHTML = `
+      const href = `index.html${surveyQueryString("post_review")}#pr1`;
+      const viewed = viewedReviewHotelSet();
+      const required = requiredHotelIds();
+      const viewedCount = required.filter(id => viewed.has(id)).length;
+      const unlocked = viewedCount >= required.length;
+      box.innerHTML = unlocked ? `
         <div>
-          <strong>Browsing stage 2:</strong>
-          You are now viewing the same 6 hotel listings with guest reviews.
+          <strong>Post-review questions unlocked:</strong>
+          You have opened review popups for all 3 hotels.
         </div>
+        <button class="btn study-flow__btn" type="button" data-flow-continue="${escapeXml(href)}">Continue to post-review questions</button>
+      ` : `
+        <div>
+          <strong>Post-review questions locked:</strong>
+          Open the review popup for each of the 3 hotels before continuing.
+          <div class="study-flow__note">Completed ${formatCount(viewedCount)} of ${formatCount(required.length)} review popups.</div>
+        </div>
+        <button class="btn study-flow__btn" type="button" disabled>Continue to post-review questions</button>
       `;
     } else {
       const href = `index.html${surveyQueryString("hotel_questionnaire")}#hq1`;
-      box.innerHTML = `
+      const viewed = viewedHotelSet();
+      const required = requiredHotelIds();
+      const viewedCount = required.filter(id => viewed.has(id)).length;
+      const unlocked = viewedCount >= required.length;
+      box.innerHTML = unlocked ? `
         <div>
-          <strong>Browsing stage 1:</strong>
-          View all 6 hotel listings without guest reviews. When you are finished, answer the hotel questions before continuing to full reviews.
+          <strong>Hotel questions unlocked:</strong>
+          You have opened all 3 hotel detail popups.
         </div>
-        <a class="btn study-flow__btn" href="${escapeXml(href)}">Continue to hotel questions</a>
+        <button class="btn study-flow__btn" type="button" data-flow-continue="${escapeXml(href)}">Continue to hotel questions</button>
+      ` : `
+        <div>
+          <strong>Hotel questions locked:</strong>
+          Open each of the 3 hotel detail popups. You may close a popup whenever you are done; each popup has a maximum viewing time of 30 seconds and cannot be reopened after closing or timing out.
+          <div class="study-flow__note">Completed ${formatCount(viewedCount)} of ${formatCount(required.length)} hotel popups.</div>
+        </div>
+        <button class="btn study-flow__btn" type="button" disabled>Continue to hotel questions</button>
       `;
     }
-
-    head.insertAdjacentElement("afterend", box);
   }
 
   function renderResults() {
@@ -11420,9 +11686,8 @@
       if (coverTitle) coverTitle.textContent = state.showReviews ? "Information treatment:" : "Hotel information:";
     }
 
-    const sortSelect = document.getElementById("sortSelect");
-    const sortValue = sortSelect ? sortSelect.value : "recommended";
-    const hotels = bySort(sortValue);
+    const hotels = visibleHotels();
+    const completedNoReviewViews = state.showReviews ? new Set() : viewedHotelSet();
     const results = document.getElementById("results");
     results.innerHTML = "";
 
@@ -11432,34 +11697,27 @@
       card.setAttribute("data-hotel-id", h.id);
 
       const score10 = bookingScore(h.guestRating);
+      const displayedReviewCount = state.showReviews ? balancedReviews(h).length : h.guestReviewCount;
       const scoreBox = state.showReviews ? `
         <div class="booking-scoreline">
           <div>
             <div class="booking-scoreword">${escapeXml(bookingScoreWord(score10))}</div>
-            <div class="booking-reviewcount">${formatCount(h.guestReviewCount)} reviews</div>
+            <div class="booking-reviewcount">${formatCount(displayedReviewCount)} reviews</div>
           </div>
           <div class="booking-score">${escapeXml(score10)}</div>
         </div>
       ` : `
         <div class="booking-no-score">
           <strong>Guest reviews hidden</strong>
-          <span>Review information is not shown in this version.</span>
         </div>
       `;
+
+      const isCompletedNoReviewView = !state.showReviews && completedNoReviewViews.has(h.id);
 
       card.innerHTML = `
         <div class="card__body">
           <div>
             <h3 class="hotel-title">${escapeXml(h.name)}</h3>
-            <div class="sub"><button class="map-link" type="button" data-map="${escapeXml(h.id)}">Show on map</button> - ${escapeXml(h.neighborhood)} - ${escapeXml(h.address)}</div>
-            <div class="listing-meta">${escapeXml(h.hotelClass)} - ${escapeXml(h.distance)}</div>
-            <div class="booking-roomline">One selected room option available for this mock listing</div>
-            <div>
-              ${h.tags.map(t => `<span class="pill2">${escapeXml(t)}</span>`).join("")}
-            </div>
-            <div class="amenities">
-              ${h.amenities.slice(0, 4).map(a => amenityChipHtml(a)).join("")}
-            </div>
           </div>
 
           <div class="priceBox priceBox--text">
@@ -11469,8 +11727,9 @@
               <div class="per">per night - comparable study rate</div>
             </div>
             <div class="cta">
-              <button class="btn" type="button" data-open="${h.id}">See availability</button>
-              <button class="btn2" type="button" data-open="${h.id}">${state.showReviews ? "Read reviews" : "View property details"}</button>
+              ${isCompletedNoReviewView
+                ? `<button class="btn" type="button" disabled>Viewed</button>`
+                : `<button class="btn" type="button" data-open="${h.id}">${state.showReviews ? "Read reviews" : "View details"}</button>`}
             </div>
           </div>
         </div>
@@ -11478,12 +11737,13 @@
 
       results.appendChild(card);
     }
+    renderStudyFlowCta();
   }
 
   function ratingBreakdownRows(hotel) {
     const b = hotel.ratingBreakdown;
     if (!b) return "";
-    return Object.keys(b).map(k => `
+    return Object.keys(b).filter(k => !isLocationInfoText(k)).map(k => `
       <div class="breakdown__row">
         <span class="breakdown__k">${escapeXml(k)}</span>
         <span class="breakdown__v">${escapeXml(bookingScore(b[k]))}</span>
@@ -11491,10 +11751,56 @@
     `).join("");
   }
 
+  function detailNotesHtml(hotel) {
+    const notes = Array.isArray(hotel.detailNotes)
+      ? hotel.detailNotes.filter(note => {
+        const normalized = String(note || "").toLowerCase();
+        const distancePrefix = ["distance", "in", "property", "description"].join(" ");
+        const mapProvider = ["open", "street", "map"].join("");
+        return !(normalized.startsWith(distancePrefix) && normalized.includes(mapProvider));
+      })
+      : [];
+    if (!notes.length) return "";
+    return `
+      <div class="property-detail-notes">
+        ${notes.map((note, index) => `
+          <p class="${index === notes.length - 1 ? "is-muted" : ""}">${escapeXml(note)}</p>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function categoryBarsHtml(hotel) {
+    const b = hotel.ratingBreakdown;
+    if (!b) return "";
+    const entries = Object.keys(b).map(key => {
+      const score = Number(bookingScore(b[key]));
+      const width = Math.max(0, Math.min(100, score * 10));
+      return { key, score: score.toFixed(1), width };
+    });
+    if (!entries.length) return "";
+    return `
+      <div class="section property-category-section" data-track-section="guest_rating_categories">
+        <h3>Categories:</h3>
+        <div class="category-bars">
+          ${entries.map(item => `
+            <div class="category-bar">
+              <div class="category-bar__head">
+                <span>${escapeXml(item.key)}</span>
+                <strong>${escapeXml(item.score)}</strong>
+              </div>
+              <div class="category-bar__track" aria-hidden="true">
+                <span style="width:${item.width}%"></span>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
   function reviewStatusText(visible, total) {
-    if (!total) return "No comments shown";
-    if (visible >= total) return `Showing all ${formatCount(total)} comments`;
-    return `Showing 1-${formatCount(visible)} of ${formatCount(total)} comments`;
+    return "";
   }
 
   function isStayChip(text) {
@@ -11570,23 +11876,10 @@
 
   function reviewCardHtml(review, index, initialVisible) {
     const r = reviewDisplay(review);
-    const initial = (r.reviewer || "G").trim().charAt(0).toUpperCase();
     return `
       <article class="review" data-review="1" data-review-index="${index}"${index >= initialVisible ? " hidden" : ""}>
         <aside class="review__guest">
-          <div class="review__guestTop">
-            <div class="review__avatar" aria-hidden="true">${escapeXml(initial)}</div>
-            <div>
-              <div class="review__name">${escapeXml(r.reviewer)}</div>
-              ${r.activeSince ? `<div class="review__since">${escapeXml(r.activeSince)}</div>` : ""}
-              ${r.country ? `<div class="review__country"><span class="review__flag" aria-hidden="true"></span>${escapeXml(r.country)}</div>` : ""}
-            </div>
-          </div>
-          <div class="review__guestDetails">
-            ${reviewDetailHtml("Room", r.room)}
-            ${reviewDetailHtml("Stay", r.stay)}
-            ${reviewDetailHtml("Traveler", r.guestType)}
-          </div>
+          <div class="review__name">${escapeXml(r.reviewer)}</div>
         </aside>
         <div class="review__body">
           <div class="review__topline">
@@ -11604,7 +11897,7 @@
   }
 
   function reviewsHtml(hotel) {
-    const reviews = Array.isArray(hotel.reviews) ? hotel.reviews : [];
+    const reviews = balancedReviews(hotel);
     const total = reviews.length;
     const initialVisible = total;
     return `
@@ -11616,16 +11909,6 @@
         data-review-visible="${initialVisible}"
         data-review-initial="${initialVisible}"
         data-review-step="${REVIEW_BATCH_VISIBLE}">
-        <div class="reviews__head">
-          <h3 style="margin:0">Guest reviews</h3>
-          <div class="tag">Exact pasted reviews</div>
-        </div>
-        <div class="reviews__tools">
-          <div class="reviews__count" data-review-status aria-live="polite">${escapeXml(reviewStatusText(initialVisible, total))}</div>
-          <div class="reviews__actions">
-            <button class="review-action review-action--quiet" type="button" data-review-action="back-top">Back to top</button>
-          </div>
-        </div>
         <div class="reviews__list" data-review-list>
           ${reviews.map((review, index) => reviewCardHtml(review, index, initialVisible)).join("")}
         </div>
@@ -11634,6 +11917,7 @@
   }
 
   function factList(items) {
+    if (!items.length) return "";
     return `
       <ul class="fact-list">
         ${items.map(item => `<li>${escapeXml(displayFact(item))}</li>`).join("")}
@@ -11642,68 +11926,31 @@
   }
 
   function aboutSectionsHtml(hotel) {
-    if (!Array.isArray(hotel.aboutSections) || !hotel.aboutSections.length) {
+    const sections = visibleAboutSections(hotel);
+    if (!sections.length) {
       return `
-        <div class="kv">
-          <div class="k">Address</div><div>${escapeXml(hotel.address)}</div>
-          <div class="k">Description</div><div>${escapeXml(hotel.about)}</div>
-          <div class="k">Hotel class</div><div>${escapeXml(hotel.hotelClass)}</div>
+        <div class="property-summary">
+          <div class="property-pill-row">
+            ${hotel.locationScoreText ? `<span class="property-map-pill">${escapeXml(hotel.locationScoreText)}</span>` : ""}
+          </div>
         </div>
       `;
     }
 
     return `
       <div class="property-summary">
-        <div class="kv property-summary__kv">
-          <div class="k">Address</div><div>${escapeXml(hotel.address)}</div>
-          <div class="k">Hotel class</div><div>${escapeXml(hotel.hotelClass)}</div>
-          <div class="k">Transit</div><div>${escapeXml(hotel.distance)}</div>
-        </div>
         <div class="property-pill-row">
-          ${hotel.guestLovedNote ? `<span class="property-pill">${escapeXml(hotel.guestLovedNote)}</span>` : ""}
           ${hotel.locationScoreText ? `<span class="property-map-pill">${escapeXml(hotel.locationScoreText)}</span>` : ""}
         </div>
         <div class="about-card-grid">
-          ${hotel.aboutSections.map(section => `
+          ${sections.map(section => `
             <div class="about-card">
               <h4>${escapeXml(section.title)}</h4>
               <p>${escapeXml(section.text)}</p>
             </div>
           `).join("")}
         </div>
-      </div>
-    `;
-  }
-
-  function areaInfoHtml(hotel) {
-    if (!Array.isArray(hotel.areaInfo) || !hotel.areaInfo.length) return "";
-    return `
-      <div class="hotel-area-section" data-track-section="area_info">
-        <div class="hotel-area-head">
-          <div>
-            <h3>Hotel area info</h3>
-            <div class="property-pill-row">
-              ${hotel.guestLovedNote ? `<span class="property-pill">${escapeXml(hotel.guestLovedNote)}</span>` : ""}
-              ${hotel.locationScoreText ? `<button class="map-link property-map-pill" type="button" data-map="${escapeXml(hotel.id)}">${escapeXml(hotel.areaMapText || hotel.locationScoreText)} - show map</button>` : ""}
-            </div>
-          </div>
-          <button class="btn hotel-area-cta" type="button" data-open="${escapeXml(hotel.id)}">See availability</button>
-        </div>
-        <div class="area-grid">
-          ${hotel.areaInfo.map(group => `
-            <div class="area-card">
-              <h4>${escapeXml(group.title)}</h4>
-              <div class="area-list">
-                ${group.items.map(([name, distance]) => `
-                  <div class="area-row">
-                    <span>${escapeXml(name)}</span>
-                    <strong>${escapeXml(distance)}</strong>
-                  </div>
-                `).join("")}
-              </div>
-            </div>
-          `).join("")}
-        </div>
+        ${detailNotesHtml(hotel)}
       </div>
     `;
   }
@@ -11717,7 +11964,6 @@
             <h3>Amenities of ${escapeXml(hotel.name)}</h3>
             ${hotel.amenityDetails.scoreLine ? `<div class="amenity-score-line">${escapeXml(hotel.amenityDetails.scoreLine)}</div>` : ""}
           </div>
-          <button class="btn hotel-area-cta" type="button" data-open="${escapeXml(hotel.id)}">See availability</button>
         </div>
         <div class="amenity-detail-popular">
           <h4>Most popular amenities</h4>
@@ -11742,14 +11988,22 @@
 
   function modalTemplate(hotel) {
     const state = pageState();
-    const uiState = getUiState();
-    const isSelected = uiState.selectedHotelId === hotel.id;
-    const isSaved = uiState.savedHotelIds.includes(hotel.id);
-    const actionStatus = isSelected
-      ? `${hotel.name} is selected.`
-      : isSaved
-        ? `${hotel.name} is saved.`
-        : "";
+    if (state.showReviews) {
+      return `
+        <div class="modal-backdrop" data-close="1"></div>
+        <div class="modal modal--reviews-only" role="dialog" aria-modal="true" aria-label="${escapeXml(hotel.name)} reviews">
+          <div class="modal__top">
+            <h2 class="modal__title">${escapeXml(hotel.name)}</h2>
+            <button class="xbtn" type="button" data-close="1" aria-label="Close">x</button>
+          </div>
+          <div class="modal__scroll" id="hotelModalScroll" data-hotel-scroll="1">
+            ${reviewsHtml(hotel)}
+          </div>
+        </div>
+      `;
+    }
+
+    const facts = visibleFacts(hotel);
     return `
       <div class="modal-backdrop" data-close="1"></div>
       <div class="modal" role="dialog" aria-modal="true" aria-label="${escapeXml(hotel.name)} details">
@@ -11757,13 +12011,16 @@
           <div>
             <h2 class="modal__title">${escapeXml(hotel.name)}</h2>
             <div class="brand-pill">${escapeXml(hotel.brand)}</div>
-            <div class="sub">${escapeXml(hotel.neighborhood)} - ${escapeXml(hotel.hotelClass)}</div>
+            <div class="sub">${escapeXml(hotel.locationScoreText || "")}</div>
           </div>
           <button class="xbtn" type="button" data-close="1" aria-label="Close">x</button>
         </div>
+        <div class="modal-timer" data-no-review-timer>
+          You may close this popup whenever you are done. Maximum viewing time: 30 seconds. After time runs out, it will close and cannot be viewed again.
+        </div>
 
         <div class="modal__scroll" id="hotelModalScroll" data-hotel-scroll="1">
-          <div class="modal__grid">
+          <div class="modal__grid${state.showReviews ? "" : " modal__grid--single"}">
             <div class="modal__left">
               <div class="section">
                 <h3>About this property</h3>
@@ -11772,10 +12029,10 @@
                 </div>
               </div>
 
-              <div class="section" data-track-section="facts">
+              ${facts.length ? `<div class="section" data-track-section="facts">
                 <h3>Verified hotel facts</h3>
-                ${factList(hotel.facts)}
-              </div>
+                ${factList(facts)}
+              </div>` : ""}
 
               <div class="section" data-track-section="amenities">
                 <h3>Most popular amenities</h3>
@@ -11783,21 +12040,11 @@
                   ${hotel.amenities.map(a => amenityChipHtml(a)).join("")}
                 </div>
               </div>
+              ${["pendry-chicago", "nobu-hotel-chicago", "arlo-chicago"].includes(hotel.id) ? categoryBarsHtml(hotel) : ""}
             </div>
 
-            <div class="modal__right">
-              <div class="section section--availability" data-track-section="price_cta">
-                <h3>Availability</h3>
-                <div class="price price--words">$${hotel.priceNightly}</div>
-                <div class="per">per night - comparable study rate for this experiment.</div>
-                <div class="cta availability-actions">
-                  <button class="btn${isSelected ? " is-selected" : ""}" type="button" data-book="${hotel.id}">${isSelected ? "Selected" : "Select hotel"}</button>
-                  <button class="btn2${isSaved ? " is-saved" : ""}" type="button" data-fave="${hotel.id}">${isSaved ? "Saved" : "Save"}</button>
-                  <div class="action-status" data-action-status aria-live="polite">${escapeXml(actionStatus)}</div>
-                </div>
-              </div>
-
-              ${state.showReviews ? `
+            ${state.showReviews ? `
+              <div class="modal__right">
                 <div class="section section--ratings">
                   <h3>Guest ratings</h3>
                   <div data-track-section="guest_ratings">
@@ -11813,80 +12060,64 @@
                     </div>
                   </div>
                 </div>
-              ` : ``}
-            </div>
+              </div>
+            ` : ``}
           </div>
           ${amenityDetailsHtml(hotel)}
-          ${areaInfoHtml(hotel)}
           ${state.showReviews ? reviewsHtml(hotel) : ""}
         </div>
       </div>
     `;
   }
 
-  function mapModalTemplate(hotel) {
-    const mapUrl = hotelMapUrl(hotel);
-    const embedUrl = hotelMapEmbedUrl(hotel);
-    return `
-      <div class="modal-backdrop" data-close="1"></div>
-      <div class="modal map-modal" role="dialog" aria-modal="true" aria-label="${escapeXml(hotel.name)} map">
-        <div class="modal__top">
-          <div>
-            <h2 class="modal__title">${escapeXml(hotel.name)}</h2>
-            <div class="sub">${escapeXml(hotel.address)}</div>
-          </div>
-          <button class="xbtn" type="button" data-close="1" aria-label="Close">x</button>
-        </div>
-        <div class="modal__scroll map-modal__body">
-          <iframe
-            class="map-frame"
-            title="${escapeXml(hotel.name)} map location"
-            src="${escapeXml(embedUrl)}"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade">
-          </iframe>
-          <div class="map-address">
-            <strong>Address</strong>
-            <span>${escapeXml(hotel.address)}</span>
-          </div>
-          <div class="map-actions">
-            <a class="btn" href="${escapeXml(mapUrl)}" target="_blank" rel="noreferrer">Open larger map</a>
-            <button class="btn2" type="button" data-open="${hotel.id}">View hotel details</button>
-          </div>
-        </div>
-      </div>
-    `;
+  function clearNoReviewTimer() {
+    if (noReviewTimer) {
+      clearInterval(noReviewTimer);
+      noReviewTimer = null;
+    }
   }
 
-  function openMapModal(hotelId) {
-    const hotel = HOTELS.find(h => h.id === hotelId);
-    if (!hotel) {
-      if ((location.hash || "").startsWith("#map/")) location.hash = "#results";
+  function startNoReviewTimer(hotelId) {
+    clearNoReviewTimer();
+    const root = document.getElementById("modalRoot");
+    const timerEl = root.querySelector("[data-no-review-timer]");
+    const deadline = ensureNoReviewDeadline(hotelId);
+    if (!deadline) {
+      closeModal("already_viewed");
+      renderResults();
       return;
     }
 
-    if (activeHotelSession) {
-      closeModal("map");
-    }
+    const tick = () => {
+      const remainingMs = Math.max(0, deadline - Date.now());
+      const remainingSeconds = Math.ceil(remainingMs / 1000);
+      if (timerEl) {
+        timerEl.textContent = `You may close this popup whenever you are done. Maximum viewing time remaining: ${remainingSeconds} seconds.`;
+      }
+      if (remainingMs <= 0) {
+        clearNoReviewTimer();
+        markNoReviewHotelViewed(hotelId, "time_limit_reached");
+        closeModal("time_limit");
+        renderResults();
+      }
+    };
 
-    const root = document.getElementById("modalRoot");
-    if (typeof modalScrollCleanup === "function") modalScrollCleanup();
-    activeHotelSession = null;
-
-    root.setAttribute("data-active-map", hotelId);
-    root.removeAttribute("data-active-hotel");
-    root.innerHTML = mapModalTemplate(hotel);
-    root.classList.add("is-open");
-    root.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
-    location.hash = "#map/" + hotelId;
-    logEvent("open_map", { hotelId, address: hotel.address });
+    tick();
+    noReviewTimer = window.setInterval(tick, 250);
   }
 
   function openHotelModal(hotelId, source) {
     const hotel = HOTELS.find(h => h.id === hotelId);
     if (!hotel) {
       if ((location.hash || "").startsWith("#hotel/")) location.hash = "#results";
+      return;
+    }
+
+    const page = pageState();
+    if (!page.showReviews && viewedHotelSet().has(hotelId)) {
+      logEvent("no_review_hotel_reopen_blocked", { hotelId, source });
+      if ((location.hash || "").startsWith("#hotel/")) location.hash = "#results";
+      renderResults();
       return;
     }
 
@@ -11907,6 +12138,7 @@
 
     const root = document.getElementById("modalRoot");
     if (typeof modalScrollCleanup === "function") modalScrollCleanup();
+    clearNoReviewTimer();
 
     root.setAttribute("data-active-hotel", hotelId);
     root.removeAttribute("data-active-map");
@@ -11914,9 +12146,10 @@
     root.classList.add("is-open");
     root.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
-    location.hash = "#hotel/" + hotelId;
+    const targetHash = "#hotel/" + hotelId;
+    if (location.hash !== targetHash) location.hash = targetHash;
 
-    logEvent("open_hotel", { hotelId, source, reviews: pageState().showReviews });
+    logEvent("open_hotel", { hotelId, source, reviews: page.showReviews });
 
     const scrollEl = root.querySelector("[data-hotel-scroll='1']");
     if (scrollEl) {
@@ -11942,6 +12175,8 @@
       a.addEventListener("mouseenter", () => logEvent("amenity_hover", { hotelId, amenity: a.getAttribute("data-amenity") }));
       a.addEventListener("click", () => logEvent("amenity_click", { hotelId, amenity: a.getAttribute("data-amenity") }));
     });
+
+    if (!page.showReviews) startNoReviewTimer(hotelId);
 
     const reviews = root.querySelector("#reviews");
     if (reviews) {
@@ -11981,41 +12216,24 @@
       });
     }
 
-    root.querySelectorAll("[data-book]").forEach(b => {
-      b.addEventListener("click", () => {
-        const uiState = getUiState();
-        uiState.selectedHotelId = hotelId;
-        setUiState(uiState);
-        b.textContent = "Selected";
-        b.classList.add("is-selected");
-        const status = root.querySelector("[data-action-status]");
-        if (status) status.textContent = `${hotel.name} selected.`;
-        logEvent("book_click", { hotelId, selected: true });
-      });
-    });
-    root.querySelectorAll("[data-fave]").forEach(b => {
-      b.addEventListener("click", () => {
-        const uiState = getUiState();
-        const saved = new Set(uiState.savedHotelIds);
-        const willSave = !saved.has(hotelId);
-        if (willSave) saved.add(hotelId);
-        else saved.delete(hotelId);
-        uiState.savedHotelIds = Array.from(saved);
-        setUiState(uiState);
-        b.textContent = willSave ? "Saved" : "Save";
-        b.classList.toggle("is-saved", willSave);
-        const status = root.querySelector("[data-action-status]");
-        if (status) status.textContent = willSave ? `${hotel.name} saved.` : `${hotel.name} removed from saved hotels.`;
-        logEvent("save_click", { hotelId, saved: willSave });
-      });
-    });
   }
 
   function closeModal(source) {
     const root = document.getElementById("modalRoot");
     if (!root.classList.contains("is-open")) return;
+    let shouldRenderAfterClose = false;
 
     if (activeHotelSession) {
+      const page = pageState();
+      if (!page.showReviews && !viewedHotelSet().has(activeHotelSession.hotelId)) {
+        markNoReviewHotelViewed(activeHotelSession.hotelId, source === "time_limit" ? "time_limit_reached" : "closed_before_time_limit");
+        shouldRenderAfterClose = true;
+      }
+      if (page.showReviews && !viewedReviewHotelSet().has(activeHotelSession.hotelId)) {
+        markReviewHotelViewed(activeHotelSession.hotelId, "review_modal_closed");
+        shouldRenderAfterClose = true;
+      }
+
       logEvent("hotel_page_time", {
         hotelId: activeHotelSession.hotelId,
         durationMs: Date.now() - activeHotelSession.startedAt,
@@ -12029,6 +12247,7 @@
     }
 
     if (typeof modalScrollCleanup === "function") modalScrollCleanup();
+    clearNoReviewTimer();
 
     root.classList.remove("is-open");
     root.removeAttribute("data-active-hotel");
@@ -12038,6 +12257,7 @@
     document.body.style.overflow = "";
     if ((location.hash || "").startsWith("#hotel/") || (location.hash || "").startsWith("#map/")) location.hash = "#results";
     logEvent("close_modal", { source });
+    if (shouldRenderAfterClose) renderResults();
   }
 
   function wireGlobalHandlers() {
@@ -12048,14 +12268,6 @@
     if (condLabel) condLabel.textContent = "Chicago";
     renderVersionLinks();
     renderStudyFlowCta();
-
-    const sortSelect = document.getElementById("sortSelect");
-    if (sortSelect) {
-      sortSelect.addEventListener("change", (e) => {
-        logEvent("sort_change", { value: e.target.value });
-        renderResults();
-      });
-    }
 
     const downloadLogBtn = document.getElementById("downloadLogBtn");
     if (downloadLogBtn) {
@@ -12083,16 +12295,17 @@
         return;
       }
 
-      const map = e.target && e.target.closest && e.target.closest("[data-map]");
-      if (map) {
-        const hotelId = map.getAttribute("data-map");
-        openMapModal(hotelId);
-        return;
-      }
-
       const close = e.target && e.target.closest && e.target.closest("[data-close='1']");
       if (close) {
         closeModal("click");
+        return;
+      }
+
+      const flowContinue = e.target && e.target.closest && e.target.closest("[data-flow-continue]");
+      if (flowContinue) {
+        const href = flowContinue.getAttribute("data-flow-continue");
+        logEvent("study_flow_continue", { href, phase: pageState().phase });
+        location.replace(href);
       }
     });
 
@@ -12120,11 +12333,12 @@
       const h = location.hash || "";
       if (h.startsWith("#hotel/")) {
         const id = h.split("/")[1];
+        const modalRoot = document.getElementById("modalRoot");
+        if (modalRoot && modalRoot.classList.contains("is-open") && modalRoot.getAttribute("data-active-hotel") === id) return;
         openHotelModal(id, "deeplink");
       }
       if (h.startsWith("#map/")) {
-        const id = h.split("/")[1];
-        openMapModal(id);
+        location.hash = "#results";
       }
     });
   }
@@ -12145,8 +12359,7 @@
       openHotelModal(id, "deeplink");
     }
     if (h.startsWith("#map/")) {
-      const id = h.split("/")[1];
-      openMapModal(id);
+      location.hash = "#results";
     }
   }
 

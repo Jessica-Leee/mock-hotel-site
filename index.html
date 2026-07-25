@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbxPojbcbSKbiB6nxHdYp1DYE8_en_Ugq1EyaieEN_H2j8kD67VOIv0qzbxk28rUNxx50Q/exec"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260714-1" />
+    <link rel="stylesheet" href="./styles.css?v=20260725-12" />
   </head>
   <body data-survey-page="true">
     <header class="booking-header" aria-label="Site header">
@@ -45,19 +45,62 @@
       (function () {
         const STORAGE_KEY = "mock_hotel_survey_v1";
         const SURVEY_EVENT_STORAGE_KEY = "mock_hotel_survey_events_v1";
+        const HOTEL_VIEW_STATE_KEY = "mock_hotel_no_review_views_v1";
+        const HOTEL_REVIEW_VIEW_STATE_KEY = "mock_hotel_review_views_v1";
         const params = new URLSearchParams(location.search);
         const prolificId = params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "";
-        const hotelQuestionnaireMode = params.get("survey_stage") === "hotel_questionnaire" || (location.hash || "").startsWith("#hq");
+        const surveyStage = params.get("survey_stage") || "";
+        const hotelQuestionnaireMode = surveyStage === "hotel_questionnaire" || (location.hash || "").startsWith("#hq");
+        const postReviewMode = surveyStage === "post_review" || (location.hash || "").startsWith("#pr");
         const ASSIGNED_ATTRIBUTE_COUNT = 3;
 
         const hotels = [
           { id: "pendry-chicago", name: "Pendry Chicago" },
-          { id: "viceroy-chicago", name: "Viceroy Chicago" },
-          { id: "the-robey-chicago", name: "The Robey, Chicago, a Member of Design Hotels" },
-          { id: "the-emily-hotel", name: "The Emily Hotel" },
           { id: "nobu-hotel-chicago", name: "Nobu Hotel Chicago" },
           { id: "arlo-chicago", name: "Arlo Chicago" }
         ];
+
+        function hotelViewStorageKey() {
+          const suffix = params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "anonymous";
+          return `${HOTEL_VIEW_STATE_KEY}:${suffix}`;
+        }
+
+        function hotelReviewViewStorageKey() {
+          const suffix = params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "anonymous";
+          return `${HOTEL_REVIEW_VIEW_STATE_KEY}:${suffix}`;
+        }
+
+        function noReviewViewingComplete() {
+          let state = {};
+          try { state = JSON.parse(localStorage.getItem(hotelViewStorageKey())) || {}; }
+          catch (_) { state = {}; }
+          const viewed = new Set(Array.isArray(state.viewedHotelIds) ? state.viewedHotelIds : []);
+          return hotels.every(hotel => viewed.has(hotel.id));
+        }
+
+        function reviewViewingComplete() {
+          let state = {};
+          try { state = JSON.parse(localStorage.getItem(hotelReviewViewStorageKey())) || {}; }
+          catch (_) { state = {}; }
+          const viewed = new Set(Array.isArray(state.viewedHotelIds) ? state.viewedHotelIds : []);
+          return hotels.every(hotel => viewed.has(hotel.id));
+        }
+
+        if (hotelQuestionnaireMode && !noReviewViewingComplete()) {
+          const nextParams = new URLSearchParams(location.search || "");
+          if (prolificId) nextParams.set("PROLIFIC_PID", prolificId);
+          nextParams.set("survey_stage", "no_reviews");
+          location.replace("hotels-no-reviews.html?" + nextParams.toString());
+          return;
+        }
+
+        if (postReviewMode && !reviewViewingComplete()) {
+          const nextParams = new URLSearchParams(location.search || "");
+          if (prolificId) nextParams.set("PROLIFIC_PID", prolificId);
+          nextParams.set("survey_stage", "with_reviews");
+          location.replace("hotels-with-reviews.html?" + nextParams.toString());
+          return;
+        }
 
         const attributePool = [
           { id: "cleanliness", label: "Cleanliness", likelihoodId: "clean", likelihoodLabel: "Clean" },
@@ -69,6 +112,39 @@
           { id: "value_for_money", label: "Value for money", likelihoodId: "good_value_for_money", likelihoodLabel: "Good value for money" },
           { id: "breakfast_quality", label: "Breakfast quality", likelihoodId: "high_quality_breakfast", likelihoodLabel: "High-quality breakfast" }
         ];
+
+        const trueAttributeValues = {
+          "pendry-chicago": {
+            cleanliness: 1,
+            service_quality: 1,
+            room_comfort: 1,
+            wifi_reliability: 1,
+            noise_level: 0,
+            location_convenience: 1,
+            value_for_money: 1,
+            breakfast_quality: 1
+          },
+          "nobu-hotel-chicago": {
+            cleanliness: 1,
+            service_quality: 1,
+            room_comfort: 1,
+            wifi_reliability: 1,
+            noise_level: 0,
+            location_convenience: 1,
+            value_for_money: 0,
+            breakfast_quality: 1
+          },
+          "arlo-chicago": {
+            cleanliness: 1,
+            service_quality: 1,
+            room_comfort: 1,
+            wifi_reliability: 1,
+            noise_level: 0,
+            location_convenience: 1,
+            value_for_money: 1,
+            breakfast_quality: 1
+          }
+        };
 
         const matrixConfigs = {
           likelihood: {
@@ -200,6 +276,14 @@
           { id: `hotelq_${hotel.id}_confidence`, type: "hotelMatrix", matrix: "confidence", hotel }
         ]);
 
+        const postReviewPages = [
+          { id: "post_review_choice", type: "hotelChoice" },
+          { id: "post_review_reveal", type: "actualReveal" },
+          { id: "post_review_satisfaction", type: "likert7" },
+          { id: "post_review_switch", type: "switchChoice" },
+          { id: "post_review_confidence_surprise", type: "confidenceSurprise" }
+        ];
+
         function standardPages() {
           const scenario = assignedScenario();
           return [
@@ -211,6 +295,7 @@
         }
 
         function activePages() {
+          if (postReviewMode) return postReviewPages;
           return hotelQuestionnaireMode ? hotelQuestionnairePages : standardPages();
         }
 
@@ -309,6 +394,21 @@
           );
         }
 
+        function chosenHotelId() {
+          const state = getState();
+          const answer = state.answers && state.answers.post_review_choice;
+          return answer && answer.hotel_id ? answer.hotel_id : "";
+        }
+
+        function chosenHotel() {
+          const id = chosenHotelId();
+          return hotels.find(hotel => hotel.id === id) || hotels[0];
+        }
+
+        function trueAttributesFor(hotelId) {
+          return trueAttributeValues[hotelId] || {};
+        }
+
         function getSurveyEvents() {
           try { return JSON.parse(localStorage.getItem(SURVEY_EVENT_STORAGE_KEY)) || []; }
           catch (_) { return []; }
@@ -387,7 +487,7 @@
 
         function currentIndex() {
           const pageSet = activePages();
-          const pattern = hotelQuestionnaireMode ? /^#hq(\d+)$/ : /^#q(\d+)$/;
+          const pattern = postReviewMode ? /^#pr(\d+)$/ : hotelQuestionnaireMode ? /^#hq(\d+)$/ : /^#q(\d+)$/;
           const match = (location.hash || "").match(pattern);
           const index = match ? Number(match[1]) - 1 : 0;
           return Math.min(Math.max(index, 0), pageSet.length - 1);
@@ -395,11 +495,17 @@
 
         function pageUrl(index) {
           const query = location.search || (prolificId ? "?PROLIFIC_PID=" + encodeURIComponent(prolificId) : "");
-          return location.pathname + query + (hotelQuestionnaireMode ? "#hq" : "#q") + (index + 1);
+          const prefix = postReviewMode ? "#pr" : hotelQuestionnaireMode ? "#hq" : "#q";
+          return location.pathname + query + prefix + (index + 1);
         }
 
         function setQuestionHtml(html) {
-          document.getElementById("surveyQuestion").innerHTML = html;
+          document.getElementById("surveyQuestion").innerHTML = `
+            <div class="survey-notice">
+              Please review carefully before submitting. Once you continue to the next page, you cannot return to a previous page, and there is no back button.
+            </div>
+            ${html}
+          `;
         }
 
         function scenarioTable(rows) {
@@ -453,6 +559,139 @@
           `;
         }
 
+        function radioOptionList(name, options, selectedValue) {
+          return `
+            <div class="survey-option-list">
+              ${options.map(option => {
+                const id = `${name}_${option[0]}`;
+                const checked = selectedValue === option[0] ? " checked" : "";
+                return `
+                  <label class="survey-option" for="${escapeHtml(id)}">
+                    <input id="${escapeHtml(id)}" type="radio" name="${escapeHtml(name)}" value="${escapeHtml(option[0])}" required${checked} />
+                    <span>${option[1]}</span>
+                  </label>
+                `;
+              }).join("")}
+            </div>
+          `;
+        }
+
+        function hotelChoiceHtml(savedAnswer) {
+          const selectedValue = (savedAnswer && savedAnswer.hotel_id) || "";
+          return `
+            <h1 class="survey-title">After reading the reviews, which hotel would you choose?</h1>
+            <p class="survey-copy">Select the hotel you would book based on all information you viewed.</p>
+            ${radioOptionList("chosen_hotel", hotels.map(hotel => [hotel.id, escapeHtml(hotel.name)]), selectedValue)}
+          `;
+        }
+
+        function trueAttributeTableHtml(hotel) {
+          const values = trueAttributesFor(hotel.id);
+          return `
+            <div class="actual-attr-table" role="table" aria-label="Actual hotel attributes">
+              <div class="actual-attr-row actual-attr-row--head" role="row">
+                <div role="columnheader">Attribute</div>
+                <div role="columnheader">Actual value</div>
+              </div>
+              ${attributePool.map(attribute => {
+                const value = Number(values[attribute.id] || 0);
+                return `
+                  <div class="actual-attr-row" role="row">
+                    <div role="cell">${escapeHtml(attribute.label)}</div>
+                    <div role="cell"><strong>${value}</strong> - ${value ? "Positive" : "Negative"}</div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          `;
+        }
+
+        function actualRevealHtml(savedAnswer) {
+          const hotel = chosenHotel();
+          return `
+            <div class="survey-reveal">
+              <h1 class="survey-title">Revealed: Actual Hotel Attributes</h1>
+              <p class="survey-copy">The true quality values for <strong>${escapeHtml(hotel.name)}</strong> are now revealed from the review corpus.</p>
+              <p class="survey-copy">Each attribute is shown as 1 = Positive or 0 = Negative.</p>
+              ${trueAttributeTableHtml(hotel)}
+            </div>
+            <label class="survey-check">
+              <input id="answerInput" type="checkbox" required ${savedAnswer && savedAnswer.value ? "checked" : ""} />
+              <span>I have reviewed the actual attribute values for my chosen hotel.</span>
+            </label>
+          `;
+        }
+
+        function likert7Html(savedAnswer) {
+          const selectedValue = (savedAnswer && savedAnswer.value) || "";
+          return `
+            <h1 class="survey-title">Knowing the actual attribute values of your chosen hotel, how satisfied are you with your choice?</h1>
+            ${radioOptionList("satisfaction", [
+              ["1", "1 - Very dissatisfied"],
+              ["2", "2"],
+              ["3", "3"],
+              ["4", "4"],
+              ["5", "5"],
+              ["6", "6"],
+              ["7", "7 - Very satisfied"]
+            ], selectedValue)}
+          `;
+        }
+
+        function switchChoiceHtml(savedAnswer) {
+          const selectedValue = (savedAnswer && savedAnswer.value) || "";
+          return `
+            <h1 class="survey-title">Would you choose a different hotel if you were booking again, knowing what you know now?</h1>
+            ${radioOptionList("switch_choice", [
+              ["yes", "Yes - I would switch to a different hotel"],
+              ["no", "No - I would choose the same hotel again"]
+            ], selectedValue)}
+          `;
+        }
+
+        function confidenceRangeHtml(savedAnswer) {
+          const value = savedAnswer && savedAnswer.value ? savedAnswer.value : "50";
+          return `
+            <h1 class="survey-title">Confidence in your switching answer</h1>
+            <p class="survey-copy">0 = not at all confident, 100 = completely confident.</p>
+            <label class="survey-range">
+              <span>Confidence in switching decision</span>
+              <input id="answerInput" name="switch_confidence" type="range" min="0" max="100" step="1" value="${escapeHtml(value)}" />
+              <output>${escapeHtml(value)}</output>
+            </label>
+          `;
+        }
+
+        function attributeSurpriseHtml(savedAnswer) {
+          const values = (savedAnswer && savedAnswer.values) || {};
+          return `
+            <h1 class="survey-title">For each attribute of your chosen hotel, how surprised are you by the true value revealed?</h1>
+            <p class="survey-copy">0 = not surprised at all, 10 = completely surprised.</p>
+            <div class="survey-range-list">
+              ${attributePool.map(attribute => {
+                const value = values[attribute.id] || "0";
+                return `
+                  <label class="survey-range survey-range--row">
+                    <span>${escapeHtml(attribute.label)}</span>
+                    <input name="${escapeHtml(attribute.id)}" type="range" min="0" max="10" step="1" value="${escapeHtml(value)}" />
+                    <output>${escapeHtml(value)}</output>
+                  </label>
+                `;
+              }).join("")}
+            </div>
+          `;
+        }
+
+        function confidenceSurpriseHtml(savedAnswer) {
+          const confidenceValue = savedAnswer && savedAnswer.switch_confidence ? savedAnswer.switch_confidence : "50";
+          const surpriseValues = savedAnswer && savedAnswer.surprise_values ? savedAnswer.surprise_values : {};
+          return `
+            ${confidenceRangeHtml({ value: confidenceValue })}
+            <div class="survey-divider"></div>
+            ${attributeSurpriseHtml({ values: surpriseValues })}
+          `;
+        }
+
         function render() {
           const index = currentIndex();
           const pageSet = activePages();
@@ -463,8 +702,11 @@
           const fill = document.getElementById("surveyProgressFill");
           const submit = document.getElementById("surveySubmit");
           const card = document.querySelector(".survey-card");
+          submit.hidden = false;
 
-          if (hotelQuestionnaireMode) {
+          if (postReviewMode) {
+            stepLabel.textContent = `Post-review questionnaire ${index + 1} of ${pageSet.length}`;
+          } else if (hotelQuestionnaireMode) {
             stepLabel.textContent = `Hotel questionnaire ${index + 1} of ${pageSet.length}`;
           } else {
             const questionCount = pageSet.filter(item => item.type !== "browseIntro").length;
@@ -472,10 +714,17 @@
             stepLabel.textContent = page.type === "browseIntro" ? "Next: Browse Hotel Listings" : "Question " + displayedStep + " of " + questionCount;
           }
           fill.style.width = (Math.min(index + 1, pageSet.length) / pageSet.length * 100) + "%";
-          submit.textContent = page.type === "browseIntro" ? "Start hotel browsing" : index === pageSet.length - 1 && hotelQuestionnaireMode ? "Continue to reviews" : "Submit";
+          submit.textContent = page.type === "browseIntro"
+            ? "Start hotel browsing"
+            : index === pageSet.length - 1 && hotelQuestionnaireMode
+              ? "Continue to reviews"
+              : index === pageSet.length - 1 && postReviewMode
+                ? "Finish"
+                : "Submit";
           if (card) {
             card.classList.toggle("survey-card--scenario", page.type === "scenario");
             card.classList.toggle("survey-card--matrix", page.type === "hotelMatrix");
+            card.classList.toggle("survey-card--reveal", page.type === "actualReveal");
           }
 
           if (page.type === "prolific") {
@@ -515,10 +764,24 @@
             `);
           } else if (page.type === "hotelMatrix") {
             setQuestionHtml(matrixHtml(page, answer));
+          } else if (page.type === "hotelChoice") {
+            setQuestionHtml(hotelChoiceHtml(answer));
+          } else if (page.type === "actualReveal") {
+            setQuestionHtml(actualRevealHtml(answer));
+          } else if (page.type === "likert7") {
+            setQuestionHtml(likert7Html(answer));
+          } else if (page.type === "switchChoice") {
+            setQuestionHtml(switchChoiceHtml(answer));
+          } else if (page.type === "rangeConfidence") {
+            setQuestionHtml(confidenceRangeHtml(answer));
+          } else if (page.type === "attributeSurprise") {
+            setQuestionHtml(attributeSurpriseHtml(answer));
+          } else if (page.type === "confidenceSurprise") {
+            setQuestionHtml(confidenceSurpriseHtml(answer));
           } else {
             setQuestionHtml(`
               <h1 class="survey-title">Next: Browse Hotel Listings</h1>
-              <p class="survey-copy">You will now visit the hotel browsing platform to view 6 hotel listings. Browse each hotel carefully - examine photos, amenities, and descriptions.</p>
+              <p class="survey-copy">You will now visit the hotel browsing platform to view 3 hotel listings. Browse each hotel carefully - examine photos, amenities, and descriptions.</p>
               <p class="survey-copy">First you will see listings without reviews. After that, you will continue to the version with full reviews.</p>
             `);
           }
@@ -566,6 +829,74 @@
               values,
               submitted_at: state.updated_at
             };
+          } else if (page.type === "hotelChoice") {
+            const selected = document.querySelector(`input[name="chosen_hotel"]:checked`);
+            const hotelId = selected ? selected.value : "";
+            const hotel = hotels.find(item => item.id === hotelId);
+            state.answers[page.id] = {
+              hotel_id: hotelId,
+              hotel_name: hotel ? hotel.name : "",
+              submitted_at: state.updated_at
+            };
+          } else if (page.type === "actualReveal") {
+            const hotel = chosenHotel();
+            state.answers[page.id] = {
+              value: true,
+              hotel_id: hotel.id,
+              hotel_name: hotel.name,
+              true_attributes: trueAttributesFor(hotel.id),
+              submitted_at: state.updated_at
+            };
+          } else if (page.type === "likert7") {
+            const selected = document.querySelector(`input[name="satisfaction"]:checked`);
+            state.answers[page.id] = {
+              value: selected ? selected.value : "",
+              hotel_id: chosenHotel().id,
+              hotel_name: chosenHotel().name,
+              submitted_at: state.updated_at
+            };
+          } else if (page.type === "switchChoice") {
+            const selected = document.querySelector(`input[name="switch_choice"]:checked`);
+            state.answers[page.id] = {
+              value: selected ? selected.value : "",
+              hotel_id: chosenHotel().id,
+              hotel_name: chosenHotel().name,
+              submitted_at: state.updated_at
+            };
+          } else if (page.type === "rangeConfidence") {
+            const input = document.getElementById("answerInput");
+            state.answers[page.id] = {
+              value: input ? input.value : "",
+              hotel_id: chosenHotel().id,
+              hotel_name: chosenHotel().name,
+              submitted_at: state.updated_at
+            };
+          } else if (page.type === "attributeSurprise") {
+            const values = {};
+            attributePool.forEach(attribute => {
+              const input = document.querySelector(`input[name="${attribute.id}"]`);
+              values[attribute.id] = input ? input.value : "";
+            });
+            state.answers[page.id] = {
+              hotel_id: chosenHotel().id,
+              hotel_name: chosenHotel().name,
+              values,
+              submitted_at: state.updated_at
+            };
+          } else if (page.type === "confidenceSurprise") {
+            const confidenceInput = document.querySelector(`input[name="switch_confidence"]`);
+            const values = {};
+            attributePool.forEach(attribute => {
+              const input = document.querySelector(`input[name="${attribute.id}"]`);
+              values[attribute.id] = input ? input.value : "";
+            });
+            state.answers[page.id] = {
+              hotel_id: chosenHotel().id,
+              hotel_name: chosenHotel().name,
+              switch_confidence: confidenceInput ? confidenceInput.value : "",
+              surprise_values: values,
+              submitted_at: state.updated_at
+            };
           }
           setState(state);
           logSurveyEvent(page, state.answers[page.id], state);
@@ -578,7 +909,7 @@
           if (pid) nextParams.set("PROLIFIC_PID", pid);
           nextParams.set("survey_stage", "no_reviews");
           logSurveyEvent({ id: "browse_intro", type: "transition" }, { value: "start_hotel_browsing" }, state || getState());
-          location.href = "hotels-no-reviews.html?" + nextParams.toString();
+          location.replace("hotels-no-reviews.html?" + nextParams.toString());
         }
 
         function goToReviewBrowsing(state) {
@@ -587,8 +918,33 @@
           if (pid) nextParams.set("PROLIFIC_PID", pid);
           nextParams.set("survey_stage", "with_reviews");
           logSurveyEvent({ id: "hotel_questionnaire_complete", type: "transition" }, { value: "start_review_browsing" }, state || getState());
-          location.href = "hotels-with-reviews.html?" + nextParams.toString();
+          location.replace("hotels-with-reviews.html?" + nextParams.toString());
         }
+
+        function renderCompletionScreen() {
+          document.getElementById("surveyQuestion").innerHTML = `
+            <div class="survey-complete">
+              <h1 class="survey-title">Thank you</h1>
+              <p class="survey-copy">Your responses have been submitted.</p>
+            </div>
+          `;
+          document.getElementById("surveySubmit").hidden = true;
+          document.getElementById("surveyStepLabel").textContent = "Complete";
+          document.getElementById("surveyProgressFill").style.width = "100%";
+        }
+
+        function finishPostReviewQuestionnaire(state) {
+          logSurveyEvent({ id: "post_review_complete", type: "transition" }, { value: "complete" }, state || getState());
+          renderCompletionScreen();
+          history.replaceState(null, "", location.pathname + (location.search || "") + "#complete");
+        }
+
+        document.getElementById("surveyForm").addEventListener("input", function (event) {
+          const input = event.target;
+          if (!input || input.type !== "range") return;
+          const output = input.parentElement && input.parentElement.querySelector("output");
+          if (output) output.textContent = input.value;
+        });
 
         document.getElementById("surveyForm").addEventListener("submit", function (event) {
           event.preventDefault();
@@ -604,18 +960,33 @@
             goToReviewBrowsing(state);
             return;
           }
+          if (postReviewMode && index === pageSet.length - 1) {
+            finishPostReviewQuestionnaire(state);
+            return;
+          }
           const next = Math.min(index + 1, pageSet.length - 1);
-          history.pushState(null, "", pageUrl(next));
+          history.replaceState(null, "", pageUrl(next));
           render();
           window.scrollTo({ top: 0, behavior: "auto" });
         });
 
-        window.addEventListener("popstate", render);
+        window.addEventListener("popstate", () => {
+          if (postReviewMode && location.hash === "#complete") renderCompletionScreen();
+          else render();
+        });
 
-        if (!location.hash || (hotelQuestionnaireMode && !/^#hq\d+$/.test(location.hash)) || (!hotelQuestionnaireMode && !/^#q\d+$/.test(location.hash))) {
+        function validHashForMode() {
+          const hash = location.hash || "";
+          if (postReviewMode) return /^#pr\d+$/.test(hash) || hash === "#complete";
+          if (hotelQuestionnaireMode) return /^#hq\d+$/.test(hash);
+          return /^#q\d+$/.test(hash);
+        }
+
+        if (!location.hash || !validHashForMode()) {
           history.replaceState(null, "", pageUrl(0));
         }
-        render();
+        if (postReviewMode && location.hash === "#complete") renderCompletionScreen();
+        else render();
       })();
     </script>
   </body>
