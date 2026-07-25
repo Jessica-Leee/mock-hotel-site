@@ -889,7 +889,9 @@ body{
 }
 .xbtn:focus-visible{outline:2px solid var(--brand); outline-offset:2px}
 .modal__grid{display:grid; grid-template-columns:minmax(0,1.45fr) minmax(310px,.65fr); gap:0}
+.modal__grid--single{grid-template-columns:1fr}
 .modal__left{padding:18px; border-right:1px solid var(--line)}
+.modal__grid--single .modal__left{border-right:0}
 .modal__right{
   padding:18px;
   background:#f5f7fb;

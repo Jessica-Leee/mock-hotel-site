@@ -11282,28 +11282,34 @@
     return "Pleasant";
   }
 
+  const LOCATION_INFO_RE = /\b(location|nearby|attractions?|airport|beach|station|subway|metro|train|transit|walking|walkable|walk|mile|mi\b|ft\b|address|michigan avenue|loop|west loop|wicker park|gold coast|river north|streeterville|magnificent mile|fulton market|millennium|cloud gate|navy pier|willis tower|united center|art institute|state\/lake|ogilvie|clark\/division|morgan|damen)\b/i;
+
+  function isLocationInfoText(value) {
+    return LOCATION_INFO_RE.test(String(value || ""));
+  }
+
+  function visibleTags(hotel) {
+    return (hotel.tags || []).filter(tag => !isLocationInfoText(tag));
+  }
+
+  function visibleFacts(hotel) {
+    return (hotel.facts || []).filter(fact => !isLocationInfoText(fact));
+  }
+
+  function visibleAboutSections(hotel) {
+    return (hotel.aboutSections || []).filter(section => !isLocationInfoText(`${section.title || ""} ${section.text || ""}`));
+  }
+
   function displayFact(item) {
     const text = String(item || "");
     const ratingMatch = text.match(/^Tripadvisor lists a ([\d.]+)\/5 traveler rating from ([\d,]+) reviews\.$/);
     if (ratingMatch) return `Guest rating: ${bookingScore(ratingMatch[1])}/10 from ${ratingMatch[2]} reviews.`;
     return text
-      .replace(/^Tripadvisor classifies the property as /, "Hotel class: ")
-      .replace(/^Tripadvisor lists the address as /, "Address: ")
+      .replace(/^Tripadvisor classifies the property as /, "")
+      .replace(/^Tripadvisor lists the address as /, "")
       .replace(/^Tripadvisor lists the style as /, "Style: ")
       .replace(/^Tripadvisor lists /, "Property details: ")
       .replace(/^Tripadvisor notes /, "Property details: ");
-  }
-
-  function hotelMapQuery(hotel) {
-    return `${hotel.name}, ${hotel.address}, Chicago, Illinois`;
-  }
-
-  function hotelMapUrl(hotel) {
-    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotelMapQuery(hotel))}`;
-  }
-
-  function hotelMapEmbedUrl(hotel) {
-    return `https://maps.google.com/maps?q=${encodeURIComponent(hotelMapQuery(hotel))}&output=embed`;
   }
 
   function scrollIntoModalView(target, offset = 12) {
@@ -11352,11 +11358,8 @@
     return `${n}-star`;
   }
 
-  function bySort(value) {
-    const hotels = HOTELS.filter(hotel => VISIBLE_HOTEL_IDS.has(hotel.id));
-    if (value === "class_high") hotels.sort((a, b) => b.stars - a.stars || a.name.localeCompare(b.name));
-    if (value === "name") hotels.sort((a, b) => a.name.localeCompare(b.name));
-    return hotels;
+  function visibleHotels() {
+    return HOTELS.filter(hotel => VISIBLE_HOTEL_IDS.has(hotel.id));
   }
 
   function renderVersionLinks() {
@@ -11425,9 +11428,7 @@
       if (coverTitle) coverTitle.textContent = state.showReviews ? "Information treatment:" : "Hotel information:";
     }
 
-    const sortSelect = document.getElementById("sortSelect");
-    const sortValue = sortSelect ? sortSelect.value : "recommended";
-    const hotels = bySort(sortValue);
+    const hotels = visibleHotels();
     const results = document.getElementById("results");
     results.innerHTML = "";
 
@@ -11448,20 +11449,18 @@
       ` : `
         <div class="booking-no-score">
           <strong>Guest reviews hidden</strong>
-          <span>Review information is not shown in this version.</span>
         </div>
       `;
+
+      const tags = visibleTags(h);
 
       card.innerHTML = `
         <div class="card__body">
           <div>
             <h3 class="hotel-title">${escapeXml(h.name)}</h3>
-            <div class="sub"><button class="map-link" type="button" data-map="${escapeXml(h.id)}">Show on map</button> - ${escapeXml(h.neighborhood)} - ${escapeXml(h.address)}</div>
-            <div class="listing-meta">${escapeXml(h.hotelClass)} - ${escapeXml(h.distance)}</div>
+            <div class="listing-meta">${escapeXml(h.locationScoreText || "")}</div>
             <div class="booking-roomline">One selected room option available for this mock listing</div>
-            <div>
-              ${h.tags.map(t => `<span class="pill2">${escapeXml(t)}</span>`).join("")}
-            </div>
+            ${tags.length ? `<div>${tags.map(t => `<span class="pill2">${escapeXml(t)}</span>`).join("")}</div>` : ""}
             <div class="amenities">
               ${h.amenities.slice(0, 4).map(a => amenityChipHtml(a)).join("")}
             </div>
@@ -11474,8 +11473,7 @@
               <div class="per">per night - comparable study rate</div>
             </div>
             <div class="cta">
-              <button class="btn" type="button" data-open="${h.id}">See availability</button>
-              <button class="btn2" type="button" data-open="${h.id}">${state.showReviews ? "Read reviews" : "View property details"}</button>
+              <button class="btn" type="button" data-open="${h.id}">${state.showReviews ? "Read reviews" : "View details"}</button>
             </div>
           </div>
         </div>
@@ -11488,7 +11486,7 @@
   function ratingBreakdownRows(hotel) {
     const b = hotel.ratingBreakdown;
     if (!b) return "";
-    return Object.keys(b).map(k => `
+    return Object.keys(b).filter(k => !isLocationInfoText(k)).map(k => `
       <div class="breakdown__row">
         <span class="breakdown__k">${escapeXml(k)}</span>
         <span class="breakdown__v">${escapeXml(bookingScore(b[k]))}</span>
@@ -11639,6 +11637,7 @@
   }
 
   function factList(items) {
+    if (!items.length) return "";
     return `
       <ul class="fact-list">
         ${items.map(item => `<li>${escapeXml(displayFact(item))}</li>`).join("")}
@@ -11647,65 +11646,27 @@
   }
 
   function aboutSectionsHtml(hotel) {
-    if (!Array.isArray(hotel.aboutSections) || !hotel.aboutSections.length) {
+    const sections = visibleAboutSections(hotel);
+    if (!sections.length) {
       return `
-        <div class="kv">
-          <div class="k">Address</div><div>${escapeXml(hotel.address)}</div>
-          <div class="k">Description</div><div>${escapeXml(hotel.about)}</div>
-          <div class="k">Hotel class</div><div>${escapeXml(hotel.hotelClass)}</div>
+        <div class="property-summary">
+          <div class="property-pill-row">
+            ${hotel.locationScoreText ? `<span class="property-map-pill">${escapeXml(hotel.locationScoreText)}</span>` : ""}
+          </div>
         </div>
       `;
     }
 
     return `
       <div class="property-summary">
-        <div class="kv property-summary__kv">
-          <div class="k">Address</div><div>${escapeXml(hotel.address)}</div>
-          <div class="k">Hotel class</div><div>${escapeXml(hotel.hotelClass)}</div>
-          <div class="k">Transit</div><div>${escapeXml(hotel.distance)}</div>
-        </div>
         <div class="property-pill-row">
-          ${hotel.guestLovedNote ? `<span class="property-pill">${escapeXml(hotel.guestLovedNote)}</span>` : ""}
           ${hotel.locationScoreText ? `<span class="property-map-pill">${escapeXml(hotel.locationScoreText)}</span>` : ""}
         </div>
         <div class="about-card-grid">
-          ${hotel.aboutSections.map(section => `
+          ${sections.map(section => `
             <div class="about-card">
               <h4>${escapeXml(section.title)}</h4>
               <p>${escapeXml(section.text)}</p>
-            </div>
-          `).join("")}
-        </div>
-      </div>
-    `;
-  }
-
-  function areaInfoHtml(hotel) {
-    if (!Array.isArray(hotel.areaInfo) || !hotel.areaInfo.length) return "";
-    return `
-      <div class="hotel-area-section" data-track-section="area_info">
-        <div class="hotel-area-head">
-          <div>
-            <h3>Hotel area info</h3>
-            <div class="property-pill-row">
-              ${hotel.guestLovedNote ? `<span class="property-pill">${escapeXml(hotel.guestLovedNote)}</span>` : ""}
-              ${hotel.locationScoreText ? `<button class="map-link property-map-pill" type="button" data-map="${escapeXml(hotel.id)}">${escapeXml(hotel.areaMapText || hotel.locationScoreText)} - show map</button>` : ""}
-            </div>
-          </div>
-          <button class="btn hotel-area-cta" type="button" data-open="${escapeXml(hotel.id)}">See availability</button>
-        </div>
-        <div class="area-grid">
-          ${hotel.areaInfo.map(group => `
-            <div class="area-card">
-              <h4>${escapeXml(group.title)}</h4>
-              <div class="area-list">
-                ${group.items.map(([name, distance]) => `
-                  <div class="area-row">
-                    <span>${escapeXml(name)}</span>
-                    <strong>${escapeXml(distance)}</strong>
-                  </div>
-                `).join("")}
-              </div>
             </div>
           `).join("")}
         </div>
@@ -11722,7 +11683,6 @@
             <h3>Amenities of ${escapeXml(hotel.name)}</h3>
             ${hotel.amenityDetails.scoreLine ? `<div class="amenity-score-line">${escapeXml(hotel.amenityDetails.scoreLine)}</div>` : ""}
           </div>
-          <button class="btn hotel-area-cta" type="button" data-open="${escapeXml(hotel.id)}">See availability</button>
         </div>
         <div class="amenity-detail-popular">
           <h4>Most popular amenities</h4>
@@ -11747,14 +11707,7 @@
 
   function modalTemplate(hotel) {
     const state = pageState();
-    const uiState = getUiState();
-    const isSelected = uiState.selectedHotelId === hotel.id;
-    const isSaved = uiState.savedHotelIds.includes(hotel.id);
-    const actionStatus = isSelected
-      ? `${hotel.name} is selected.`
-      : isSaved
-        ? `${hotel.name} is saved.`
-        : "";
+    const facts = visibleFacts(hotel);
     return `
       <div class="modal-backdrop" data-close="1"></div>
       <div class="modal" role="dialog" aria-modal="true" aria-label="${escapeXml(hotel.name)} details">
@@ -11762,13 +11715,13 @@
           <div>
             <h2 class="modal__title">${escapeXml(hotel.name)}</h2>
             <div class="brand-pill">${escapeXml(hotel.brand)}</div>
-            <div class="sub">${escapeXml(hotel.neighborhood)} - ${escapeXml(hotel.hotelClass)}</div>
+            <div class="sub">${escapeXml(hotel.locationScoreText || "")}</div>
           </div>
           <button class="xbtn" type="button" data-close="1" aria-label="Close">x</button>
         </div>
 
         <div class="modal__scroll" id="hotelModalScroll" data-hotel-scroll="1">
-          <div class="modal__grid">
+          <div class="modal__grid${state.showReviews ? "" : " modal__grid--single"}">
             <div class="modal__left">
               <div class="section">
                 <h3>About this property</h3>
@@ -11777,10 +11730,10 @@
                 </div>
               </div>
 
-              <div class="section" data-track-section="facts">
+              ${facts.length ? `<div class="section" data-track-section="facts">
                 <h3>Verified hotel facts</h3>
-                ${factList(hotel.facts)}
-              </div>
+                ${factList(facts)}
+              </div>` : ""}
 
               <div class="section" data-track-section="amenities">
                 <h3>Most popular amenities</h3>
@@ -11790,19 +11743,8 @@
               </div>
             </div>
 
-            <div class="modal__right">
-              <div class="section section--availability" data-track-section="price_cta">
-                <h3>Availability</h3>
-                <div class="price price--words">$${hotel.priceNightly}</div>
-                <div class="per">per night - comparable study rate for this experiment.</div>
-                <div class="cta availability-actions">
-                  <button class="btn${isSelected ? " is-selected" : ""}" type="button" data-book="${hotel.id}">${isSelected ? "Selected" : "Select hotel"}</button>
-                  <button class="btn2${isSaved ? " is-saved" : ""}" type="button" data-fave="${hotel.id}">${isSaved ? "Saved" : "Save"}</button>
-                  <div class="action-status" data-action-status aria-live="polite">${escapeXml(actionStatus)}</div>
-                </div>
-              </div>
-
-              ${state.showReviews ? `
+            ${state.showReviews ? `
+              <div class="modal__right">
                 <div class="section section--ratings">
                   <h3>Guest ratings</h3>
                   <div data-track-section="guest_ratings">
@@ -11818,74 +11760,14 @@
                     </div>
                   </div>
                 </div>
-              ` : ``}
-            </div>
+              </div>
+            ` : ``}
           </div>
           ${amenityDetailsHtml(hotel)}
-          ${areaInfoHtml(hotel)}
           ${state.showReviews ? reviewsHtml(hotel) : ""}
         </div>
       </div>
     `;
-  }
-
-  function mapModalTemplate(hotel) {
-    const mapUrl = hotelMapUrl(hotel);
-    const embedUrl = hotelMapEmbedUrl(hotel);
-    return `
-      <div class="modal-backdrop" data-close="1"></div>
-      <div class="modal map-modal" role="dialog" aria-modal="true" aria-label="${escapeXml(hotel.name)} map">
-        <div class="modal__top">
-          <div>
-            <h2 class="modal__title">${escapeXml(hotel.name)}</h2>
-            <div class="sub">${escapeXml(hotel.address)}</div>
-          </div>
-          <button class="xbtn" type="button" data-close="1" aria-label="Close">x</button>
-        </div>
-        <div class="modal__scroll map-modal__body">
-          <iframe
-            class="map-frame"
-            title="${escapeXml(hotel.name)} map location"
-            src="${escapeXml(embedUrl)}"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade">
-          </iframe>
-          <div class="map-address">
-            <strong>Address</strong>
-            <span>${escapeXml(hotel.address)}</span>
-          </div>
-          <div class="map-actions">
-            <a class="btn" href="${escapeXml(mapUrl)}" target="_blank" rel="noreferrer">Open larger map</a>
-            <button class="btn2" type="button" data-open="${hotel.id}">View hotel details</button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  function openMapModal(hotelId) {
-    const hotel = HOTELS.find(h => h.id === hotelId);
-    if (!hotel) {
-      if ((location.hash || "").startsWith("#map/")) location.hash = "#results";
-      return;
-    }
-
-    if (activeHotelSession) {
-      closeModal("map");
-    }
-
-    const root = document.getElementById("modalRoot");
-    if (typeof modalScrollCleanup === "function") modalScrollCleanup();
-    activeHotelSession = null;
-
-    root.setAttribute("data-active-map", hotelId);
-    root.removeAttribute("data-active-hotel");
-    root.innerHTML = mapModalTemplate(hotel);
-    root.classList.add("is-open");
-    root.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
-    location.hash = "#map/" + hotelId;
-    logEvent("open_map", { hotelId, address: hotel.address });
   }
 
   function openHotelModal(hotelId, source) {
@@ -11986,34 +11868,6 @@
       });
     }
 
-    root.querySelectorAll("[data-book]").forEach(b => {
-      b.addEventListener("click", () => {
-        const uiState = getUiState();
-        uiState.selectedHotelId = hotelId;
-        setUiState(uiState);
-        b.textContent = "Selected";
-        b.classList.add("is-selected");
-        const status = root.querySelector("[data-action-status]");
-        if (status) status.textContent = `${hotel.name} selected.`;
-        logEvent("book_click", { hotelId, selected: true });
-      });
-    });
-    root.querySelectorAll("[data-fave]").forEach(b => {
-      b.addEventListener("click", () => {
-        const uiState = getUiState();
-        const saved = new Set(uiState.savedHotelIds);
-        const willSave = !saved.has(hotelId);
-        if (willSave) saved.add(hotelId);
-        else saved.delete(hotelId);
-        uiState.savedHotelIds = Array.from(saved);
-        setUiState(uiState);
-        b.textContent = willSave ? "Saved" : "Save";
-        b.classList.toggle("is-saved", willSave);
-        const status = root.querySelector("[data-action-status]");
-        if (status) status.textContent = willSave ? `${hotel.name} saved.` : `${hotel.name} removed from saved hotels.`;
-        logEvent("save_click", { hotelId, saved: willSave });
-      });
-    });
   }
 
   function closeModal(source) {
@@ -12054,14 +11908,6 @@
     renderVersionLinks();
     renderStudyFlowCta();
 
-    const sortSelect = document.getElementById("sortSelect");
-    if (sortSelect) {
-      sortSelect.addEventListener("change", (e) => {
-        logEvent("sort_change", { value: e.target.value });
-        renderResults();
-      });
-    }
-
     const downloadLogBtn = document.getElementById("downloadLogBtn");
     if (downloadLogBtn) {
       downloadLogBtn.addEventListener("click", () => {
@@ -12085,13 +11931,6 @@
       if (open) {
         const hotelId = open.getAttribute("data-open");
         openHotelModal(hotelId, "results");
-        return;
-      }
-
-      const map = e.target && e.target.closest && e.target.closest("[data-map]");
-      if (map) {
-        const hotelId = map.getAttribute("data-map");
-        openMapModal(hotelId);
         return;
       }
 
@@ -12128,8 +11967,7 @@
         openHotelModal(id, "deeplink");
       }
       if (h.startsWith("#map/")) {
-        const id = h.split("/")[1];
-        openMapModal(id);
+        location.hash = "#results";
       }
     });
   }
@@ -12150,8 +11988,7 @@
       openHotelModal(id, "deeplink");
     }
     if (h.startsWith("#map/")) {
-      const id = h.split("/")[1];
-      openMapModal(id);
+      location.hash = "#results";
     }
   }
 
