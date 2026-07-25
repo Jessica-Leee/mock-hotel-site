@@ -1293,8 +1293,8 @@ body{
 }
 .modal__scroll > .reviews{
   margin-top:0;
-  border-top:1px solid var(--line);
-  padding:16px 16px 20px;
+  border-top:0;
+  padding:8px 16px 20px;
   background:#fff;
 }
 .modal__scroll > .reviews .reviews__head h3{
@@ -1359,15 +1359,15 @@ body{
   background:#fff;
   margin-top:0;
   display:grid;
-  grid-template-columns:minmax(190px, 240px) minmax(0, 1fr);
-  gap:24px;
+  grid-template-columns:minmax(110px, 170px) minmax(0, 1fr);
+  gap:20px;
   position:relative;
 }
 .reviews__list .review{margin-top:0}
 .review:first-of-type{margin-top:0}
 .review__meta{display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:12px; color:var(--muted)}
 .review__quote{margin-top:8px; font-size:12px; color:#1c2a40; line-height:1.45; white-space:pre-line}
-.review__guest{font-size:13px; color:#1a1a1a}
+.review__guest{font-size:13px; color:#1a1a1a; padding-top:2px}
 .review__guestTop{display:flex; align-items:flex-start; gap:10px}
 .review__avatar{
   width:32px;

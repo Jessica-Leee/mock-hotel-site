@@ -11495,9 +11495,7 @@
   }
 
   function reviewStatusText(visible, total) {
-    if (!total) return "No comments shown";
-    if (visible >= total) return `Showing all ${formatCount(total)} comments`;
-    return `Showing 1-${formatCount(visible)} of ${formatCount(total)} comments`;
+    return "";
   }
 
   function isStayChip(text) {
@@ -11573,23 +11571,10 @@
 
   function reviewCardHtml(review, index, initialVisible) {
     const r = reviewDisplay(review);
-    const initial = (r.reviewer || "G").trim().charAt(0).toUpperCase();
     return `
       <article class="review" data-review="1" data-review-index="${index}"${index >= initialVisible ? " hidden" : ""}>
         <aside class="review__guest">
-          <div class="review__guestTop">
-            <div class="review__avatar" aria-hidden="true">${escapeXml(initial)}</div>
-            <div>
-              <div class="review__name">${escapeXml(r.reviewer)}</div>
-              ${r.activeSince ? `<div class="review__since">${escapeXml(r.activeSince)}</div>` : ""}
-              ${r.country ? `<div class="review__country"><span class="review__flag" aria-hidden="true"></span>${escapeXml(r.country)}</div>` : ""}
-            </div>
-          </div>
-          <div class="review__guestDetails">
-            ${reviewDetailHtml("Room", r.room)}
-            ${reviewDetailHtml("Stay", r.stay)}
-            ${reviewDetailHtml("Traveler", r.guestType)}
-          </div>
+          <div class="review__name">${escapeXml(r.reviewer)}</div>
         </aside>
         <div class="review__body">
           <div class="review__topline">
@@ -11619,16 +11604,6 @@
         data-review-visible="${initialVisible}"
         data-review-initial="${initialVisible}"
         data-review-step="${REVIEW_BATCH_VISIBLE}">
-        <div class="reviews__head">
-          <h3 style="margin:0">Guest reviews</h3>
-          <div class="tag">Exact pasted reviews</div>
-        </div>
-        <div class="reviews__tools">
-          <div class="reviews__count" data-review-status aria-live="polite">${escapeXml(reviewStatusText(initialVisible, total))}</div>
-          <div class="reviews__actions">
-            <button class="review-action review-action--quiet" type="button" data-review-action="back-top">Back to top</button>
-          </div>
-        </div>
         <div class="reviews__list" data-review-list>
           ${reviews.map((review, index) => reviewCardHtml(review, index, initialVisible)).join("")}
         </div>
@@ -11707,6 +11682,21 @@
 
   function modalTemplate(hotel) {
     const state = pageState();
+    if (state.showReviews) {
+      return `
+        <div class="modal-backdrop" data-close="1"></div>
+        <div class="modal modal--reviews-only" role="dialog" aria-modal="true" aria-label="${escapeXml(hotel.name)} reviews">
+          <div class="modal__top">
+            <h2 class="modal__title">${escapeXml(hotel.name)}</h2>
+            <button class="xbtn" type="button" data-close="1" aria-label="Close">x</button>
+          </div>
+          <div class="modal__scroll" id="hotelModalScroll" data-hotel-scroll="1">
+            ${reviewsHtml(hotel)}
+          </div>
+        </div>
+      `;
+    }
+
     const facts = visibleFacts(hotel);
     return `
       <div class="modal-backdrop" data-close="1"></div>
