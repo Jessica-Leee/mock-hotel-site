@@ -11718,6 +11718,7 @@
         <div class="card__body">
           <div>
             <h3 class="hotel-title">${escapeXml(h.name)}</h3>
+            ${state.showReviews ? "" : hotelListingPreviewHtml(h)}
           </div>
 
           <div class="priceBox priceBox--text">
@@ -11738,6 +11739,18 @@
       results.appendChild(card);
     }
     renderStudyFlowCta();
+  }
+
+  function hotelListingPreviewHtml(hotel) {
+    const tags = visibleTags(hotel);
+    return `
+      ${hotel.locationScoreText ? `<div class="listing-meta">${escapeXml(hotel.locationScoreText)}</div>` : ""}
+      <div class="booking-roomline">One selected room option available for this mock listing</div>
+      ${tags.length ? `<div>${tags.map(t => `<span class="pill2">${escapeXml(t)}</span>`).join("")}</div>` : ""}
+      <div class="amenities">
+        ${(hotel.amenities || []).slice(0, 4).map(a => amenityChipHtml(a)).join("")}
+      </div>
+    `;
   }
 
   function ratingBreakdownRows(hotel) {
