@@ -1,4 +1,4 @@
-# Mock hotel site — deployment + tracking
+# Hotel survey site — deployment + tracking
 
 ## Live site
 
@@ -9,12 +9,12 @@ Hosted on [GitHub Pages](https://pages.github.com/) from the `main` branch. Push
 ## Study URLs
 
 - **Survey (entry):** https://jessica-leee.github.io/mock-hotel-site/
-- **No reviews:** https://jessica-leee.github.io/mock-hotel-site/hotels-no-reviews.html
-- **With reviews:** https://jessica-leee.github.io/mock-hotel-site/hotels-with-reviews.html
+- **Search page 1:** https://jessica-leee.github.io/mock-hotel-site/hotel_1.html?survey_stage=search_1
+- **Search page 2:** https://jessica-leee.github.io/mock-hotel-site/hotel_2.html?survey_stage=search_2
 
 `index.html` is the survey entry page. After the survey, participants are routed to one of the Chicago hotel pages. Hotel details are text-only; hotel photos and galleries are not rendered.
 
-The no-review page is labeled as Phase 1 browsing and uses the relisted-hotel cover story from the experiment design. The review page is labeled as the Phase 2 Full Reviews Control condition and does not show an AI summary.
+The participant-facing flow uses neutral page names and query strings so the condition is not disclosed in the URL.
 
 ## Ensure multiple participants are recorded
 
