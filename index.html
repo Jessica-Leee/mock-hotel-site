@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbxPojbcbSKbiB6nxHdYp1DYE8_en_Ugq1EyaieEN_H2j8kD67VOIv0qzbxk28rUNxx50Q/exec"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260725-14" />
+    <link rel="stylesheet" href="./styles.css?v=20260728-1" />
   </head>
   <body data-survey-page="true">
     <header class="booking-header" aria-label="Site header">
@@ -89,16 +89,16 @@
         if (hotelQuestionnaireMode && !noReviewViewingComplete()) {
           const nextParams = new URLSearchParams(location.search || "");
           if (prolificId) nextParams.set("PROLIFIC_PID", prolificId);
-          nextParams.set("survey_stage", "no_reviews");
-          location.replace("hotels-no-reviews.html?" + nextParams.toString());
+          nextParams.set("survey_stage", "search_1");
+          location.replace("hotel_1.html?" + nextParams.toString());
           return;
         }
 
         if (postReviewMode && !reviewViewingComplete()) {
           const nextParams = new URLSearchParams(location.search || "");
           if (prolificId) nextParams.set("PROLIFIC_PID", prolificId);
-          nextParams.set("survey_stage", "with_reviews");
-          location.replace("hotels-with-reviews.html?" + nextParams.toString());
+          nextParams.set("survey_stage", "search_2");
+          location.replace("hotel_2.html?" + nextParams.toString());
           return;
         }
 
@@ -107,7 +107,7 @@
           { id: "service_quality", label: "Service quality", likelihoodId: "good_service_quality", likelihoodLabel: "Good Service quality" },
           { id: "room_comfort", label: "Room comfort", likelihoodId: "comfortable_rooms", likelihoodLabel: "Comfortable rooms" },
           { id: "wifi_reliability", label: "Wi-Fi reliability", likelihoodId: "reliable_wifi", likelihoodLabel: "Reliable Wi-Fi" },
-          { id: "noise_level", label: "Noise level", likelihoodId: "low_noise_level", likelihoodLabel: "Low noise level" },
+          { id: "noise_level", label: "Noise level", questionnaireLabel: "Low Noise Level", likelihoodId: "low_noise_level", likelihoodLabel: "Low Noise Level" },
           { id: "location_convenience", label: "Location convenience", likelihoodId: "convenient_location", likelihoodLabel: "Convenient location" },
           { id: "value_for_money", label: "Value for money", likelihoodId: "good_value_for_money", likelihoodLabel: "Good value for money" },
           { id: "breakfast_quality", label: "Breakfast quality", likelihoodId: "high_quality_breakfast", likelihoodLabel: "High-quality breakfast" }
@@ -170,9 +170,9 @@
             title: () => "How confident are you in each rating above?",
             rows: () => selectedAttributeRows("attribute"),
             columns: [
-              ["low", "low"],
-              ["medium", "medium"],
-              ["high", "high"]
+              ["low", "Low"],
+              ["medium", "Medium"],
+              ["high", "High"]
             ]
           }
         };
@@ -390,7 +390,7 @@
             .filter(Boolean);
           return attributes.map(attribute => kind === "likelihood"
             ? [attribute.likelihoodId, attribute.likelihoodLabel]
-            : [attribute.id, attribute.label]
+            : [attribute.id, attribute.questionnaireLabel || attribute.label]
           );
         }
 
@@ -907,18 +907,18 @@
           const nextParams = new URLSearchParams(location.search || "");
           const pid = (state && state.prolific_id) || prolificId || "";
           if (pid) nextParams.set("PROLIFIC_PID", pid);
-          nextParams.set("survey_stage", "no_reviews");
+          nextParams.set("survey_stage", "search_1");
           logSurveyEvent({ id: "browse_intro", type: "transition" }, { value: "start_hotel_browsing" }, state || getState());
-          location.replace("hotels-no-reviews.html?" + nextParams.toString());
+          location.replace("hotel_1.html?" + nextParams.toString());
         }
 
         function goToReviewBrowsing(state) {
           const nextParams = new URLSearchParams(location.search || "");
           const pid = (state && state.prolific_id) || prolificId || "";
           if (pid) nextParams.set("PROLIFIC_PID", pid);
-          nextParams.set("survey_stage", "with_reviews");
+          nextParams.set("survey_stage", "search_2");
           logSurveyEvent({ id: "hotel_questionnaire_complete", type: "transition" }, { value: "start_review_browsing" }, state || getState());
-          location.replace("hotels-with-reviews.html?" + nextParams.toString());
+          location.replace("hotel_2.html?" + nextParams.toString());
         }
 
         function renderCompletionScreen() {

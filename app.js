@@ -10508,15 +10508,19 @@
     const p = new URLSearchParams(location.search);
     const path = location.pathname.toLowerCase();
     const reviewParam = (p.get("reviews") || "").toLowerCase();
+    const surveyStage = (p.get("survey_stage") || "").toLowerCase();
     const bodyVersion = (document.body.dataset.reviewVersion || "auto").toLowerCase();
     const legacyPhase = p.get("phase");
 
     let showReviews = false;
     if (["1", "true", "yes", "with"].includes(reviewParam)) showReviews = true;
     else if (["0", "false", "no", "without"].includes(reviewParam)) showReviews = false;
+    else if (surveyStage === "search_2") showReviews = true;
+    else if (surveyStage === "search_1") showReviews = false;
     else if (bodyVersion === "with") showReviews = true;
     else if (bodyVersion === "without") showReviews = false;
-    else if (path.includes("with-reviews") || legacyPhase === "2") showReviews = true;
+    else if (path.includes("hotel_2") || path.includes("with-reviews") || legacyPhase === "2") showReviews = true;
+    else if (path.includes("hotel_1") || path.includes("no-reviews") || legacyPhase === "1") showReviews = false;
 
     return {
       showReviews,
@@ -11706,11 +11710,7 @@
           </div>
           <div class="booking-score">${escapeXml(score10)}</div>
         </div>
-      ` : `
-        <div class="booking-no-score">
-          <strong>Guest reviews hidden</strong>
-        </div>
-      `;
+      ` : "";
 
       const isCompletedNoReviewView = !state.showReviews && completedNoReviewViews.has(h.id);
 
@@ -11725,7 +11725,7 @@
             ${scoreBox}
             <div>
               <div class="price price--words">$${h.priceNightly}</div>
-              <div class="per">per night - comparable study rate</div>
+              <div class="per">per night</div>
             </div>
             <div class="cta">
               ${isCompletedNoReviewView
@@ -11745,7 +11745,7 @@
     const tags = visibleTags(hotel);
     return `
       ${hotel.locationScoreText ? `<div class="listing-meta">${escapeXml(hotel.locationScoreText)}</div>` : ""}
-      <div class="booking-roomline">One selected room option available for this mock listing</div>
+      <div class="booking-roomline">One selected room option available for this listing</div>
       ${tags.length ? `<div>${tags.map(t => `<span class="pill2">${escapeXml(t)}</span>`).join("")}</div>` : ""}
       <div class="amenities">
         ${(hotel.amenities || []).slice(0, 4).map(a => amenityChipHtml(a)).join("")}
