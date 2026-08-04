@@ -130,6 +130,14 @@ body{
   line-height:1.45;
   font-weight:750;
 }
+.survey-notice--countdown{
+  border:2px solid #f59f00;
+  border-left:6px solid #f08c00;
+  background:#fff3bf;
+  color:#5c3200;
+  box-shadow:0 8px 20px rgba(240, 140, 0, .16);
+  font-weight:850;
+}
 .survey-notice--browse{
   margin:0 0 14px;
 }
@@ -648,6 +656,19 @@ body{
 .study-flow strong{
   color:#003b95;
 }
+.study-flow--timer{
+  border:2px solid #f59f00;
+  border-left:6px solid #f08c00;
+  background:#fff3bf;
+  color:#5c3200;
+  box-shadow:0 10px 24px rgba(240, 140, 0, .14);
+}
+.study-flow--timer strong{
+  color:#7a3f00;
+}
+.study-flow--timer .study-flow__note{
+  color:#7a3f00;
+}
 .study-flow__btn{
   flex:0 0 auto;
   display:inline-flex;
@@ -951,14 +972,29 @@ body{
 }
 .modal-timer{
   margin:0 18px 12px;
-  padding:10px 12px;
-  border:1px solid #d9e5ff;
+  padding:12px 14px;
+  border:2px solid #f59f00;
+  border-left:6px solid #f08c00;
   border-radius:8px;
-  background:#f7faff;
-  color:#1e2f4d;
+  background:#fff3bf;
+  color:#5c3200;
+  box-shadow:0 8px 20px rgba(240, 140, 0, .16);
   font-size:13px;
   line-height:1.45;
-  font-weight:800;
+  font-weight:900;
+}
+.modal-warning{
+  margin:0 18px 12px;
+  padding:12px 14px;
+  border:2px solid #e8590c;
+  border-left:6px solid #e8590c;
+  border-radius:8px;
+  background:#fff4e6;
+  color:#7a2e00;
+  box-shadow:0 8px 20px rgba(232, 89, 12, .14);
+  font-size:13px;
+  line-height:1.45;
+  font-weight:900;
 }
 .modal__title{
   margin:0;
@@ -1600,7 +1636,7 @@ body{
   color:#202124;
   line-height:1.45;
 }
-.review__body{min-width:0; padding-right:64px}
+.review__body{min-width:0}
 .review__topline{
   min-height:28px;
   display:flex;
@@ -1612,22 +1648,6 @@ body{
   color:#5a5f68;
   font-size:13px;
   line-height:1.4;
-}
-.review__scoreBadge{
-  position:absolute;
-  top:16px;
-  right:0;
-  min-width:38px;
-  height:38px;
-  padding:0 7px;
-  border-radius:6px 6px 6px 0;
-  display:grid;
-  place-items:center;
-  background:#003b95;
-  color:#fff;
-  font-size:18px;
-  font-weight:900;
-  font-variant-numeric:tabular-nums;
 }
 .review__title{
   margin:0 0 14px;
@@ -1714,7 +1734,6 @@ body{
     grid-template-columns:1fr;
     gap:16px;
   }
-  .review__body{padding-right:58px}
   .review__guestDetails{margin-top:14px}
   .review__title{font-size:17px}
   .review__textBlock p{font-size:14px}

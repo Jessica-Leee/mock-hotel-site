@@ -5,12 +5,14 @@
   const HOTEL_REVIEW_VIEW_STATE_KEY = "mock_hotel_review_views_v1";
   const HOTEL_ORDER_STATE_KEY = "mock_hotel_visible_order_v1";
   const NO_REVIEW_VIEW_SECONDS = 30;
+  const REVIEW_WARNING_SECONDS = 5 * 60;
 
   let activeHotelSession = null;
   let modalScrollCleanup = null;
   let randomizedVisibleHotelIds = null;
   let balancedVisibleReviewCount = null;
   let noReviewTimer = null;
+  let reviewWarningTimer = null;
   const REVIEW_INITIAL_VISIBLE = 12;
   const REVIEW_BATCH_VISIBLE = 24;
 
@@ -10331,6 +10333,7 @@
     const state = safeJsonParse(localStorage.getItem(hotelViewStorageKey()), {}) || {};
     return {
       viewedHotelIds: Array.isArray(state.viewedHotelIds) ? state.viewedHotelIds.filter(Boolean) : [],
+      elapsedMsByHotel: state.elapsedMsByHotel && typeof state.elapsedMsByHotel === "object" ? state.elapsedMsByHotel : {},
       deadlines: state.deadlines && typeof state.deadlines === "object" ? state.deadlines : {},
       updatedAt: state.updatedAt || ""
     };
@@ -10352,32 +10355,59 @@
     localStorage.setItem(hotelReviewViewStorageKey(), JSON.stringify(state || {}));
   }
 
+  function noReviewLimitMs() {
+    return NO_REVIEW_VIEW_SECONDS * 1000;
+  }
+
+  function normalizedNoReviewElapsedMs(value) {
+    const elapsed = Number(value || 0);
+    if (!Number.isFinite(elapsed) || elapsed <= 0) return 0;
+    return Math.min(noReviewLimitMs(), elapsed);
+  }
+
+  function noReviewElapsedMs(state, hotelId) {
+    return normalizedNoReviewElapsedMs(state && state.elapsedMsByHotel ? state.elapsedMsByHotel[hotelId] : 0);
+  }
+
+  function noReviewRemainingMs(hotelId, state = getHotelViewState()) {
+    return Math.max(0, noReviewLimitMs() - noReviewElapsedMs(state, hotelId));
+  }
+
   function finalizeExpiredNoReviewViews() {
     const state = getHotelViewState();
     const viewed = new Set(state.viewedHotelIds);
-    const deadlines = state.deadlines || {};
+    const elapsedMsByHotel = state.elapsedMsByHotel || {};
     const newlyCompleted = [];
-    const now = Date.now();
+    let changed = false;
 
     requiredHotelIds().forEach(id => {
-      const deadline = Number(deadlines[id] || 0);
-      if (deadline && deadline <= now && !viewed.has(id)) {
+      const elapsedMs = noReviewElapsedMs(state, id);
+      if (elapsedMsByHotel[id] != null && elapsedMsByHotel[id] !== elapsedMs) {
+        elapsedMsByHotel[id] = elapsedMs;
+        changed = true;
+      }
+      if (elapsedMs >= noReviewLimitMs() && !viewed.has(id)) {
         viewed.add(id);
         newlyCompleted.push(id);
+        changed = true;
       }
-      if (deadline && deadline <= now) delete deadlines[id];
     });
 
-    if (!newlyCompleted.length) return;
+    if (state.deadlines && Object.keys(state.deadlines).length) {
+      state.deadlines = {};
+      changed = true;
+    }
+
+    if (!changed) return;
 
     state.viewedHotelIds = Array.from(viewed);
-    state.deadlines = deadlines;
+    state.elapsedMsByHotel = elapsedMsByHotel;
     state.updatedAt = new Date().toISOString();
     setHotelViewState(state);
     newlyCompleted.forEach(hotelId => {
       logEvent("no_review_hotel_view_complete", {
         hotelId,
-        reason: "deadline_expired",
+        reason: "time_limit_reached",
         viewedCount: state.viewedHotelIds.length,
         requiredCount: requiredHotelIds().length
       });
@@ -10413,7 +10443,9 @@
     if (viewed.has(hotelId)) return;
     viewed.add(hotelId);
     state.viewedHotelIds = Array.from(viewed);
-    if (state.deadlines) delete state.deadlines[hotelId];
+    state.elapsedMsByHotel = state.elapsedMsByHotel || {};
+    state.elapsedMsByHotel[hotelId] = noReviewElapsedMs(state, hotelId);
+    if (state.deadlines) state.deadlines = {};
     state.updatedAt = new Date().toISOString();
     setHotelViewState(state);
     logEvent("no_review_hotel_view_complete", {
@@ -10422,6 +10454,47 @@
       viewedCount: state.viewedHotelIds.length,
       requiredCount: requiredHotelIds().length
     });
+  }
+
+  function recordNoReviewHotelTime(hotelId, durationMs, reason = "modal_closed") {
+    const state = getHotelViewState();
+    const beforeMs = noReviewElapsedMs(state, hotelId);
+    const addedMs = Math.max(0, Number(durationMs || 0));
+    const afterMs = Math.min(noReviewLimitMs(), beforeMs + addedMs);
+    const actualAddedMs = Math.max(0, afterMs - beforeMs);
+    const viewed = new Set(state.viewedHotelIds);
+    const wasViewed = viewed.has(hotelId);
+
+    viewed.add(hotelId);
+    state.viewedHotelIds = Array.from(viewed);
+    state.elapsedMsByHotel = state.elapsedMsByHotel || {};
+    state.elapsedMsByHotel[hotelId] = afterMs;
+    if (state.deadlines) state.deadlines = {};
+    state.updatedAt = new Date().toISOString();
+    setHotelViewState(state);
+
+    if (!wasViewed) {
+      logEvent("no_review_hotel_view_complete", {
+        hotelId,
+        reason,
+        viewedCount: state.viewedHotelIds.length,
+        requiredCount: requiredHotelIds().length
+      });
+    }
+
+    logEvent("no_review_hotel_time_recorded", {
+      hotelId,
+      reason,
+      addedMs: Math.round(actualAddedMs),
+      totalMs: Math.round(afterMs),
+      remainingMs: Math.round(noReviewLimitMs() - afterMs)
+    });
+
+    if (afterMs >= noReviewLimitMs() && beforeMs < noReviewLimitMs()) {
+      logEvent("no_review_hotel_time_limit_reached", { hotelId, totalMs: Math.round(afterMs) });
+    }
+
+    return { beforeMs, afterMs, actualAddedMs, remainingMs: noReviewLimitMs() - afterMs };
   }
 
   function markReviewHotelViewed(hotelId, reason = "review_modal_closed") {
@@ -10440,24 +10513,17 @@
     });
   }
 
-  function ensureNoReviewDeadline(hotelId) {
+  function ensureNoReviewTimeAvailable(hotelId) {
     const state = getHotelViewState();
-    if (state.viewedHotelIds.includes(hotelId)) return 0;
-
-    const existingDeadline = Number((state.deadlines || {})[hotelId] || 0);
-    if (existingDeadline > Date.now()) return existingDeadline;
-    if (existingDeadline && existingDeadline <= Date.now()) {
-      markNoReviewHotelViewed(hotelId);
-      return 0;
-    }
-
-    const deadline = Date.now() + (NO_REVIEW_VIEW_SECONDS * 1000);
-    state.deadlines = state.deadlines || {};
-    state.deadlines[hotelId] = deadline;
-    state.updatedAt = new Date().toISOString();
-    setHotelViewState(state);
-    logEvent("no_review_hotel_timer_started", { hotelId, seconds: NO_REVIEW_VIEW_SECONDS });
-    return deadline;
+    const remainingMs = noReviewRemainingMs(hotelId, state);
+    if (remainingMs <= 0) return 0;
+    logEvent("no_review_hotel_timer_started", {
+      hotelId,
+      seconds: NO_REVIEW_VIEW_SECONDS,
+      elapsedMs: Math.round(noReviewElapsedMs(state, hotelId)),
+      remainingMs: Math.round(remainingMs)
+    });
+    return remainingMs;
   }
 
   function getLogs() {
@@ -10609,7 +10675,6 @@
               "Couples in particular like the location - they rated it 9.5 for a two-person trip."
           ],
           "facts": [
-              "Excellent location rated 9.7/10 from 798 reviews.",
               "Room option: King Guestroom, 295 sq ft, 1 king bed.",
               "Subway/metro and train access is 1,100 ft walking from State/Lake station.",
               "Real guests, real stays and real opinions."
@@ -10620,7 +10685,7 @@
               "Chicago Riverwalk",
               "Art Institute of Chicago"
           ],
-          "locationScoreText": "Excellent location - rated 9.7/10",
+          "locationScoreText": "",
           "areaMapText": "Excellent location",
           "guestLovedNote": "Guests loved walking around the neighborhood.",
           "guestRating": 4.85,
@@ -10760,7 +10825,6 @@
               }
           ],
           "facts": [
-              "Excellent location rated 9.5/10 from 935 reviews.",
               "Modern guest rooms include flat-screen cable TV, plush lounge seating, complimentary WiFi, minibar and coffee machine.",
               "Subway access is 1,250 ft walking from Clark/Division station.",
               "Couples in particular like the location, rating it 9.5 for a two-person trip."
@@ -10771,7 +10835,7 @@
               "Navy Pier",
               "Millennium Park"
           ],
-          "locationScoreText": "Excellent location - rated 9.5/10",
+          "locationScoreText": "",
           "areaMapText": "Excellent location",
           "guestLovedNote": "Guests loved walking around the neighborhood.",
           "guestRating": 4.75,
@@ -10906,7 +10970,6 @@
               }
           ],
           "facts": [
-              "Excellent location rated 9.6/10 from 235 reviews.",
               "Room option: King Room, 330 sq ft, 1 king bed.",
               "Subway access is 300 ft walking from Damen station.",
               "Couples in particular like the location, rating it 9.6 for a two-person trip."
@@ -10917,7 +10980,7 @@
               "United Center",
               "Lincoln Park Zoo"
           ],
-          "locationScoreText": "Excellent location - rated 9.6/10",
+          "locationScoreText": "",
           "areaMapText": "Excellent location",
           "guestLovedNote": "Guests loved walking around the neighborhood.",
           "guestRating": 4.8,
@@ -11071,7 +11134,6 @@
               }
           ],
           "facts": [
-              "Excellent location rated 9.3/10 from 273 reviews.",
               "Room option: Standard King Room, 290 sq ft, 1 king bed.",
               "Subway access is 600 ft walking from Morgan station.",
               "Couples in particular like the location, rating it 9.4 for a two-person trip."
@@ -11082,7 +11144,7 @@
               "Restaurant Row",
               "Millennium Park"
           ],
-          "locationScoreText": "Excellent location - rated 9.3/10",
+          "locationScoreText": "",
           "areaMapText": "Excellent location",
           "guestLovedNote": "Guests loved walking around the neighborhood.",
           "guestRating": 4.65,
@@ -11219,7 +11281,6 @@
               "Couples in particular like the location - they rated it 9.5 for a two-person trip."
           ],
           "facts": [
-              "Excellent location rated 9.5/10 from 373 reviews.",
               "Room option: Yubune King, 439 sq ft, 1 king bed.",
               "Couples in particular like the location, rating it 9.5 for a two-person trip.",
               "Nearby transit includes Ogilvie Transportation Center and Union Station."
@@ -11230,7 +11291,7 @@
               "Willis Tower",
               "Art Institute of Chicago"
           ],
-          "locationScoreText": "Excellent location - rated 9.5/10",
+          "locationScoreText": "",
           "guestLovedNote": "Guests loved walking around the neighborhood.",
           "guestRating": 4.75,
           "guestReviewCount": 373,
@@ -11371,8 +11432,7 @@
               "Couples in particular like the location - they rated it 9.7 for a two-person trip."
           ],
           "facts": [
-              "Overall guest score rated 8.9/10 from 1,955 reviews.",
-              "Excellent location rated 9.7/10 from guest reviews.",
+              "Overall guest score rated 9.6/10 from 1,955 reviews.",
               "Room option: Standard King Room, 220 sq ft, 1 king bed.",
               "Subway/metro and train access is 550 ft walking from Millennium Station station.",
               "Couples in particular like the location, rating it 9.8 for a two-person trip.",
@@ -11384,10 +11444,10 @@
               "Cloud Gate",
               "Art Institute of Chicago"
           ],
-          "locationScoreText": "Excellent location - rated 9.7/10",
+          "locationScoreText": "",
           "areaMapText": "Excellent location",
           "guestLovedNote": "Guests loved walking around the neighborhood.",
-          "guestRating": 4.45,
+          "guestRating": 4.8,
           "guestReviewCount": 1955,
           "ratingBreakdown": {
               "Staff": 4.65,
@@ -11482,6 +11542,11 @@
 
   function formatCount(n) {
     return Number(n || 0).toLocaleString();
+  }
+
+  function reviewCountLabel(count, usePlus) {
+    const countText = `${formatCount(count)}${usePlus && Number(count || 0) >= 100 ? "+" : ""}`;
+    return `${countText} reviews`;
   }
 
   function bookingScore(score5) {
@@ -11652,6 +11717,7 @@
       const required = requiredHotelIds();
       const viewedCount = required.filter(id => viewed.has(id)).length;
       const unlocked = viewedCount >= required.length;
+      if (!unlocked) box.classList.add("study-flow--timer");
       box.innerHTML = unlocked ? `
         <div>
           <strong>Hotel questions unlocked:</strong>
@@ -11661,11 +11727,24 @@
       ` : `
         <div>
           <strong>Hotel questions locked:</strong>
-          Open each of the 3 hotel detail popups. You may close a popup whenever you are done; each popup has a maximum viewing time of 30 seconds and cannot be reopened after closing or timing out.
+          Open each hotel detail popup before continuing. Each hotel has a 30-second total viewing limit.
           <div class="study-flow__note">Completed ${formatCount(viewedCount)} of ${formatCount(required.length)} hotel popups.</div>
         </div>
         <button class="btn study-flow__btn" type="button" disabled>Continue to hotel questions</button>
       `;
+    }
+  }
+
+  function updateBrowseNotice() {
+    const notice = document.querySelector(".survey-notice--browse");
+    if (!notice) return;
+
+    if (pageState().showReviews) {
+      notice.classList.remove("survey-notice--countdown");
+      notice.textContent = "Continue carefully: you cannot return to earlier pages. Open the review popup for each hotel before continuing.";
+    } else {
+      notice.classList.add("survey-notice--countdown");
+      notice.textContent = "Continue carefully: you cannot return to earlier pages. Each hotel popup can be reopened, but each hotel has a 30-second total viewing limit.";
     }
   }
 
@@ -11692,6 +11771,7 @@
 
     const hotels = visibleHotels();
     const completedNoReviewViews = state.showReviews ? new Set() : viewedHotelSet();
+    const noReviewViewState = state.showReviews ? null : getHotelViewState();
     const results = document.getElementById("results");
     results.innerHTML = "";
 
@@ -11702,17 +11782,19 @@
 
       const score10 = bookingScore(h.guestRating);
       const displayedReviewCount = state.showReviews ? balancedReviews(h).length : h.guestReviewCount;
+      const displayedReviewCountLabel = reviewCountLabel(displayedReviewCount, state.showReviews);
       const scoreBox = state.showReviews ? `
         <div class="booking-scoreline">
           <div>
             <div class="booking-scoreword">${escapeXml(bookingScoreWord(score10))}</div>
-            <div class="booking-reviewcount">${formatCount(displayedReviewCount)} reviews</div>
+            <div class="booking-reviewcount">${escapeXml(displayedReviewCountLabel)}</div>
           </div>
           <div class="booking-score">${escapeXml(score10)}</div>
         </div>
       ` : "";
 
       const isCompletedNoReviewView = !state.showReviews && completedNoReviewViews.has(h.id);
+      const hasNoReviewTimeRemaining = state.showReviews || noReviewRemainingMs(h.id, noReviewViewState) > 0;
 
       card.innerHTML = `
         <div class="card__body">
@@ -11728,9 +11810,9 @@
               <div class="per">per night</div>
             </div>
             <div class="cta">
-              ${isCompletedNoReviewView
-                ? `<button class="btn" type="button" disabled>Viewed</button>`
-                : `<button class="btn" type="button" data-open="${h.id}">${state.showReviews ? "Read reviews" : "View details"}</button>`}
+              ${!hasNoReviewTimeRemaining
+                ? `<button class="btn" type="button" disabled>Time used</button>`
+                : `<button class="btn" type="button" data-open="${h.id}">${state.showReviews ? "Read reviews" : (isCompletedNoReviewView ? "View again" : "View details")}</button>`}
             </div>
           </div>
         </div>
@@ -11744,7 +11826,6 @@
   function hotelListingPreviewHtml(hotel) {
     const tags = visibleTags(hotel);
     return `
-      ${hotel.locationScoreText ? `<div class="listing-meta">${escapeXml(hotel.locationScoreText)}</div>` : ""}
       <div class="booking-roomline">One selected room option available for this listing</div>
       ${tags.length ? `<div>${tags.map(t => `<span class="pill2">${escapeXml(t)}</span>`).join("")}</div>` : ""}
       <div class="amenities">
@@ -11897,7 +11978,6 @@
         <div class="review__body">
           <div class="review__topline">
             <div class="review__date">${r.reviewed ? `Reviewed: ${escapeXml(r.reviewed)}` : ""}</div>
-            ${r.scoreText ? `<div class="review__scoreBadge" aria-label="${escapeXml(r.scoredLabel)}">${escapeXml(r.scoreText)}</div>` : ""}
           </div>
           ${r.title ? `<h4 class="review__title">${escapeXml(r.title)}</h4>` : ""}
           <div class="review__copy">
@@ -11943,18 +12023,12 @@
     if (!sections.length) {
       return `
         <div class="property-summary">
-          <div class="property-pill-row">
-            ${hotel.locationScoreText ? `<span class="property-map-pill">${escapeXml(hotel.locationScoreText)}</span>` : ""}
-          </div>
         </div>
       `;
     }
 
     return `
       <div class="property-summary">
-        <div class="property-pill-row">
-          ${hotel.locationScoreText ? `<span class="property-map-pill">${escapeXml(hotel.locationScoreText)}</span>` : ""}
-        </div>
         <div class="about-card-grid">
           ${sections.map(section => `
             <div class="about-card">
@@ -12009,6 +12083,9 @@
             <h2 class="modal__title">${escapeXml(hotel.name)}</h2>
             <button class="xbtn" type="button" data-close="1" aria-label="Close">x</button>
           </div>
+          <div class="modal-warning" data-review-warning role="alert" hidden>
+            You have been viewing this review popup for more than 5 minutes. Please continue when you are ready.
+          </div>
           <div class="modal__scroll" id="hotelModalScroll" data-hotel-scroll="1">
             ${reviewsHtml(hotel)}
           </div>
@@ -12024,12 +12101,11 @@
           <div>
             <h2 class="modal__title">${escapeXml(hotel.name)}</h2>
             <div class="brand-pill">${escapeXml(hotel.brand)}</div>
-            <div class="sub">${escapeXml(hotel.locationScoreText || "")}</div>
           </div>
           <button class="xbtn" type="button" data-close="1" aria-label="Close">x</button>
         </div>
         <div class="modal-timer" data-no-review-timer>
-          You may close this popup whenever you are done. Maximum viewing time: 30 seconds. After time runs out, it will close and cannot be viewed again.
+          30-second total limit for this hotel. You can close and reopen until time runs out.
         </div>
 
         <div class="modal__scroll" id="hotelModalScroll" data-hotel-scroll="1">
@@ -12090,26 +12166,48 @@
     }
   }
 
+  function clearReviewWarningTimer() {
+    if (reviewWarningTimer) {
+      clearTimeout(reviewWarningTimer);
+      reviewWarningTimer = null;
+    }
+  }
+
+  function startReviewWarningTimer(hotelId) {
+    clearReviewWarningTimer();
+    reviewWarningTimer = window.setTimeout(() => {
+      if (!activeHotelSession || activeHotelSession.hotelId !== hotelId) return;
+      if (!pageState().showReviews) return;
+      const root = document.getElementById("modalRoot");
+      const warning = root && root.querySelector("[data-review-warning]");
+      if (warning) warning.hidden = false;
+      logEvent("review_popup_time_warning", { hotelId, seconds: REVIEW_WARNING_SECONDS });
+    }, REVIEW_WARNING_SECONDS * 1000);
+  }
+
   function startNoReviewTimer(hotelId) {
     clearNoReviewTimer();
     const root = document.getElementById("modalRoot");
     const timerEl = root.querySelector("[data-no-review-timer]");
-    const deadline = ensureNoReviewDeadline(hotelId);
-    if (!deadline) {
-      closeModal("already_viewed");
+    const startRemainingMs = ensureNoReviewTimeAvailable(hotelId);
+    if (!startRemainingMs) {
+      closeModal("time_already_used");
       renderResults();
       return;
     }
+    const startElapsedMs = noReviewLimitMs() - startRemainingMs;
 
     const tick = () => {
-      const remainingMs = Math.max(0, deadline - Date.now());
+      const activeElapsedMs = activeHotelSession && activeHotelSession.hotelId === hotelId
+        ? Date.now() - activeHotelSession.startedAt
+        : 0;
+      const remainingMs = Math.max(0, noReviewLimitMs() - startElapsedMs - activeElapsedMs);
       const remainingSeconds = Math.ceil(remainingMs / 1000);
       if (timerEl) {
-        timerEl.textContent = `You may close this popup whenever you are done. Maximum viewing time remaining: ${remainingSeconds} seconds.`;
+        timerEl.textContent = `Time left for this hotel: ${remainingSeconds} seconds. You can close and reopen until time runs out.`;
       }
       if (remainingMs <= 0) {
         clearNoReviewTimer();
-        markNoReviewHotelViewed(hotelId, "time_limit_reached");
         closeModal("time_limit");
         renderResults();
       }
@@ -12127,8 +12225,8 @@
     }
 
     const page = pageState();
-    if (!page.showReviews && viewedHotelSet().has(hotelId)) {
-      logEvent("no_review_hotel_reopen_blocked", { hotelId, source });
+    if (!page.showReviews && noReviewRemainingMs(hotelId) <= 0) {
+      logEvent("no_review_hotel_reopen_blocked", { hotelId, source, reason: "cumulative_time_limit_reached" });
       if ((location.hash || "").startsWith("#hotel/")) location.hash = "#results";
       renderResults();
       return;
@@ -12152,6 +12250,7 @@
     const root = document.getElementById("modalRoot");
     if (typeof modalScrollCleanup === "function") modalScrollCleanup();
     clearNoReviewTimer();
+    clearReviewWarningTimer();
 
     root.setAttribute("data-active-hotel", hotelId);
     root.removeAttribute("data-active-map");
@@ -12189,7 +12288,8 @@
       a.addEventListener("click", () => logEvent("amenity_click", { hotelId, amenity: a.getAttribute("data-amenity") }));
     });
 
-    if (!page.showReviews) startNoReviewTimer(hotelId);
+    if (page.showReviews) startReviewWarningTimer(hotelId);
+    else startNoReviewTimer(hotelId);
 
     const reviews = root.querySelector("#reviews");
     if (reviews) {
@@ -12238,8 +12338,12 @@
 
     if (activeHotelSession) {
       const page = pageState();
-      if (!page.showReviews && !viewedHotelSet().has(activeHotelSession.hotelId)) {
-        markNoReviewHotelViewed(activeHotelSession.hotelId, source === "time_limit" ? "time_limit_reached" : "closed_before_time_limit");
+      if (!page.showReviews) {
+        recordNoReviewHotelTime(
+          activeHotelSession.hotelId,
+          Date.now() - activeHotelSession.startedAt,
+          source === "time_limit" ? "time_limit_reached" : "closed_before_time_limit"
+        );
         shouldRenderAfterClose = true;
       }
       if (page.showReviews && !viewedReviewHotelSet().has(activeHotelSession.hotelId)) {
@@ -12261,6 +12365,7 @@
 
     if (typeof modalScrollCleanup === "function") modalScrollCleanup();
     clearNoReviewTimer();
+    clearReviewWarningTimer();
 
     root.classList.remove("is-open");
     root.removeAttribute("data-active-hotel");
@@ -12357,6 +12462,7 @@
   }
 
   function init() {
+    updateBrowseNotice();
     renderResults();
     wireGlobalHandlers();
 

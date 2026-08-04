@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbxPojbcbSKbiB6nxHdYp1DYE8_en_Ugq1EyaieEN_H2j8kD67VOIv0qzbxk28rUNxx50Q/exec"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260728-1" />
+    <link rel="stylesheet" href="./styles.css?v=20260804-1" />
   </head>
   <body data-survey-page="true">
     <header class="booking-header" aria-label="Site header">
@@ -34,7 +34,7 @@
         <form id="surveyForm" class="survey-form">
           <div id="surveyQuestion"></div>
           <div class="survey-actions">
-            <button id="surveySubmit" class="btn" type="submit">Submit</button>
+            <button id="surveySubmit" class="btn" type="submit">Next</button>
           </div>
         </form>
       </section>
@@ -148,7 +148,7 @@
 
         const matrixConfigs = {
           likelihood: {
-            title: hotel => `Based on browsing <strong>${escapeHtml(hotel.name)}</strong>, select how likely you think the hotel has each attribute`,
+            title: () => "Select how likely you think the hotel has each attribute",
             rows: () => selectedAttributeRows("likelihood"),
             columns: [
               ["extremely_unlikely", "Extremely<br>unlikely"],
@@ -156,14 +156,6 @@
               ["neither", "Neither likely<br>nor unlikely"],
               ["somewhat_likely", "Somewhat likely"],
               ["extremely_likely", "Extremely likely"]
-            ]
-          },
-          belief: {
-            title: hotel => `Based on browsing <strong>${escapeHtml(hotel.name)}</strong>, select your current belief for each attribute.`,
-            rows: () => selectedAttributeRows("attribute"),
-            columns: [
-              ["yes_positive", "Yes / Positive"],
-              ["no_negative", "No / Negative"]
             ]
           },
           confidence: {
@@ -270,18 +262,24 @@
           }
         ];
 
-        const hotelQuestionnairePages = hotels.flatMap(hotel => [
-          { id: `hotelq_${hotel.id}_likelihood`, type: "hotelMatrix", matrix: "likelihood", hotel },
-          { id: `hotelq_${hotel.id}_belief`, type: "hotelMatrix", matrix: "belief", hotel },
-          { id: `hotelq_${hotel.id}_confidence`, type: "hotelMatrix", matrix: "confidence", hotel }
-        ]);
+        function hotelMatrixPages(prefix) {
+          return hotels.flatMap(hotel => [
+            { id: `${prefix}_${hotel.id}_likelihood`, type: "hotelMatrix", matrix: "likelihood", hotel },
+            { id: `${prefix}_${hotel.id}_confidence`, type: "hotelMatrix", matrix: "confidence", hotel }
+          ]);
+        }
 
-        const postReviewPages = [
+        const hotelQuestionnairePages = hotelMatrixPages("hotelq");
+        const postReviewOutcomePages = [
           { id: "post_review_choice", type: "hotelChoice" },
           { id: "post_review_reveal", type: "actualReveal" },
           { id: "post_review_satisfaction", type: "likert7" },
           { id: "post_review_switch", type: "switchChoice" },
           { id: "post_review_confidence_surprise", type: "confidenceSurprise" }
+        ];
+        const postReviewPages = [
+          ...hotelMatrixPages("postreview"),
+          ...postReviewOutcomePages
         ];
 
         function standardPages() {
@@ -502,7 +500,7 @@
         function setQuestionHtml(html) {
           document.getElementById("surveyQuestion").innerHTML = `
             <div class="survey-notice">
-              Please review carefully before submitting. Once you continue to the next page, you cannot return to a previous page, and there is no back button.
+              Continue carefully: you cannot return to earlier pages.
             </div>
             ${html}
           `;
@@ -624,8 +622,10 @@
 
         function likert7Html(savedAnswer) {
           const selectedValue = (savedAnswer && savedAnswer.value) || "";
+          const hotel = chosenHotel();
           return `
             <h1 class="survey-title">Knowing the actual attribute values of your chosen hotel, how satisfied are you with your choice?</h1>
+            <p class="survey-copy"><strong>Your selected hotel:</strong> ${escapeHtml(hotel.name)}</p>
             ${radioOptionList("satisfaction", [
               ["1", "1 - Very dissatisfied"],
               ["2", "2"],
@@ -720,7 +720,7 @@
               ? "Continue to reviews"
               : index === pageSet.length - 1 && postReviewMode
                 ? "Finish"
-                : "Submit";
+                : "Next";
           if (card) {
             card.classList.toggle("survey-card--scenario", page.type === "scenario");
             card.classList.toggle("survey-card--matrix", page.type === "hotelMatrix");
@@ -824,6 +824,7 @@
               hotel_id: page.hotel.id,
               hotel_name: page.hotel.name,
               matrix: page.matrix,
+              questionnaire_stage: postReviewMode ? "with_reviews" : "no_reviews",
               assigned_attribute_ids: assignment.attribute_ids || [],
               assigned_attribute_labels: assignment.attribute_labels || [],
               values,
