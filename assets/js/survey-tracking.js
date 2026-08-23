@@ -15,8 +15,8 @@
  * Same-tab follow-up survey (e.g. Qualtrics on your domain): read sessionStorage[HOTEL_EXPERIMENT_STORAGE_KEY]
  * for the full event array after participants return from the hotel task page.
  *
- * Live researcher dashboard: open live-dashboard.html in another tab (same origin, e.g. http://localhost:8080).
- * Uses BroadcastChannel("hotel_experiment_live") + localStorage hotel_experiment_live_v1 (throttled).
+ * Browser events are mirrored through BroadcastChannel("hotel_experiment_live") and
+ * localStorage hotel_experiment_live_v1 for optional same-origin research tooling.
  */
 (function () {
   "use strict";
@@ -24,6 +24,7 @@
   var LIVE_CHANNEL = "hotel_experiment_live";
   var LIVE_STORAGE_KEY = "hotel_experiment_live_v1";
   var STORAGE_KEY = "hotel_experiment_tracking_v1";
+  var STREAM_OUTBOX_STORAGE_PREFIX = "hotel_experiment_stream_outbox_v1";
   var events = [];
   var pageLoadTs = Date.now();
   var persistTimer = null;
@@ -39,6 +40,7 @@
   var streamTimer = null;
   var streamSeq = 0;
   var streamFlushInFlight = false;
+  var eventSeq = 0;
 
   function now() {
     return Date.now();
@@ -47,6 +49,33 @@
   function getMeta(name) {
     var m = document.querySelector('meta[name="' + name + '"]');
     return m && m.getAttribute("content") ? String(m.getAttribute("content")).trim() : "";
+  }
+
+  function pagePhase() {
+    try {
+      var p = new URLSearchParams(location.search);
+      var explicitPhase = p.get("phase");
+      var stage = (p.get("survey_stage") || "").toLowerCase();
+      var bodyVersion = (document.body && document.body.dataset.reviewVersion || "").toLowerCase();
+      var path = (location.pathname || "").toLowerCase();
+      if (explicitPhase === "3" || stage === "search_3" || stage === "post_review_ai" || bodyVersion === "with-ai-summary" || path.indexOf("hotel_3") >= 0) return "3";
+      if (explicitPhase === "2" || stage === "search_2" || stage === "post_review" || bodyVersion === "with" || path.indexOf("hotel_2") >= 0) return "2";
+      return "1";
+    } catch (e) {
+      return "1";
+    }
+  }
+
+  function pageCondition() {
+    try {
+      var p = new URLSearchParams(location.search);
+      var condition = (p.get("cond") || "none").toLowerCase();
+      var bodyVersion = (document.body && document.body.dataset.reviewVersion || "").toLowerCase();
+      if (condition === "vanilla" || condition === "newsworthy" || condition === "ai_summary") return condition;
+      return bodyVersion === "with-ai-summary" ? "ai_summary" : "none";
+    } catch (e) {
+      return "none";
+    }
   }
 
   function getStreamUrl() {
@@ -58,6 +87,56 @@
     } catch (e) {
       return "";
     }
+  }
+
+  function createEventId() {
+    eventSeq += 1;
+    try {
+      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        return "behavior_" + window.crypto.randomUUID();
+      }
+    } catch (e) {
+      /* fall through */
+    }
+    return "behavior_" + pageLoadTs + "_" + eventSeq + "_" + Math.random().toString(36).slice(2, 10);
+  }
+
+  function streamOutboxStorageKey() {
+    var prolific = prolificMeta();
+    var participant = prolific.prolific_pid || prolific.session_id || "anonymous";
+    return STREAM_OUTBOX_STORAGE_PREFIX + ":" + encodeURIComponent(participant);
+  }
+
+  function loadStreamOutbox() {
+    try {
+      var key = streamOutboxStorageKey();
+      var stored = localStorage.getItem(key) || sessionStorage.getItem(key);
+      var parsed = stored ? JSON.parse(stored) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function persistStreamOutbox() {
+    var serialized = JSON.stringify(streamQueue.slice(-2000));
+    var key = streamOutboxStorageKey();
+    try {
+      localStorage.setItem(key, serialized);
+    } catch (e) {
+      /* sessionStorage remains as a fallback */
+    }
+    try {
+      sessionStorage.setItem(key, serialized);
+    } catch (e2) {
+      /* storage can be unavailable in strict privacy modes */
+    }
+  }
+
+  function removeStreamBatch(batch) {
+    var ids = new Set(batch.map(function (entry) { return entry.event_id; }));
+    streamQueue = streamQueue.filter(function (entry) { return !ids.has(entry.event_id); });
+    persistStreamOutbox();
   }
 
   function initLiveRelay() {
@@ -117,7 +196,10 @@
 
   function enqueueStream(entry) {
     if (!streamUrl) return;
-    streamQueue.push(entry);
+    if (!streamQueue.some(function (queued) { return queued.event_id === entry.event_id; })) {
+      streamQueue.push(entry);
+      persistStreamOutbox();
+    }
     scheduleStreamFlush();
   }
 
@@ -130,13 +212,13 @@
     }, 2000);
   }
 
-  function flushStream(reason) {
+  function flushStream(reason, preferBeacon) {
     if (!streamUrl) return;
     if (!streamQueue.length) return;
     if (streamFlushInFlight) return;
     streamFlushInFlight = true;
 
-    var batch = streamQueue.splice(0, Math.min(streamQueue.length, 400));
+    var batch = streamQueue.slice(0, Math.min(streamQueue.length, 400));
     var body = {
       v: 1,
       kind: "event_batch",
@@ -146,26 +228,25 @@
       seq_end: streamSeq + batch.length - 1,
       page_url: location.href,
       page_path: location.pathname,
-      phase: (function () {
-        try {
-          var x = new URLSearchParams(location.search).get("phase");
-          return x === "2" ? "2" : "1";
-        } catch (e2) {
-          return "1";
-        }
-      })(),
-      cond: (function () {
-        try {
-          var c = (new URLSearchParams(location.search).get("cond") || "none").toLowerCase();
-          return c === "vanilla" || c === "newsworthy" ? c : "none";
-        } catch (e3) {
-          return "none";
-        }
-      })(),
+      phase: pagePhase(),
+      cond: pageCondition(),
       prolific: prolificMeta(),
       events: batch
     };
     streamSeq += batch.length;
+
+    if (preferBeacon && navigator.sendBeacon) {
+      try {
+        var beaconBlob = new Blob([JSON.stringify(body)], { type: "text/plain;charset=utf-8" });
+        if (navigator.sendBeacon(streamUrl, beaconBlob)) removeStreamBatch(batch);
+      } catch (beaconError) {
+        /* keep the batch for the next page load */
+      } finally {
+        streamFlushInFlight = false;
+        if (streamQueue.length) scheduleStreamFlush();
+      }
+      return;
+    }
 
     // Apps Script + cross-origin is often simplest with no-cors.
     // We don't need to read the response; we just want the sheet to append.
@@ -176,6 +257,10 @@
         keepalive: true,
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify(body)
+      }).then(function () {
+        removeStreamBatch(batch);
+      }).catch(function () {
+        /* keep the batch in the persistent outbox for retry */
       }).finally(function () {
         streamFlushInFlight = false;
         if (streamQueue.length) scheduleStreamFlush();
@@ -188,8 +273,8 @@
     // Fallback: sendBeacon (best-effort)
     try {
       if (navigator.sendBeacon) {
-        var blob = new Blob([JSON.stringify(body)], { type: "text/plain" });
-        navigator.sendBeacon(streamUrl, blob);
+        var blob = new Blob([JSON.stringify(body)], { type: "text/plain;charset=utf-8" });
+        if (navigator.sendBeacon(streamUrl, blob)) removeStreamBatch(batch);
       }
     } catch (e2) {
       /* ignore */
@@ -201,6 +286,7 @@
 
   function log(event_type, element_id, value) {
     var entry = {
+      event_id: createEventId(),
       event_type: event_type,
       element_id: element_id != null ? String(element_id) : "",
       timestamp: now(),
@@ -292,22 +378,8 @@
       v: 1,
       page_url: location.href,
       page_path: location.pathname,
-      phase: (function () {
-        try {
-          var x = new URLSearchParams(location.search).get("phase");
-          return x === "2" ? "2" : "1";
-        } catch (e2) {
-          return "1";
-        }
-      })(),
-      cond: (function () {
-        try {
-          var c = (new URLSearchParams(location.search).get("cond") || "none").toLowerCase();
-          return c === "vanilla" || c === "newsworthy" ? c : "none";
-        } catch (e3) {
-          return "none";
-        }
-      })(),
+      phase: pagePhase(),
+      cond: pageCondition(),
       started_at_ms: pageLoadTs,
       ended_at_ms: now(),
       prolific: prolificMeta(),
@@ -696,7 +768,7 @@
     } catch (e2) {
       /* ignore */
     }
-    flushStream("pagehide");
+    flushStream("pagehide", true);
     flushBeacon();
     passPayloadToCompletionUrl();
   }
@@ -704,7 +776,7 @@
   function onVisibility() {
     if (document.visibilityState === "hidden") {
       persistSync();
-      flushStream("hidden");
+      flushStream("hidden", true);
       flushBeacon();
       passPayloadToCompletionUrl();
     }
@@ -713,6 +785,11 @@
   function init() {
     initLiveRelay();
     streamUrl = getStreamUrl();
+    streamQueue = loadStreamOutbox();
+    streamQueue.forEach(function (entry) {
+      if (!entry.event_id) entry.event_id = createEventId();
+    });
+    persistStreamOutbox();
     log("session_start", location.pathname, { href: location.href });
 
     window.addEventListener(
@@ -764,6 +841,7 @@
 
     startMouseSampler();
     window.addEventListener("pagehide", onPageHide);
+    window.addEventListener("online", function () { flushStream("online"); });
     document.addEventListener("visibilitychange", onVisibility);
 
     window.HOTEL_EXPERIMENT_STORAGE_KEY = STORAGE_KEY;
@@ -775,6 +853,7 @@
     };
     window.HOTEL_EXPERIMENT_FLUSH = function () {
       persistSync();
+      flushStream("manual");
       flushBeacon();
       passPayloadToCompletionUrl();
     };
