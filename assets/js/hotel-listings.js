@@ -10587,6 +10587,7 @@
       || surveyStage === "search_3"
       || bodyVersion === "with-ai-summary"
       || bodyVersion === "ai-summary"
+      || path.includes("search-ai-summaries")
       || path.includes("hotel_3")
       || legacyPhase === "3";
   }
@@ -10608,8 +10609,8 @@
     else if (surveyStage === "search_1") showReviews = false;
     else if (bodyVersion === "with") showReviews = true;
     else if (bodyVersion === "without") showReviews = false;
-    else if (path.includes("hotel_2") || legacyPhase === "2") showReviews = true;
-    else if (path.includes("hotel_1") || legacyPhase === "1") showReviews = false;
+    else if (path.includes("search-reviews") || path.includes("hotel_2") || legacyPhase === "2") showReviews = true;
+    else if (path.includes("search-no-reviews") || path.includes("hotel_1") || legacyPhase === "1") showReviews = false;
 
     return {
       showReviews,

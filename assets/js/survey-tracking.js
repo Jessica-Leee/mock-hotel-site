@@ -58,8 +58,8 @@
       var stage = (p.get("survey_stage") || "").toLowerCase();
       var bodyVersion = (document.body && document.body.dataset.reviewVersion || "").toLowerCase();
       var path = (location.pathname || "").toLowerCase();
-      if (explicitPhase === "3" || stage === "search_3" || stage === "post_review_ai" || bodyVersion === "with-ai-summary" || path.indexOf("hotel_3") >= 0) return "3";
-      if (explicitPhase === "2" || stage === "search_2" || stage === "post_review" || bodyVersion === "with" || path.indexOf("hotel_2") >= 0) return "2";
+      if (explicitPhase === "3" || stage === "search_3" || stage === "post_review_ai" || bodyVersion === "with-ai-summary" || path.indexOf("search-ai-summaries") >= 0 || path.indexOf("hotel_3") >= 0) return "3";
+      if (explicitPhase === "2" || stage === "search_2" || stage === "post_review" || bodyVersion === "with" || path.indexOf("search-reviews") >= 0 || path.indexOf("hotel_2") >= 0) return "2";
       return "1";
     } catch (e) {
       return "1";

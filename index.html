@@ -40,7 +40,7 @@
       </section>
     </main>
 
-    <script src="./assets/js/survey-tracking.js?v=20260823-3"></script>
+    <script src="./assets/js/survey-tracking.js?v=20260823-5"></script>
     <script>
       (function () {
         const SURVEY_STORAGE_PREFIX = "mock_hotel_survey_v1";
@@ -99,7 +99,7 @@
           const nextParams = new URLSearchParams(location.search || "");
           if (prolificId) nextParams.set("PROLIFIC_PID", prolificId);
           nextParams.set("survey_stage", "search_1");
-          location.replace("hotel_1.html?" + nextParams.toString());
+          location.replace("search-no-reviews.html?" + nextParams.toString());
           return;
         }
 
@@ -107,7 +107,7 @@
           const nextParams = new URLSearchParams(location.search || "");
           if (prolificId) nextParams.set("PROLIFIC_PID", prolificId);
           nextParams.set("survey_stage", postReviewAiMode ? "search_3" : "search_2");
-          location.replace((postReviewAiMode ? "hotel_3.html?" : "hotel_2.html?") + nextParams.toString());
+          location.replace((postReviewAiMode ? "search-ai-summaries.html?" : "search-reviews.html?") + nextParams.toString());
           return;
         }
 
@@ -1196,7 +1196,7 @@
           if (pid) nextParams.set("PROLIFIC_PID", pid);
           nextParams.set("survey_stage", "search_1");
           logSurveyEvent({ id: "browse_intro", type: "transition" }, { value: "start_hotel_browsing" }, state || getState());
-          location.replace("hotel_1.html?" + nextParams.toString());
+          location.replace("search-no-reviews.html?" + nextParams.toString());
         }
 
         function goToReviewBrowsing(state) {
@@ -1210,7 +1210,7 @@
             { value: useAiSummary ? "start_ai_summary_review_browsing" : "start_review_browsing" },
             state || getState()
           );
-          location.replace((useAiSummary ? "hotel_3.html?" : "hotel_2.html?") + nextParams.toString());
+          location.replace((useAiSummary ? "search-ai-summaries.html?" : "search-reviews.html?") + nextParams.toString());
         }
 
         function renderCompletionScreen() {
