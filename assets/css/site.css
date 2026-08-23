@@ -463,11 +463,23 @@ body{
   width:100%;
   accent-color:#0071c2;
 }
+.survey-range input[type="range"].is-unset{
+  accent-color:#c5d0de;
+}
+.survey-range input[type="range"].is-unset::-webkit-slider-thumb{
+  opacity:0;
+}
+.survey-range input[type="range"].is-unset::-moz-range-thumb{
+  opacity:0;
+}
 .survey-range output{
   color:#1f2937;
   font-weight:800;
   text-align:right;
   font-variant-numeric:tabular-nums;
+}
+.survey-range output.is-unset{
+  color:#9aa7b8;
 }
 .survey-complete{
   text-align:center;
