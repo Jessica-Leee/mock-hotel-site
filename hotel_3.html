@@ -3,15 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Chicago hotel search - page 1</title>
+    <title>Chicago hotel search - page 3</title>
     <!-- Streaming to Google Sheets (Apps Script Web App). -->
     <meta
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbxPojbcbSKbiB6nxHdYp1DYE8_en_Ugq1EyaieEN_H2j8kD67VOIv0qzbxk28rUNxx50Q/exec"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260804-1" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260823-3" />
   </head>
-  <body data-review-version="without">
+  <body data-review-version="with-ai-summary">
 
     <header class="booking-header" aria-label="Site header">
       <div class="booking-header__inner">
@@ -41,9 +41,8 @@
       </div>
     </section>
 
-<main class="app">
+    <main class="app">
       <div class="layout">
-
         <aside class="filters booking-sidebar" aria-label="Filter results">
           <h2 class="h2">Filter by:</h2>
           <div class="filter">
@@ -64,8 +63,8 @@
           <div class="content__head">
             <h1 class="h1">Chicago: 3 properties found</h1>
           </div>
-          <div class="survey-notice survey-notice--browse survey-notice--countdown">
-            Continue carefully: you cannot return to earlier pages. Each hotel popup can be reopened, but each hotel has a 30-second total viewing limit.
+          <div class="survey-notice survey-notice--browse">
+            You cannot return to earlier pages. Open the reviews and AI summary for each hotel before continuing.
           </div>
 
           <div id="results" class="results"></div>
@@ -75,7 +74,7 @@
 
     <div id="modalRoot" class="modal-root" aria-hidden="true"></div>
 
-    <script src="./tracking.js"></script>
-    <script src="./app.js?v=20260804-1"></script>
+    <script src="./assets/js/survey-tracking.js?v=20260823-3"></script>
+    <script src="./assets/js/hotel-listings.js?v=20260823-3"></script>
   </body>
 </html>

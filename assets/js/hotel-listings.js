@@ -3,6 +3,7 @@
   const UI_STATE_KEY = "mock_hotel_ui_state_v1";
   const HOTEL_VIEW_STATE_KEY = "mock_hotel_no_review_views_v1";
   const HOTEL_REVIEW_VIEW_STATE_KEY = "mock_hotel_review_views_v1";
+  const HOTEL_AI_REVIEW_VIEW_STATE_KEY = "mock_hotel_ai_review_views_v1";
   const HOTEL_ORDER_STATE_KEY = "mock_hotel_visible_order_v1";
   const NO_REVIEW_VIEW_SECONDS = 30;
   const REVIEW_WARNING_SECONDS = 5 * 60;
@@ -10304,7 +10305,10 @@
   }
 
   function hotelReviewViewStorageKey() {
-    return `${HOTEL_REVIEW_VIEW_STATE_KEY}:${participantStorageSuffix()}`;
+    const prefix = aiSummaryRequested()
+      ? HOTEL_AI_REVIEW_VIEW_STATE_KEY
+      : HOTEL_REVIEW_VIEW_STATE_KEY;
+    return `${prefix}:${participantStorageSuffix()}`;
   }
 
   function hotelOrderStorageKey() {
@@ -10508,6 +10512,7 @@
     logEvent("review_hotel_view_complete", {
       hotelId,
       reason,
+      condition: pageState().showAiSummary ? "with_ai_summary" : "with_reviews",
       viewedCount: state.viewedHotelIds.length,
       requiredCount: requiredHotelIds().length
     });
@@ -10570,6 +10575,22 @@
     document.body.removeChild(a);
   }
 
+  function aiSummaryRequested() {
+    const p = new URLSearchParams(location.search);
+    const path = location.pathname.toLowerCase();
+    const summaryParam = (p.get("ai_summary") || p.get("summary") || "").toLowerCase();
+    const surveyStage = (p.get("survey_stage") || "").toLowerCase();
+    const bodyVersion = (document.body.dataset.reviewVersion || "auto").toLowerCase();
+    const legacyPhase = p.get("phase");
+
+    return ["1", "true", "yes", "with"].includes(summaryParam)
+      || surveyStage === "search_3"
+      || bodyVersion === "with-ai-summary"
+      || bodyVersion === "ai-summary"
+      || path.includes("hotel_3")
+      || legacyPhase === "3";
+  }
+
   function pageState() {
     const p = new URLSearchParams(location.search);
     const path = location.pathname.toLowerCase();
@@ -10577,21 +10598,28 @@
     const surveyStage = (p.get("survey_stage") || "").toLowerCase();
     const bodyVersion = (document.body.dataset.reviewVersion || "auto").toLowerCase();
     const legacyPhase = p.get("phase");
+    const showAiSummary = aiSummaryRequested();
 
-    let showReviews = false;
-    if (["1", "true", "yes", "with"].includes(reviewParam)) showReviews = true;
+    let showReviews = showAiSummary;
+    if (showAiSummary) showReviews = true;
+    else if (["1", "true", "yes", "with"].includes(reviewParam)) showReviews = true;
     else if (["0", "false", "no", "without"].includes(reviewParam)) showReviews = false;
     else if (surveyStage === "search_2") showReviews = true;
     else if (surveyStage === "search_1") showReviews = false;
     else if (bodyVersion === "with") showReviews = true;
     else if (bodyVersion === "without") showReviews = false;
-    else if (path.includes("hotel_2") || path.includes("with-reviews") || legacyPhase === "2") showReviews = true;
-    else if (path.includes("hotel_1") || path.includes("no-reviews") || legacyPhase === "1") showReviews = false;
+    else if (path.includes("hotel_2") || legacyPhase === "2") showReviews = true;
+    else if (path.includes("hotel_1") || legacyPhase === "1") showReviews = false;
 
     return {
       showReviews,
-      versionLabel: showReviews ? "Phase 2 full reviews" : "Phase 1 browsing",
-      phase: showReviews ? "2" : "1"
+      showAiSummary,
+      versionLabel: showAiSummary
+        ? "Phase 3 reviews with AI summary"
+        : showReviews
+          ? "Phase 2 full reviews"
+          : "Phase 1 browsing",
+      phase: showAiSummary ? "3" : showReviews ? "2" : "1"
     };
   }
 
@@ -11540,6 +11568,48 @@
     "arlo-chicago"
   ]);
 
+  const AI_REVIEW_SUMMARIES = {
+    "pendry-chicago": {
+      overview: "Guests consistently describe Pendry Chicago as a polished, welcoming hotel with attentive service, distinctive historic design, and comfortable rooms.",
+      strengths: [
+        "Staff, concierge, front desk, and valet service are frequently described as friendly, proactive, and especially helpful for celebrations or special requests.",
+        "Guests often praise the clean rooms, comfortable beds, spacious layouts in many room types, and the building's Art Deco character.",
+        "The lobby, bar, cafe, fitness center, and rooftop spaces are commonly appreciated when they are available."
+      ],
+      considerations: [
+        "Some rooms receive noticeable traffic, siren, or Michigan Avenue street noise.",
+        "Elevator waits can be slow, and rooftop access may be limited by opening hours or private events.",
+        "Parking, incidental holds, in-room dining, and other service charges can feel expensive; a smaller number of reviews mention limited views or maintenance details."
+      ]
+    },
+    "nobu-hotel-chicago": {
+      overview: "Guests most often describe Nobu Hotel Chicago as a design-forward luxury stay with spacious rooms, strong service, and memorable dining in the West Loop.",
+      strengths: [
+        "The minimalist Japanese-inspired interiors, comfortable beds, large bathrooms, soaking tubs in selected rooms, and thoughtful in-room amenities receive frequent praise.",
+        "Staff are commonly described as warm, attentive, accommodating, and helpful with celebrations or special requests.",
+        "Guests regularly highlight the Nobu restaurant, rooftop, pool, steam facilities, and access to nearby restaurants."
+      ],
+      considerations: [
+        "Parking, room service, bottled water, and breakfast can add substantial cost.",
+        "Several guests find the room or bathroom lighting too dim, particularly for working or applying makeup.",
+        "Some reviews mention street or rooftop noise and limited hours, size, or availability for the rooftop, pool, gym, or sauna."
+      ]
+    },
+    "arlo-chicago": {
+      overview: "Guests most often highlight Arlo Chicago's central setting, friendly staff, clean modern rooms, comfortable beds, and convenient on-site dining.",
+      strengths: [
+        "The hotel is repeatedly described as convenient for walking to central Chicago attractions and public transportation.",
+        "Front desk and restaurant staff are frequently praised as welcoming, responsive, and helpful.",
+        "Many reviews mention clean rooms, comfortable beds, strong showers, and enjoyable breakfast, coffee, or restaurant options."
+      ],
+      considerations: [
+        "Street noise, sirens, thin walls, and noise from neighboring rooms affect some stays; higher rooms facing away from the main street are often described as quieter.",
+        "A smaller group of guests report inconsistent housekeeping, including floors, towels, or bathroom details.",
+        "Parking and in-room extras can feel expensive, while some rooms have limited views and the coffee setup receives mixed reactions."
+      ]
+    }
+  };
+
   function formatCount(n) {
     return Number(n || 0).toLocaleString();
   }
@@ -11692,22 +11762,24 @@
     box.className = "study-flow";
 
     if (state.showReviews) {
-      const href = `index.html${surveyQueryString("post_review")}#pr1`;
+      const postReviewStage = state.showAiSummary ? "post_review_ai" : "post_review";
+      const href = `index.html${surveyQueryString(postReviewStage)}#pr1`;
       const viewed = viewedReviewHotelSet();
       const required = requiredHotelIds();
       const viewedCount = required.filter(id => viewed.has(id)).length;
       const unlocked = viewedCount >= required.length;
+      const popupLabel = state.showAiSummary ? "review and AI-summary popups" : "review popups";
       box.innerHTML = unlocked ? `
         <div>
           <strong>Post-review questions unlocked:</strong>
-          You have opened review popups for all 3 hotels.
+          You have opened ${popupLabel} for all 3 hotels.
         </div>
         <button class="btn study-flow__btn" type="button" data-flow-continue="${escapeXml(href)}">Continue to post-review questions</button>
       ` : `
         <div>
           <strong>Post-review questions locked:</strong>
-          Open the review popup for each of the 3 hotels before continuing.
-          <div class="study-flow__note">Completed ${formatCount(viewedCount)} of ${formatCount(required.length)} review popups.</div>
+          Open the ${state.showAiSummary ? "reviews and AI summary" : "reviews"} for each of the 3 hotels before continuing.
+          <div class="study-flow__note">Completed ${formatCount(viewedCount)} of ${formatCount(required.length)} ${popupLabel}.</div>
         </div>
         <button class="btn study-flow__btn" type="button" disabled>Continue to post-review questions</button>
       `;
@@ -11739,9 +11811,12 @@
     const notice = document.querySelector(".survey-notice--browse");
     if (!notice) return;
 
-    if (pageState().showReviews) {
+    const state = pageState();
+    if (state.showReviews) {
       notice.classList.remove("survey-notice--countdown");
-      notice.textContent = "Continue carefully: you cannot return to earlier pages. Open the review popup for each hotel before continuing.";
+      notice.textContent = state.showAiSummary
+        ? "You cannot return to earlier pages. Open the reviews and AI summary for each hotel before continuing."
+        : "Continue carefully: you cannot return to earlier pages. Open the review popup for each hotel before continuing.";
     } else {
       notice.classList.add("survey-notice--countdown");
       notice.textContent = "Continue carefully: you cannot return to earlier pages. Each hotel popup can be reopened, but each hotel has a 30-second total viewing limit.";
@@ -11761,8 +11836,10 @@
       coverStory.style.display = "block";
       const coverText = coverStory.querySelector(".callout__text");
       if (coverText) {
-        coverText.textContent = state.showReviews
-          ? "Full Reviews Control: participants read guest ratings and individual review excerpts. No AI summary is shown in this version."
+        coverText.textContent = state.showAiSummary
+          ? "Participants see an AI-generated summary followed by the complete set of individual guest reviews."
+          : state.showReviews
+            ? "Full Reviews Control: participants read guest ratings and individual review excerpts. No AI summary is shown in this version."
           : "Guest ratings and reviews are not displayed in this version.";
       }
       const coverTitle = coverStory.querySelector(".callout__title");
@@ -11989,6 +12066,37 @@
     `;
   }
 
+  function aiReviewSummaryHtml(hotel) {
+    const summary = AI_REVIEW_SUMMARIES[hotel.id];
+    if (!summary) return "";
+    const reviewCount = balancedReviews(hotel).length;
+    const listHtml = items => items.map(item => `<li>${escapeXml(item)}</li>`).join("");
+
+    return `
+      <section class="ai-review-summary" data-track-section="ai_review_summary" aria-labelledby="aiSummaryTitle-${escapeXml(hotel.id)}">
+        <div class="ai-review-summary__head">
+          <div>
+            <div class="ai-review-summary__label">AI-generated review summary</div>
+            <h3 id="aiSummaryTitle-${escapeXml(hotel.id)}">What guests consistently mention</h3>
+          </div>
+          <div class="ai-review-summary__count">${formatCount(reviewCount)} reviews summarized</div>
+        </div>
+        <p class="ai-review-summary__overview">${escapeXml(summary.overview)}</p>
+        <div class="ai-review-summary__grid">
+          <div class="ai-review-summary__section">
+            <h4>Common strengths</h4>
+            <ul>${listHtml(summary.strengths)}</ul>
+          </div>
+          <div class="ai-review-summary__section">
+            <h4>Things to consider</h4>
+            <ul>${listHtml(summary.considerations)}</ul>
+          </div>
+        </div>
+        <p class="ai-review-summary__note">This AI-generated summary covers all reviews shown below and may miss nuance. Read the individual reviews for details.</p>
+      </section>
+    `;
+  }
+
   function reviewsHtml(hotel) {
     const reviews = balancedReviews(hotel);
     const total = reviews.length;
@@ -12087,6 +12195,7 @@
             You have been viewing this review popup for more than 5 minutes. Please continue when you are ready.
           </div>
           <div class="modal__scroll" id="hotelModalScroll" data-hotel-scroll="1">
+            ${state.showAiSummary ? aiReviewSummaryHtml(hotel) : ""}
             ${reviewsHtml(hotel)}
           </div>
         </div>
@@ -12261,7 +12370,18 @@
     const targetHash = "#hotel/" + hotelId;
     if (location.hash !== targetHash) location.hash = targetHash;
 
-    logEvent("open_hotel", { hotelId, source, reviews: page.showReviews });
+    logEvent("open_hotel", {
+      hotelId,
+      source,
+      reviews: page.showReviews,
+      aiSummary: page.showAiSummary
+    });
+    if (page.showAiSummary) {
+      logEvent("ai_review_summary_shown", {
+        hotelId,
+        reviewCount: balancedReviews(hotel).length
+      });
+    }
 
     const scrollEl = root.querySelector("[data-hotel-scroll='1']");
     if (scrollEl) {
@@ -12469,6 +12589,7 @@
     logEvent("page_load", {
       phase: pageState().phase,
       reviews: pageState().showReviews,
+      aiSummary: pageState().showAiSummary,
       city: "Chicago"
     });
 

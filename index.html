@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbxPojbcbSKbiB6nxHdYp1DYE8_en_Ugq1EyaieEN_H2j8kD67VOIv0qzbxk28rUNxx50Q/exec"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260823-2" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260823-3" />
   </head>
   <body data-survey-page="true">
     <header class="booking-header" aria-label="Site header">
@@ -40,19 +40,27 @@
       </section>
     </main>
 
-    <script src="./tracking.js"></script>
+    <script src="./assets/js/survey-tracking.js?v=20260823-3"></script>
     <script>
       (function () {
-        const STORAGE_KEY = "mock_hotel_survey_v1";
-        const SURVEY_EVENT_STORAGE_KEY = "mock_hotel_survey_events_v1";
+        const SURVEY_STORAGE_PREFIX = "mock_hotel_survey_v1";
+        const SURVEY_EVENT_STORAGE_PREFIX = "mock_hotel_survey_events_v1";
+        const SURVEY_OUTBOX_STORAGE_KEY = "mock_hotel_survey_outbox_v1";
         const HOTEL_VIEW_STATE_KEY = "mock_hotel_no_review_views_v1";
         const HOTEL_REVIEW_VIEW_STATE_KEY = "mock_hotel_review_views_v1";
+        const HOTEL_AI_REVIEW_VIEW_STATE_KEY = "mock_hotel_ai_review_views_v1";
         const params = new URLSearchParams(location.search);
         const prolificId = params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "";
+        const participantStorageId = encodeURIComponent(prolificId || params.get("SESSION_ID") || params.get("session_id") || "anonymous");
+        const STORAGE_KEY = `${SURVEY_STORAGE_PREFIX}:${participantStorageId}`;
+        const SURVEY_EVENT_STORAGE_KEY = `${SURVEY_EVENT_STORAGE_PREFIX}:${participantStorageId}`;
         const surveyStage = params.get("survey_stage") || "";
         const hotelQuestionnaireMode = surveyStage === "hotel_questionnaire" || (location.hash || "").startsWith("#hq");
-        const postReviewMode = surveyStage === "post_review" || (location.hash || "").startsWith("#pr");
+        const postReviewAiMode = surveyStage === "post_review_ai";
+        const postReviewMode = surveyStage === "post_review" || postReviewAiMode || (location.hash || "").startsWith("#pr");
         const ASSIGNED_ATTRIBUTE_COUNT = 3;
+        let surveyOutboxFlushPromise = null;
+        let surveyOutboxRetryTimer = null;
 
         const hotels = [
           { id: "pendry-chicago", name: "Pendry Chicago" },
@@ -67,7 +75,8 @@
 
         function hotelReviewViewStorageKey() {
           const suffix = params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "anonymous";
-          return `${HOTEL_REVIEW_VIEW_STATE_KEY}:${suffix}`;
+          const prefix = postReviewAiMode ? HOTEL_AI_REVIEW_VIEW_STATE_KEY : HOTEL_REVIEW_VIEW_STATE_KEY;
+          return `${prefix}:${suffix}`;
         }
 
         function noReviewViewingComplete() {
@@ -97,8 +106,8 @@
         if (postReviewMode && !reviewViewingComplete()) {
           const nextParams = new URLSearchParams(location.search || "");
           if (prolificId) nextParams.set("PROLIFIC_PID", prolificId);
-          nextParams.set("survey_stage", "search_2");
-          location.replace("hotel_2.html?" + nextParams.toString());
+          nextParams.set("survey_stage", postReviewAiMode ? "search_3" : "search_2");
+          location.replace((postReviewAiMode ? "hotel_3.html?" : "hotel_2.html?") + nextParams.toString());
           return;
         }
 
@@ -309,13 +318,38 @@
         }
 
         function getState() {
-          try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { answers: {} }; }
+          try {
+            const stored = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
+            const state = stored ? JSON.parse(stored) : { answers: {} };
+            if (!state.answers || typeof state.answers !== "object") state.answers = {};
+            return state;
+          }
           catch (_) { return { answers: {} }; }
         }
 
         function setState(state) {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-          sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          const serialized = JSON.stringify(state);
+          try { localStorage.setItem(STORAGE_KEY, serialized); }
+          catch (_) { /* sessionStorage remains as a fallback */ }
+          try { sessionStorage.setItem(STORAGE_KEY, serialized); }
+          catch (_) { /* storage can be unavailable in strict privacy modes */ }
+        }
+
+        function createRecordId(prefix) {
+          try {
+            if (window.crypto && typeof window.crypto.randomUUID === "function") {
+              return `${prefix}_${window.crypto.randomUUID()}`;
+            }
+          } catch (_) {
+            /* fall through */
+          }
+          return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 12)}`;
+        }
+
+        function ensureSubmissionId(state) {
+          if (!state.submission_id) state.submission_id = createRecordId("submission");
+          if (!state.started_at) state.started_at = new Date().toISOString();
+          return state.submission_id;
         }
 
         function randomInteger(max) {
@@ -347,6 +381,11 @@
           const state = getState();
           const assignment = state.assignment || {};
           let changed = false;
+
+          if (!state.submission_id || !state.started_at) {
+            ensureSubmissionId(state);
+            changed = true;
+          }
 
           if (!scenarios.some(scenario => scenario.id === assignment.scenario_id)) {
             const scenario = scenarios[randomInteger(scenarios.length)];
@@ -419,13 +458,19 @@
         }
 
         function getSurveyEvents() {
-          try { return JSON.parse(localStorage.getItem(SURVEY_EVENT_STORAGE_KEY)) || []; }
+          try {
+            const stored = localStorage.getItem(SURVEY_EVENT_STORAGE_KEY) || sessionStorage.getItem(SURVEY_EVENT_STORAGE_KEY);
+            return stored ? JSON.parse(stored) : [];
+          }
           catch (_) { return []; }
         }
 
         function setSurveyEvents(events) {
-          localStorage.setItem(SURVEY_EVENT_STORAGE_KEY, JSON.stringify(events));
-          sessionStorage.setItem(SURVEY_EVENT_STORAGE_KEY, JSON.stringify(events));
+          const serialized = JSON.stringify(events);
+          try { localStorage.setItem(SURVEY_EVENT_STORAGE_KEY, serialized); }
+          catch (_) { /* sessionStorage remains as a fallback */ }
+          try { sessionStorage.setItem(SURVEY_EVENT_STORAGE_KEY, serialized); }
+          catch (_) { /* storage can be unavailable in strict privacy modes */ }
         }
 
         function getMeta(name) {
@@ -441,10 +486,114 @@
           };
         }
 
+        function surveyStreamUrl() {
+          return getMeta("tracking-stream-url") || params.get("stream") || "";
+        }
+
+        function getSurveyOutbox() {
+          try {
+            const stored = localStorage.getItem(SURVEY_OUTBOX_STORAGE_KEY) || sessionStorage.getItem(SURVEY_OUTBOX_STORAGE_KEY);
+            const outbox = stored ? JSON.parse(stored) : [];
+            return Array.isArray(outbox) ? outbox : [];
+          } catch (_) {
+            return [];
+          }
+        }
+
+        function setSurveyOutbox(outbox) {
+          const serialized = JSON.stringify(outbox.slice(-500));
+          try { localStorage.setItem(SURVEY_OUTBOX_STORAGE_KEY, serialized); }
+          catch (_) { /* sessionStorage remains as a fallback */ }
+          try { sessionStorage.setItem(SURVEY_OUTBOX_STORAGE_KEY, serialized); }
+          catch (_) { /* storage can be unavailable in strict privacy modes */ }
+        }
+
+        function enqueueSurveyPayload(payload) {
+          const payloadId = payload && payload.events && payload.events[0] && payload.events[0].event_id;
+          if (!payloadId) return;
+          const outbox = getSurveyOutbox();
+          if (!outbox.some(item => item.id === payloadId)) {
+            outbox.push({ id: payloadId, queued_at: Date.now(), attempts: 0, payload });
+            setSurveyOutbox(outbox);
+          }
+        }
+
+        function removeSurveyOutboxItems(ids) {
+          const sentIds = new Set(ids);
+          setSurveyOutbox(getSurveyOutbox().filter(item => !sentIds.has(item.id)));
+        }
+
+        function scheduleSurveyOutboxRetry() {
+          if (surveyOutboxRetryTimer || !getSurveyOutbox().length) return;
+          surveyOutboxRetryTimer = window.setTimeout(() => {
+            surveyOutboxRetryTimer = null;
+            flushSurveyOutbox("retry");
+          }, 5000);
+        }
+
+        function flushSurveyOutbox(reason, preferBeacon) {
+          const streamUrl = surveyStreamUrl();
+          const queued = getSurveyOutbox();
+          if (!streamUrl || !queued.length) return Promise.resolve({ dispatched: 0, pending: queued.length });
+
+          if (preferBeacon && navigator.sendBeacon) {
+            const acceptedIds = [];
+            queued.slice(0, 40).forEach(item => {
+              try {
+                const payload = Object.assign({}, item.payload, { reason: reason || item.payload.reason });
+                const accepted = navigator.sendBeacon(
+                  streamUrl,
+                  new Blob([JSON.stringify(payload)], { type: "text/plain;charset=utf-8" })
+                );
+                if (accepted) acceptedIds.push(item.id);
+              } catch (_) {
+                /* keep the item for the next page load */
+              }
+            });
+            if (acceptedIds.length) removeSurveyOutboxItems(acceptedIds);
+            return Promise.resolve({ dispatched: acceptedIds.length, pending: getSurveyOutbox().length });
+          }
+
+          if (surveyOutboxFlushPromise) return surveyOutboxFlushPromise;
+          surveyOutboxFlushPromise = (async () => {
+            let dispatched = 0;
+            const batch = getSurveyOutbox().slice(0, 40);
+            for (const item of batch) {
+              try {
+                const payload = Object.assign({}, item.payload, { reason: reason || item.payload.reason });
+                await fetch(streamUrl, {
+                  method: "POST",
+                  mode: "no-cors",
+                  keepalive: true,
+                  headers: { "Content-Type": "text/plain;charset=utf-8" },
+                  body: JSON.stringify(payload)
+                });
+                removeSurveyOutboxItems([item.id]);
+                dispatched += 1;
+              } catch (_) {
+                const outbox = getSurveyOutbox();
+                const pending = outbox.find(candidate => candidate.id === item.id);
+                if (pending) {
+                  pending.attempts = Number(pending.attempts || 0) + 1;
+                  pending.last_attempt_at = Date.now();
+                  setSurveyOutbox(outbox);
+                }
+                break;
+              }
+            }
+            return { dispatched, pending: getSurveyOutbox().length };
+          })().finally(() => {
+            surveyOutboxFlushPromise = null;
+            scheduleSurveyOutboxRetry();
+          });
+          return surveyOutboxFlushPromise;
+        }
+
         function streamSurveyEvent(entry, state) {
-          const streamUrl = getMeta("tracking-stream-url") || params.get("stream") || "";
-          if (!streamUrl) return;
+          if (!surveyStreamUrl()) return;
           const payload = {
+            v: 2,
+            kind: "survey_event",
             page_url: location.href,
             phase: "survey",
             cond: "none",
@@ -452,36 +601,71 @@
             prolific: prolificMeta(state),
             events: [entry]
           };
-          const body = JSON.stringify(payload);
-          try {
-            if (navigator.sendBeacon) {
-              navigator.sendBeacon(streamUrl, new Blob([body], { type: "text/plain" }));
-              return;
-            }
-          } catch (_) {
-            /* fall through to fetch */
-          }
-          try {
-            fetch(streamUrl, { method: "POST", mode: "no-cors", keepalive: true, body });
-          } catch (_) {
-            /* streaming is optional */
-          }
+          enqueueSurveyPayload(payload);
+          flushSurveyOutbox("survey_event");
         }
 
         function logSurveyEvent(page, answer, state) {
+          const surveyState = state || getState();
+          const submissionId = ensureSubmissionId(surveyState);
+          setState(surveyState);
           const entry = {
+            event_id: createRecordId("survey_event"),
             event_type: "survey_submit",
             element_id: page.id,
             timestamp: Date.now(),
             value: {
               answer,
               survey_page: page.type || "transition",
-              assignment: state && state.assignment ? state.assignment : null
+              assignment: surveyState.assignment || null,
+              submission_id: submissionId
             }
           };
           const events = getSurveyEvents();
           events.push(entry);
           setSurveyEvents(events);
+          streamSurveyEvent(entry, surveyState);
+        }
+
+        function storedJson(key) {
+          try { return JSON.parse(localStorage.getItem(key)) || {}; }
+          catch (_) { return {}; }
+        }
+
+        function logCompletionSnapshot(state) {
+          const submissionId = ensureSubmissionId(state);
+          const eventId = `${submissionId}:completion_snapshot`;
+          const existingEvents = getSurveyEvents();
+          let entry = existingEvents.find(event => event.event_id === eventId);
+          if (!entry) {
+            const behaviorPayload = typeof window.HOTEL_EXPERIMENT_GET_PAYLOAD === "function"
+              ? window.HOTEL_EXPERIMENT_GET_PAYLOAD()
+              : null;
+            entry = {
+              event_id: eventId,
+              event_type: "survey_completion_snapshot",
+              element_id: "survey_completion_snapshot",
+              timestamp: Date.now(),
+              value: {
+                snapshot_version: 1,
+                submission_id: submissionId,
+                completion_status: "complete",
+                completed_at: state.completed_at,
+                prolific: prolificMeta(state),
+                assignment: state.assignment || null,
+                answers: state.answers || {},
+                no_review_viewing: storedJson(hotelViewStorageKey()),
+                with_review_viewing: storedJson(`${HOTEL_REVIEW_VIEW_STATE_KEY}:${params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "anonymous"}`),
+                with_ai_summary_viewing: storedJson(`${HOTEL_AI_REVIEW_VIEW_STATE_KEY}:${params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "anonymous"}`),
+                survey_event_count: existingEvents.length,
+                current_page_behavior_event_count: behaviorPayload && Array.isArray(behaviorPayload.events)
+                  ? behaviorPayload.events.length
+                  : 0
+              }
+            };
+            existingEvents.push(entry);
+            setSurveyEvents(existingEvents);
+          }
           streamSurveyEvent(entry, state);
         }
 
@@ -932,7 +1116,7 @@
               hotel_id: page.hotel.id,
               hotel_name: page.hotel.name,
               matrix: page.matrix,
-              questionnaire_stage: postReviewMode ? "with_reviews" : "no_reviews",
+              questionnaire_stage: postReviewAiMode ? "with_ai_summary" : postReviewMode ? "with_reviews" : "no_reviews",
               assigned_attribute_ids: assignment.attribute_ids || [],
               assigned_attribute_labels: assignment.attribute_labels || [],
               values,
@@ -1026,9 +1210,14 @@
           const nextParams = new URLSearchParams(location.search || "");
           const pid = (state && state.prolific_id) || prolificId || "";
           if (pid) nextParams.set("PROLIFIC_PID", pid);
-          nextParams.set("survey_stage", "search_2");
-          logSurveyEvent({ id: "hotel_questionnaire_complete", type: "transition" }, { value: "start_review_browsing" }, state || getState());
-          location.replace("hotel_2.html?" + nextParams.toString());
+          const useAiSummary = nextParams.get("study_version") === "3";
+          nextParams.set("survey_stage", useAiSummary ? "search_3" : "search_2");
+          logSurveyEvent(
+            { id: "hotel_questionnaire_complete", type: "transition" },
+            { value: useAiSummary ? "start_ai_summary_review_browsing" : "start_review_browsing" },
+            state || getState()
+          );
+          location.replace((useAiSummary ? "hotel_3.html?" : "hotel_2.html?") + nextParams.toString());
         }
 
         function renderCompletionScreen() {
@@ -1044,7 +1233,15 @@
         }
 
         function finishPostReviewQuestionnaire(state) {
-          logSurveyEvent({ id: "post_review_complete", type: "transition" }, { value: "complete" }, state || getState());
+          const finalState = state || getState();
+          ensureSubmissionId(finalState);
+          finalState.completion_status = "complete";
+          finalState.completed_at = finalState.completed_at || new Date().toISOString();
+          finalState.updated_at = new Date().toISOString();
+          setState(finalState);
+          logSurveyEvent({ id: "post_review_complete", type: "transition" }, { value: "complete" }, finalState);
+          logCompletionSnapshot(finalState);
+          flushSurveyOutbox("survey_complete");
           renderCompletionScreen();
           history.replaceState(null, "", location.pathname + (location.search || "") + "#complete");
         }
@@ -1107,6 +1304,22 @@
           else render();
         });
 
+        window.addEventListener("online", () => flushSurveyOutbox("online"));
+        window.addEventListener("pagehide", () => flushSurveyOutbox("pagehide", true));
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "hidden") flushSurveyOutbox("hidden", true);
+        });
+        window.MOCK_HOTEL_SURVEY_STORAGE_STATUS = function () {
+          const state = getState();
+          return {
+            submission_id: state.submission_id || "",
+            completion_status: state.completion_status || "in_progress",
+            saved_answer_count: Object.keys(state.answers || {}).length,
+            saved_event_count: getSurveyEvents().length,
+            pending_delivery_count: getSurveyOutbox().length
+          };
+        };
+
         function validHashForMode() {
           const hash = location.hash || "";
           if (postReviewMode) return /^#pr\d+$/.test(hash) || hash === "#complete";
@@ -1117,6 +1330,8 @@
         if (!location.hash || !validHashForMode()) {
           history.replaceState(null, "", pageUrl(0));
         }
+        ensureRandomization();
+        flushSurveyOutbox("page_load");
         if (postReviewMode && location.hash === "#complete") renderCompletionScreen();
         else render();
       })();
