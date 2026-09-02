@@ -15,7 +15,7 @@
  *   <meta name="tracking-stream-url" content="https://script.google.com/macros/s/.../exec" />
  */
 
-const SCHEMA_VERSION = "5";
+const SCHEMA_VERSION = "6";
 const PARTICIPANTS_SHEET = "Participants";
 const QUESTIONNAIRE_SHEET = "Questionnaire_responses";
 const VISITS_SHEET = "Hotel_visits";
@@ -125,7 +125,8 @@ const PARTICIPANT_HEADERS = [
   "frequent_booking_scenarios",
   "frequent_booking_scenario_other",
   "bot_detection_flag",
-  "bot_detection_details"
+  "bot_detection_details",
+  "survey_user_id"
 ];
 
 const QUESTIONNAIRE_HEADERS = [
@@ -156,7 +157,8 @@ const QUESTIONNAIRE_HEADERS = [
   "assigned_attribute_ids",
   "assigned_attribute_labels",
   "answer_json",
-  "schema_version"
+  "schema_version",
+  "survey_user_id"
 ];
 
 const VISIT_HEADERS = [
@@ -177,7 +179,8 @@ const VISIT_HEADERS = [
   "scroll_speed_max_px_ms",
   "scroll_speed_mean_px_ms",
   "exit_reason",
-  "schema_version"
+  "schema_version",
+  "survey_user_id"
 ];
 
 const EVENT_HEADERS = [
@@ -195,7 +198,8 @@ const EVENT_HEADERS = [
   "batch_reason",
   "batch_seq",
   "record_id",
-  "schema_version"
+  "schema_version",
+  "survey_user_id"
 ];
 
 const CODEBOOK_HEADERS = [
@@ -319,6 +323,7 @@ function applySheetLayout_(sh, name, headers) {
   if (name === PARTICIPANTS_SHEET) {
     sh.setFrozenColumns(4);
     setWidthByHeader_(sh, headers, "participant_key", 210);
+    setWidthByHeader_(sh, headers, "survey_user_id", 330);
     setWidthByHeader_(sh, headers, "assigned_scenario_title", 240);
     setWidthByHeader_(sh, headers, "prior_hotel_attributes", 320);
     setWidthByHeader_(sh, headers, "selected_hotel_name", 200);
@@ -328,6 +333,7 @@ function applySheetLayout_(sh, name, headers) {
   if (name === QUESTIONNAIRE_SHEET) {
     sh.setFrozenColumns(7);
     setWidthByHeader_(sh, headers, "response_id", 190);
+    setWidthByHeader_(sh, headers, "survey_user_id", 330);
     setWidthByHeader_(sh, headers, "question_id", 260);
     setWidthByHeader_(sh, headers, "attribute_label", 190);
     setWidthByHeader_(sh, headers, "response_label", 220);
@@ -338,6 +344,7 @@ function applySheetLayout_(sh, name, headers) {
   if (name === VISITS_SHEET) {
     sh.setFrozenColumns(7);
     setWidthByHeader_(sh, headers, "visit_id", 190);
+    setWidthByHeader_(sh, headers, "survey_user_id", 330);
     setWidthByHeader_(sh, headers, "hotel_name", 210);
     setWidthByHeader_(sh, headers, "exit_reason", 200);
   }
@@ -347,6 +354,7 @@ function applySheetLayout_(sh, name, headers) {
     setWidthByHeader_(sh, headers, "page_url", 340);
     setWidthByHeader_(sh, headers, "value_json", 440);
     setWidthByHeader_(sh, headers, "record_id", 190);
+    setWidthByHeader_(sh, headers, "survey_user_id", 330);
   }
 
   if (name === CODEBOOK_SHEET) {
@@ -504,7 +512,8 @@ function buildEventRows_(events, payload, receivedAtMs) {
       textCell_(payload.reason || ""),
       payload.seq_start != null ? payload.seq_start + i : "",
       recordId,
-      SCHEMA_VERSION
+      SCHEMA_VERSION,
+      textCell_(prolific.survey_user_id || ev.survey_user_id || "")
     ]);
   }
   return out;
@@ -763,7 +772,8 @@ function addQuestionnaireRow_(out, base, item) {
     joinCell_(assignment.attribute_ids || []),
     joinCell_(assignment.attribute_labels || []),
     jsonCell_(base.answer),
-    SCHEMA_VERSION
+    SCHEMA_VERSION,
+    textCell_(base.prolific.survey_user_id || "")
   ]);
 }
 
@@ -799,7 +809,8 @@ function buildVisitRows_(events, payload, receivedAt) {
       numberOrBlank_(value.scroll_max_px_per_ms),
       numberOrBlank_(value.scroll_mean_px_per_ms),
       textCell_(value.exit_reason || ""),
-      SCHEMA_VERSION
+      SCHEMA_VERSION,
+      textCell_(prolific.survey_user_id || ev.survey_user_id || "")
     ]);
   }
   return out;
@@ -825,6 +836,7 @@ function updateParticipant_(sh, events, payload, receivedAt) {
   summary.prolific_pid = textCell_(prolific.prolific_pid || summary.prolific_pid || "");
   summary.study_id = textCell_(prolific.study_id || summary.study_id || "");
   summary.session_id = textCell_(prolific.session_id || summary.session_id || "");
+  summary.survey_user_id = textCell_(prolific.survey_user_id || summary.survey_user_id || "");
   summary.first_recorded_at = summary.first_recorded_at || receivedAt;
   summary.last_recorded_at = receivedAt;
   summary.completion_status = summary.completion_status || "in_progress";
@@ -949,6 +961,14 @@ function ensureCodebook_(ss) {
   }
 
   rows.push([
+    "identifier",
+    "survey_user_id",
+    "Anonymous survey user ID",
+    "Automatically generated random ID",
+    "Hidden from participants and used to link questionnaire answers, hotel visits, raw events, and the participant summary across the full website flow."
+  ]);
+
+  rows.push([
     "quality_flag",
     "bot_detection_flag",
     "Automated-response detection",
@@ -1040,6 +1060,7 @@ function inferSurveyStageFromUrl_(pageUrl) {
 
 function participantKey_(prolific) {
   const meta = prolific || {};
+  if (meta.survey_user_id) return "survey_user:" + String(meta.survey_user_id);
   if (meta.session_id) return "session:" + String(meta.session_id);
   if (meta.prolific_pid) return "prolific:" + String(meta.prolific_pid);
   return "";

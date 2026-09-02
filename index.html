@@ -40,7 +40,7 @@
       </section>
     </main>
 
-    <script src="./assets/js/survey-tracking.js?v=20260823-3"></script>
+    <script src="./assets/js/survey-tracking.js?v=20260902-2"></script>
     <script>
       (function () {
         const SURVEY_STORAGE_PREFIX = "mock_hotel_survey_v1";
@@ -49,9 +49,13 @@
         const HOTEL_VIEW_STATE_KEY = "mock_hotel_no_review_views_v1";
         const HOTEL_REVIEW_VIEW_STATE_KEY = "mock_hotel_review_views_v1";
         const HOTEL_AI_REVIEW_VIEW_STATE_KEY = "mock_hotel_ai_review_views_v1";
+        const SURVEY_USER_ID_STORAGE_PREFIX = "mock_hotel_survey_user_id_v1";
+        const SURVEY_USER_ID_CURRENT_KEY = `${SURVEY_USER_ID_STORAGE_PREFIX}:current`;
         const params = new URLSearchParams(location.search);
         const prolificId = params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "";
-        const participantStorageId = encodeURIComponent(prolificId || params.get("SESSION_ID") || params.get("session_id") || "anonymous");
+        const participantIdentity = prolificId || params.get("SESSION_ID") || params.get("session_id") || "";
+        const participantStorageId = encodeURIComponent(participantIdentity || "anonymous");
+        const surveyUserId = getOrCreateSurveyUserId(participantIdentity);
         const STORAGE_KEY = `${SURVEY_STORAGE_PREFIX}:${participantStorageId}`;
         const SURVEY_EVENT_STORAGE_KEY = `${SURVEY_EVENT_STORAGE_PREFIX}:${participantStorageId}`;
         const surveyStage = params.get("survey_stage") || "";
@@ -346,6 +350,39 @@
           return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 12)}`;
         }
 
+        function persistSurveyUserId(id, identity) {
+          if (!id) return;
+          const key = `${SURVEY_USER_ID_STORAGE_PREFIX}:${encodeURIComponent(identity || "anonymous")}`;
+          try {
+            sessionStorage.setItem(key, id);
+            sessionStorage.setItem(SURVEY_USER_ID_CURRENT_KEY, id);
+          } catch (_) {
+            /* storage can be unavailable in strict privacy modes */
+          }
+          if (identity) {
+            try { localStorage.setItem(key, id); }
+            catch (_) { /* sessionStorage remains as a fallback */ }
+          }
+        }
+
+        function getOrCreateSurveyUserId(identity) {
+          const key = `${SURVEY_USER_ID_STORAGE_PREFIX}:${encodeURIComponent(identity || "anonymous")}`;
+          let id = "";
+          try { id = sessionStorage.getItem(key) || ""; }
+          catch (_) { /* continue */ }
+          if (!id && identity) {
+            try { id = localStorage.getItem(key) || ""; }
+            catch (_) { /* continue */ }
+          }
+          if (!id && !identity) {
+            try { id = sessionStorage.getItem(SURVEY_USER_ID_CURRENT_KEY) || ""; }
+            catch (_) { /* continue */ }
+          }
+          if (!id) id = createRecordId("survey_user");
+          persistSurveyUserId(id, identity);
+          return id;
+        }
+
         function ensureSubmissionId(state) {
           if (!state.submission_id) state.submission_id = createRecordId("submission");
           if (!state.started_at) state.started_at = new Date().toISOString();
@@ -384,6 +421,11 @@
 
           if (!state.submission_id || !state.started_at) {
             ensureSubmissionId(state);
+            changed = true;
+          }
+
+          if (!state.survey_user_id) {
+            state.survey_user_id = surveyUserId;
             changed = true;
           }
 
@@ -480,6 +522,7 @@
 
         function prolificMeta(state) {
           return {
+            survey_user_id: (state && state.survey_user_id) || surveyUserId,
             prolific_pid: (state && state.prolific_id) || prolificId || params.get("PROLIFIC_PID") || params.get("prolific_pid") || "",
             study_id: params.get("STUDY_ID") || params.get("study_id") || "",
             session_id: params.get("SESSION_ID") || params.get("session_id") || ""
@@ -615,6 +658,7 @@
             element_id: page.id,
             timestamp: Date.now(),
             value: {
+              survey_user_id: surveyState.survey_user_id || surveyUserId,
               answer,
               survey_page: page.type || "transition",
               assignment: surveyState.assignment || null,
@@ -648,6 +692,7 @@
               timestamp: Date.now(),
               value: {
                 snapshot_version: 1,
+                survey_user_id: state.survey_user_id || surveyUserId,
                 submission_id: submissionId,
                 completion_status: "complete",
                 completed_at: state.completed_at,
@@ -1073,6 +1118,8 @@
           if (page.type === "prolific") {
             const value = document.getElementById("answerInput").value.trim();
             state.prolific_id = value;
+            state.survey_user_id = state.survey_user_id || surveyUserId;
+            persistSurveyUserId(state.survey_user_id, value);
             state.answers[page.id] = { value, submitted_at: state.updated_at };
           } else if (page.type === "scenarioFrequency") {
             const selectedIds = Array.from(document.querySelectorAll('input[name="booking_scenario"]:checked'))

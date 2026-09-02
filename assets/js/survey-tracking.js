@@ -25,6 +25,9 @@
   var LIVE_STORAGE_KEY = "hotel_experiment_live_v1";
   var STORAGE_KEY = "hotel_experiment_tracking_v1";
   var STREAM_OUTBOX_STORAGE_PREFIX = "hotel_experiment_stream_outbox_v1";
+  var SURVEY_USER_ID_STORAGE_PREFIX = "mock_hotel_survey_user_id_v1";
+  var SURVEY_USER_ID_CURRENT_KEY = SURVEY_USER_ID_STORAGE_PREFIX + ":current";
+  var surveyUserId = "";
   var events = [];
   var pageLoadTs = Date.now();
   var persistTimer = null;
@@ -101,9 +104,58 @@
     return "behavior_" + pageLoadTs + "_" + eventSeq + "_" + Math.random().toString(36).slice(2, 10);
   }
 
+  function createSurveyUserId() {
+    try {
+      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        return "survey_user_" + window.crypto.randomUUID();
+      }
+    } catch (e) {
+      /* fall through */
+    }
+    return "survey_user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 14);
+  }
+
+  function participantIdentity() {
+    try {
+      var p = new URLSearchParams(location.search);
+      return p.get("PROLIFIC_PID") || p.get("prolific_pid") || p.get("participant_id") ||
+        p.get("SESSION_ID") || p.get("session_id") || "";
+    } catch (e) {
+      return "";
+    }
+  }
+
+  function getOrCreateSurveyUserId() {
+    var identity = participantIdentity();
+    var key = SURVEY_USER_ID_STORAGE_PREFIX + ":" + encodeURIComponent(identity || "anonymous");
+    var id = "";
+    try { id = sessionStorage.getItem(key) || ""; }
+    catch (e) { /* continue */ }
+    if (!id && identity) {
+      try { id = localStorage.getItem(key) || ""; }
+      catch (e2) { /* continue */ }
+    }
+    if (!id && !identity) {
+      try { id = sessionStorage.getItem(SURVEY_USER_ID_CURRENT_KEY) || ""; }
+      catch (e3) { /* continue */ }
+    }
+    if (!id) id = createSurveyUserId();
+    try {
+      sessionStorage.setItem(key, id);
+      sessionStorage.setItem(SURVEY_USER_ID_CURRENT_KEY, id);
+    } catch (e4) {
+      /* storage can be unavailable in strict privacy modes */
+    }
+    if (identity) {
+      try { localStorage.setItem(key, id); }
+      catch (e5) { /* sessionStorage remains as a fallback */ }
+    }
+    return id;
+  }
+
   function streamOutboxStorageKey() {
     var prolific = prolificMeta();
-    var participant = prolific.prolific_pid || prolific.session_id || "anonymous";
+    var participant = prolific.survey_user_id || prolific.prolific_pid || prolific.session_id || "anonymous";
     return STREAM_OUTBOX_STORAGE_PREFIX + ":" + encodeURIComponent(participant);
   }
 
@@ -285,12 +337,15 @@
   }
 
   function log(event_type, element_id, value) {
+    var eventValue = value && typeof value === "object" && !Array.isArray(value)
+      ? Object.assign({}, value, { survey_user_id: surveyUserId || getOrCreateSurveyUserId() })
+      : { event_value: value === undefined ? null : value, survey_user_id: surveyUserId || getOrCreateSurveyUserId() };
     var entry = {
       event_id: createEventId(),
       event_type: event_type,
       element_id: element_id != null ? String(element_id) : "",
       timestamp: now(),
-      value: value === undefined ? null : value
+      value: eventValue
     };
     events.push(entry);
     schedulePersist();
@@ -367,6 +422,7 @@
   function prolificMeta() {
     var p = new URLSearchParams(location.search);
     return {
+      survey_user_id: surveyUserId || getOrCreateSurveyUserId(),
       prolific_pid: p.get("PROLIFIC_PID") || p.get("prolific_pid") || null,
       study_id: p.get("STUDY_ID") || p.get("study_id") || null,
       session_id: p.get("SESSION_ID") || p.get("session_id") || null
@@ -783,6 +839,7 @@
   }
 
   function init() {
+    surveyUserId = getOrCreateSurveyUserId();
     initLiveRelay();
     streamUrl = getStreamUrl();
     streamQueue = loadStreamOutbox();
