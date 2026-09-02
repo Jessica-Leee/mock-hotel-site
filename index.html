@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbxPojbcbSKbiB6nxHdYp1DYE8_en_Ugq1EyaieEN_H2j8kD67VOIv0qzbxk28rUNxx50Q/exec"
     />
-    <link rel="stylesheet" href="./assets/css/site.css?v=20260823-3" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260902-1" />
   </head>
   <body data-survey-page="true">
     <header class="booking-header" aria-label="Site header">
@@ -1223,8 +1223,12 @@
         function renderCompletionScreen() {
           document.getElementById("surveyQuestion").innerHTML = `
             <div class="survey-complete">
-              <h1 class="survey-title">Thank you</h1>
-              <p class="survey-copy">Your responses have been submitted.</p>
+              <h1 class="survey-title">Website task complete</h1>
+              <p class="survey-copy">Your responses on this website have been saved.</p>
+              <div class="survey-complete__instruction" role="status">
+                <strong>Return to the Qualtrics survey</strong>
+                <p>Please return to the Qualtrics tab now to continue the study and submit your response.</p>
+              </div>
             </div>
           `;
           document.getElementById("surveySubmit").hidden = true;

@@ -473,6 +473,28 @@ body{
   text-align:center;
   padding:36px 0 24px;
 }
+.survey-complete__instruction{
+  max-width:680px;
+  margin:28px auto 0;
+  padding:20px 24px;
+  border:2px solid #0071c2;
+  border-left-width:6px;
+  border-radius:6px;
+  background:#eef7ff;
+  color:#1f2937;
+  text-align:left;
+}
+.survey-complete__instruction strong{
+  display:block;
+  color:#003b6f;
+  font-size:20px;
+  line-height:1.35;
+}
+.survey-complete__instruction p{
+  margin:8px 0 0;
+  font-size:17px;
+  line-height:1.55;
+}
 .survey-actions{
   border-top:1px solid #e6eaf2;
   padding-top:16px;

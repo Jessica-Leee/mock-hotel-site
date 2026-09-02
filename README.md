@@ -9,7 +9,7 @@ Hosted on [GitHub Pages](https://pages.github.com/) from the `main` branch. Push
 ## Study URLs
 
 - **Survey (entry):** https://jessica-leee.github.io/mock-hotel-site/
-- **Survey copy (AI-summary condition):** https://jessica-leee.github.io/mock-hotel-site/study_3.html
+- **Survey copy (AI-summary condition):** https://jessica-leee.github.io/mock-hotel-site/survey-ai-summaries.html
 - **Search page 1:** https://jessica-leee.github.io/mock-hotel-site/hotel_1.html?survey_stage=search_1
 - **Search page 2:** https://jessica-leee.github.io/mock-hotel-site/hotel_2.html?survey_stage=search_2
 - **Search page 3 (reviews with AI summaries):** https://jessica-leee.github.io/mock-hotel-site/hotel_3.html?survey_stage=search_3
@@ -23,7 +23,8 @@ The participant-facing flow uses neutral page names and query strings so the con
 ```text
 .
 ├── index.html                         # Main survey and questionnaires
-├── study_3.html                       # Neutral entry for the AI-summary condition
+├── survey-ai-summaries.html           # Main entry for the AI-summary condition
+├── study_3.html                       # Backward-compatible AI-summary entry
 ├── hotel_1.html                       # Hotel information stage
 ├── hotel_2.html                       # Reviews stage
 ├── hotel_3.html                       # Reviews plus AI-summary stage
