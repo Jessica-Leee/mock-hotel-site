@@ -9,25 +9,22 @@ Hosted on [GitHub Pages](https://pages.github.com/) from the `main` branch. Push
 ## Study URLs
 
 - **Survey (entry):** https://jessica-leee.github.io/mock-hotel-site/
-- **Survey copy (AI-summary condition):** https://jessica-leee.github.io/mock-hotel-site/survey-ai-summaries.html
-- **Search page 1:** https://jessica-leee.github.io/mock-hotel-site/hotel_1.html?survey_stage=search_1
-- **Search page 2:** https://jessica-leee.github.io/mock-hotel-site/hotel_2.html?survey_stage=search_2
-- **Search page 3 (reviews with AI summaries):** https://jessica-leee.github.io/mock-hotel-site/hotel_3.html?survey_stage=search_3
+- **Survey (AI-summary condition):** https://jessica-leee.github.io/mock-hotel-site/survey-ai-summaries.html
+- **Search without reviews:** https://jessica-leee.github.io/mock-hotel-site/search-no-reviews.html?survey_stage=search_1
+- **Search with reviews:** https://jessica-leee.github.io/mock-hotel-site/search-reviews.html?survey_stage=search_2
+- **Search with AI summaries:** https://jessica-leee.github.io/mock-hotel-site/search-ai-summaries.html?survey_stage=search_3
 
 `index.html` is the survey entry page. After the survey, participants are routed to one of the Chicago hotel pages. Hotel details are text-only; hotel photos and galleries are not rendered.
-
-The participant-facing flow uses neutral page names and query strings so the condition is not disclosed in the URL.
 
 ## Project structure
 
 ```text
 .
 ├── index.html                         # Main survey and questionnaires
-├── survey-ai-summaries.html           # Main entry for the AI-summary condition
-├── study_3.html                       # Backward-compatible AI-summary entry
-├── hotel_1.html                       # Hotel information stage
-├── hotel_2.html                       # Reviews stage
-├── hotel_3.html                       # Reviews plus AI-summary stage
+├── survey-ai-summaries.html           # Survey entry for the AI-summary condition
+├── search-no-reviews.html             # Hotel listings without reviews
+├── search-reviews.html                # Hotel listings with reviews
+├── search-ai-summaries.html           # Hotel listings with reviews and AI summaries
 ├── assets/
 │   ├── css/site.css                   # Shared interface styles
 │   └── js/
@@ -88,6 +85,7 @@ The main analysis grain is:
 - one browser interaction = one row in `events`
 
 The browser silently creates a random `survey_user_id` when a participant first enters the survey. It is never displayed or added to the URL. The same ID is attached to questionnaire answers, hotel visits, raw events, and the completion snapshot, allowing all records from one participant to be joined across tabs. `submission_id` remains a separate identifier for one completed survey submission.
+
 
 The script uses a write lock so simultaneous participants cannot overwrite each other. Questionnaire, hotel-visit, and raw event rows receive deterministic IDs so repeated network delivery does not create duplicate analysis rows.
 

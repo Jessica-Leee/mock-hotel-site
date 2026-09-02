@@ -31,7 +31,7 @@
           </div>
         </div>
 
-        <form id="surveyForm" class="survey-form">
+        <form id="surveyForm" class="survey-form" autocomplete="off">
           <div id="surveyQuestion"></div>
           <div class="survey-actions">
             <button id="surveySubmit" class="btn" type="submit">Next</button>
@@ -103,7 +103,7 @@
           const nextParams = new URLSearchParams(location.search || "");
           if (prolificId) nextParams.set("PROLIFIC_PID", prolificId);
           nextParams.set("survey_stage", "search_1");
-          location.replace("hotel_1.html?" + nextParams.toString());
+          location.replace("search-no-reviews.html?" + nextParams.toString());
           return;
         }
 
@@ -111,7 +111,7 @@
           const nextParams = new URLSearchParams(location.search || "");
           if (prolificId) nextParams.set("PROLIFIC_PID", prolificId);
           nextParams.set("survey_stage", postReviewAiMode ? "search_3" : "search_2");
-          location.replace((postReviewAiMode ? "hotel_3.html?" : "hotel_2.html?") + nextParams.toString());
+          location.replace((postReviewAiMode ? "search-ai-summaries.html?" : "search-reviews.html?") + nextParams.toString());
           return;
         }
 
@@ -785,10 +785,9 @@
           `;
         }
 
-        function matrixHtml(page, savedAnswer) {
+        function matrixHtml(page) {
           const config = matrixConfigs[page.matrix];
           const rows = typeof config.rows === "function" ? config.rows() : config.rows;
-          const values = (savedAnswer && savedAnswer.values) || {};
           const isPostReviewLikelihood = page.matrix === "likelihood" && page.id.startsWith("postreview_");
           const questionTitle = isPostReviewLikelihood
             ? "Select how likely you think the hotel has each attribute after seeing the reviews"
@@ -811,11 +810,10 @@
                       <th scope="row">${escapeHtml(row[1])}</th>
                       ${config.columns.map(column => {
                         const inputId = `${page.id}_${row[0]}_${column[0]}`;
-                        const checked = values[row[0]] === column[0] ? " checked" : "";
                         return `
                           <td>
                             <label class="survey-radio" for="${escapeHtml(inputId)}">
-                              <input id="${escapeHtml(inputId)}" type="radio" name="${escapeHtml(row[0])}" value="${escapeHtml(column[0])}" required${checked} />
+                              <input id="${escapeHtml(inputId)}" type="radio" name="${escapeHtml(row[0])}" value="${escapeHtml(column[0])}" required />
                               <span>${column[1].replace(/<br>/g, " ")}</span>
                             </label>
                           </td>
@@ -829,15 +827,14 @@
           `;
         }
 
-        function radioOptionList(name, options, selectedValue) {
+        function radioOptionList(name, options) {
           return `
             <div class="survey-option-list">
               ${options.map(option => {
                 const id = `${name}_${option[0]}`;
-                const checked = selectedValue === option[0] ? " checked" : "";
                 return `
                   <label class="survey-option" for="${escapeHtml(id)}">
-                    <input id="${escapeHtml(id)}" type="radio" name="${escapeHtml(name)}" value="${escapeHtml(option[0])}" required${checked} />
+                    <input id="${escapeHtml(id)}" type="radio" name="${escapeHtml(name)}" value="${escapeHtml(option[0])}" required />
                     <span>${option[1]}</span>
                   </label>
                 `;
@@ -846,12 +843,11 @@
           `;
         }
 
-        function hotelChoiceHtml(savedAnswer) {
-          const selectedValue = (savedAnswer && savedAnswer.hotel_id) || "";
+        function hotelChoiceHtml() {
           return `
             <h1 class="survey-title">After reading the reviews, which hotel would you choose?</h1>
             <p class="survey-copy">Select the hotel you would book based on all information you viewed.</p>
-            ${radioOptionList("chosen_hotel", hotels.map(hotel => [hotel.id, escapeHtml(hotel.name)]), selectedValue)}
+            ${radioOptionList("chosen_hotel", hotels.map(hotel => [hotel.id, escapeHtml(hotel.name)]))}
           `;
         }
 
@@ -893,7 +889,7 @@
           `;
         }
 
-        function actualRevealHtml(savedAnswer) {
+        function actualRevealHtml() {
           const hotel = chosenHotel();
           return `
             <div class="survey-reveal">
@@ -904,14 +900,13 @@
               ${trueAttributeTableHtml(hotel)}
             </div>
             <label class="survey-check">
-              <input id="answerInput" type="checkbox" required ${savedAnswer && savedAnswer.value ? "checked" : ""} />
+              <input id="answerInput" type="checkbox" required />
               <span>I have reviewed the actual attribute values for my chosen hotel.</span>
             </label>
           `;
         }
 
-        function likert7Html(savedAnswer) {
-          const selectedValue = (savedAnswer && savedAnswer.value) || "";
+        function likert7Html() {
           const hotel = chosenHotel();
           return `
             <h1 class="survey-title">Knowing the actual attribute values of your chosen hotel, how satisfied are you with your choice?</h1>
@@ -924,61 +919,64 @@
               ["5", "5"],
               ["6", "6"],
               ["7", "7 - Very satisfied"]
-            ], selectedValue)}
+            ])}
           `;
         }
 
-        function switchChoiceHtml(savedAnswer) {
-          const selectedValue = (savedAnswer && savedAnswer.value) || "";
+        function switchChoiceHtml() {
           return `
             <h1 class="survey-title">Would you choose a different hotel if you were booking again, knowing what you know now?</h1>
             ${radioOptionList("switch_choice", [
               ["yes", "Yes - I would switch to a different hotel"],
               ["no", "No - I would choose the same hotel again"]
-            ], selectedValue)}
+            ])}
           `;
         }
 
-        function confidenceRangeHtml(savedAnswer) {
-          const value = savedAnswer && savedAnswer.value ? savedAnswer.value : "50";
+        function unsetRangeInput(name, min, max, extraAttrs) {
+          return `
+            <input ${extraAttrs || ""} name="${escapeHtml(name)}" type="range" min="${min}" max="${max}" step="1" value="${min}" class="is-unset" data-answered="false" aria-invalid="true" />
+            <output class="is-unset">—</output>
+          `;
+        }
+
+        function rangeErrorHtml() {
+          return `<p class="survey-error range-selection-error" role="alert" hidden>Please move each slider to record your answer.</p>`;
+        }
+
+        function confidenceRangeHtml() {
           return `
             <h1 class="survey-title">Confidence in your switching answer</h1>
             <p class="survey-copy">0 = not at all confident, 100 = completely confident.</p>
             <label class="survey-range">
               <span>Confidence in switching decision</span>
-              <input id="answerInput" name="switch_confidence" type="range" min="0" max="100" step="1" value="${escapeHtml(value)}" />
-              <output>${escapeHtml(value)}</output>
+              ${unsetRangeInput("switch_confidence", 0, 100, 'id="answerInput"')}
             </label>
+            ${rangeErrorHtml()}
           `;
         }
 
-        function attributeSurpriseHtml(savedAnswer) {
-          const values = (savedAnswer && savedAnswer.values) || {};
+        function attributeSurpriseHtml() {
           return `
             <h1 class="survey-title">For each attribute of your chosen hotel, how surprised are you by the true value revealed?</h1>
             <p class="survey-copy">0 = not surprised at all, 10 = completely surprised.</p>
             <div class="survey-range-list">
-              ${attributePool.map(attribute => {
-                const value = values[attribute.id] || "0";
-                return `
-                  <label class="survey-range survey-range--row">
-                    <span>${escapeHtml(attribute.label)}</span>
-                    <input name="${escapeHtml(attribute.id)}" type="range" min="0" max="10" step="1" value="${escapeHtml(value)}" />
-                    <output>${escapeHtml(value)}</output>
-                  </label>
-                `;
-              }).join("")}
+              ${attributePool.map(attribute => `
+                <label class="survey-range survey-range--row">
+                  <span>${escapeHtml(attribute.label)}</span>
+                  ${unsetRangeInput(attribute.id, 0, 10)}
+                </label>
+              `).join("")}
             </div>
+            ${rangeErrorHtml()}
           `;
         }
 
-        function confidenceSurpriseHtml(savedAnswer) {
-          const confidenceValue = savedAnswer && savedAnswer.switch_confidence ? savedAnswer.switch_confidence : "50";
-          const surpriseValues = savedAnswer && savedAnswer.surprise_values ? savedAnswer.surprise_values : {};
+        function confidenceSurpriseHtml() {
           return `
-            ${confidenceRangeHtml({ value: confidenceValue })}
+            ${confidenceRangeHtml()}
             <div class="survey-divider"></div>
-            ${attributeSurpriseHtml({ values: surpriseValues })}
+            ${attributeSurpriseHtml()}
           `;
         }
 
@@ -986,8 +984,6 @@
           const index = currentIndex();
           const pageSet = activePages();
           const page = pageSet[index];
-          const state = getState();
-          const answer = state.answers[page.id] || {};
           const stepLabel = document.getElementById("surveyStepLabel");
           const fill = document.getElementById("surveyProgressFill");
           const submit = document.getElementById("surveySubmit");
@@ -1018,7 +1014,6 @@
           }
 
           if (page.type === "prolific") {
-            const value = answer.value || prolificId;
             setQuestionHtml(`
               <div class="survey-disclaimer" role="note">
                 <strong>Important:</strong> Responses generated by AI or automated tools will not be compensated.
@@ -1027,11 +1022,10 @@
               <p class="survey-copy">Please note that this response should auto-fill with the correct ID.</p>
               <label class="survey-field">
                 <span>Prolific ID</span>
-                <input id="answerInput" name="prolific_id" type="text" value="${escapeHtml(value)}" required autocomplete="off" ${prolificId ? "readonly" : ""} />
+                <input id="answerInput" name="prolific_id" type="text" value="${escapeHtml(prolificId)}" required autocomplete="off" ${prolificId ? "readonly" : ""} />
               </label>
             `);
           } else if (page.type === "scenarioFrequency") {
-            const selectedIds = new Set(Array.isArray(answer.selected_ids) ? answer.selected_ids : []);
             setQuestionHtml(`
               <h1 class="survey-title">When do you most often need to book a hotel?</h1>
               <p class="survey-copy">Select all travel scenarios that apply to you.</p>
@@ -1040,10 +1034,9 @@
                 <div class="survey-option-list survey-option-list--compact">
                   ${bookingScenarioOptions.map(option => {
                     const inputId = `booking_scenario_${option.id}`;
-                    const checked = selectedIds.has(option.id) ? " checked" : "";
                     return `
                       <label class="survey-option" for="${escapeHtml(inputId)}">
-                        <input id="${escapeHtml(inputId)}" type="checkbox" name="booking_scenario" value="${escapeHtml(option.id)}"${checked} />
+                        <input id="${escapeHtml(inputId)}" type="checkbox" name="booking_scenario" value="${escapeHtml(option.id)}" />
                         <span>${escapeHtml(option.label)}</span>
                       </label>
                     `;
@@ -1052,7 +1045,7 @@
               </fieldset>
               <label class="survey-field survey-field--short">
                 <span>If you selected Other, please specify (optional)</span>
-                <input id="bookingScenarioOther" name="booking_scenario_other" type="text" value="${escapeHtml(answer.other_text || "")}" autocomplete="off" />
+                <input id="bookingScenarioOther" name="booking_scenario_other" type="text" value="" autocomplete="off" />
               </label>
               <p id="scenarioSelectionError" class="survey-error" role="alert" hidden>Please select at least one travel scenario.</p>
               ${botTrapHtml("travel_scenarios", "TRAVEL-CHECK-27")}
@@ -1063,7 +1056,7 @@
               <p class="survey-copy">Please list all hotel attributes you would consider when choosing a hotel for travel. Separate them with commas.</p>
               <label class="survey-field">
                 <span>Hotel attributes</span>
-                <textarea id="answerInput" name="attributes" required placeholder="cleanliness, location">${escapeHtml(answer.value || "")}</textarea>
+                <textarea id="answerInput" name="attributes" required placeholder="cleanliness, location"></textarea>
               </label>
               ${botTrapHtml("hotel_attributes", "ATTRIBUTE-CHECK-41")}
             `);
@@ -1079,26 +1072,26 @@
                 ${scenarioTable(scenario.rows)}
               </div>
               <label class="survey-check">
-                <input id="answerInput" type="checkbox" required ${answer.value ? "checked" : ""} />
+                <input id="answerInput" type="checkbox" required />
                 <span>I have read this trip scenario and preference profile.</span>
               </label>
             `);
           } else if (page.type === "hotelMatrix") {
-            setQuestionHtml(matrixHtml(page, answer));
+            setQuestionHtml(matrixHtml(page));
           } else if (page.type === "hotelChoice") {
-            setQuestionHtml(hotelChoiceHtml(answer));
+            setQuestionHtml(hotelChoiceHtml());
           } else if (page.type === "actualReveal") {
-            setQuestionHtml(actualRevealHtml(answer));
+            setQuestionHtml(actualRevealHtml());
           } else if (page.type === "likert7") {
-            setQuestionHtml(likert7Html(answer));
+            setQuestionHtml(likert7Html());
           } else if (page.type === "switchChoice") {
-            setQuestionHtml(switchChoiceHtml(answer));
+            setQuestionHtml(switchChoiceHtml());
           } else if (page.type === "rangeConfidence") {
-            setQuestionHtml(confidenceRangeHtml(answer));
+            setQuestionHtml(confidenceRangeHtml());
           } else if (page.type === "attributeSurprise") {
-            setQuestionHtml(attributeSurpriseHtml(answer));
+            setQuestionHtml(attributeSurpriseHtml());
           } else if (page.type === "confidenceSurprise") {
-            setQuestionHtml(confidenceSurpriseHtml(answer));
+            setQuestionHtml(confidenceSurpriseHtml());
           } else {
             setQuestionHtml(`
               <h1 class="survey-title">Next: Browse Hotel Listings</h1>
@@ -1250,7 +1243,7 @@
           if (pid) nextParams.set("PROLIFIC_PID", pid);
           nextParams.set("survey_stage", "search_1");
           logSurveyEvent({ id: "browse_intro", type: "transition" }, { value: "start_hotel_browsing" }, state || getState());
-          location.replace("hotel_1.html?" + nextParams.toString());
+          location.replace("search-no-reviews.html?" + nextParams.toString());
         }
 
         function goToReviewBrowsing(state) {
@@ -1264,7 +1257,7 @@
             { value: useAiSummary ? "start_ai_summary_review_browsing" : "start_review_browsing" },
             state || getState()
           );
-          location.replace((useAiSummary ? "hotel_3.html?" : "hotel_2.html?") + nextParams.toString());
+          location.replace((useAiSummary ? "search-ai-summaries.html?" : "search-reviews.html?") + nextParams.toString());
         }
 
         function renderCompletionScreen() {
@@ -1311,8 +1304,15 @@
             if (error) error.hidden = true;
           }
           if (input.type !== "range") return;
+          input.classList.remove("is-unset");
+          input.dataset.answered = "true";
+          input.removeAttribute("aria-invalid");
           const output = input.parentElement && input.parentElement.querySelector("output");
-          if (output) output.textContent = input.value;
+          if (output) {
+            output.classList.remove("is-unset");
+            output.textContent = input.value;
+          }
+          document.querySelectorAll(".range-selection-error").forEach(error => { error.hidden = true; });
         });
 
         document.getElementById("surveyForm").addEventListener("submit", function (event) {
@@ -1320,6 +1320,12 @@
           const index = currentIndex();
           const pageSet = activePages();
           const page = pageSet[index];
+          const unansweredRanges = Array.from(document.querySelectorAll('input[type="range"][data-answered="false"]'));
+          if (unansweredRanges.length) {
+            document.querySelectorAll(".range-selection-error").forEach(error => { error.hidden = false; });
+            unansweredRanges[0].focus();
+            return;
+          }
           if (page.type === "scenarioFrequency") {
             const selected = document.querySelectorAll('input[name="booking_scenario"]:checked');
             const error = document.getElementById("scenarioSelectionError");
