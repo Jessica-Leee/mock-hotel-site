@@ -16,7 +16,7 @@ Hosted on [GitHub Pages](https://pages.github.com/) from the `main` branch. Push
 
 `index.html` is the full-review survey entry page. `survey-ai-summaries.html` starts the parallel AI-summary survey. Participants can complete both versions in sequence. Hotel details are text-only; hotel photos and galleries are not rendered.
 
-For paired data, open both versions with the same Prolific parameters. For example, configure both Qualtrics links with the same `PROLIFIC_PID`, `STUDY_ID`, and `SESSION_ID` piped-text values. The two pages share one GitHub Pages origin, so the hidden random `survey_user_id` is reused for the same participant while each version creates its own `submission_id`.
+For paired data, open both versions with the same `PROLIFIC_PID` value. The two pages share one GitHub Pages origin, so the hidden random `survey_user_id` is reused for the same participant. `STUDY_ID`, `SESSION_ID`, and `submission_id` are not written to the analysis sheets.
 
 ## Project structure
 
@@ -71,50 +71,48 @@ or add `?stream=YOUR_WEB_APP_URL` to the study URL.
 
 ### 4) What gets written to the sheet
 
-The refined storage design maintains five tabs:
+The receiver writes new data to three tabs:
 
-- **`Participants`** - one up-to-date row per participant and study condition. A participant who completes both versions has two rows with the same `survey_user_id`, one marked `full_reviews` and one marked `ai_summary`; each row has a different `submission_id`. It contains their frequent hotel-booking scenarios, the assigned study scenario and three randomized attributes, prior hotel attributes, final hotel choice, satisfaction, switching answer, switching confidence, attribute-surprise ratings, completion status, and automated-response quality-control flags.
-- **`Questionnaire_responses`** - one row per individual response item. A three-attribute matrix therefore creates three rows, one for each attribute. Each row includes the original response code, an analysis-ready numeric value, a readable label, the scale range, hotel and stage metadata, and the original `answer_json` for auditing.
-- **`Hotel_visits`** - one row per completed hotel popup visit. Rows include participant identifiers, stage, hotel ID/name, numeric viewing duration, scroll depth, direction changes, scroll speed, and exit reason.
-- **`events`** - one row per raw streamed event, including clicks, hovers, mouse samples, and full JSON in `value_json`. Use this tab as the untouched audit trail rather than the main analysis table.
-- **`Codebook`** - definitions for the hotel attributes, booking-scenario choices, response scales, coding directions, and survey-stage labels.
+- **`Without_AI_Survey`** - one row per participant who completes the survey with full reviews and no AI summary.
+- **`AI_Summary_Survey`** - one row per participant who completes the survey with AI review summaries.
+- **`Browsing_Information`** - one row per completed hotel-popup visit across both survey versions.
 
-The main analysis grain is:
+The two survey sheets have identical columns. Each participant's row contains:
 
-- one participant-condition submission = one row in `Participants`
-- one questionnaire item = one row in `Questionnaire_responses`
-- one opened-and-closed hotel popup = one row in `Hotel_visits`
-- one browser interaction = one row in `events`
+- the shared random `survey_user_id` and their Prolific ID answer;
+- their frequent hotel-booking scenarios and open-text hotel attributes;
+- the assigned Trip Scenario;
+- the three randomly assigned hotel attributes;
+- their pre-review and post-review likelihood and confidence answers for Pendry, Nobu, and Arlo;
+- their chosen hotel, revealed-value acknowledgement, satisfaction, switching answer, switching confidence, and surprise ratings;
+- automated-response checks and `all_answers_json` as a complete recovery copy.
 
-The browser silently creates a random `survey_user_id` when a participant first enters the survey. It is never displayed or added to the URL. The same ID is attached to both versions' questionnaire answers, hotel visits, raw events, and completion snapshots, allowing the paired records to be joined across tabs. `study_condition` distinguishes `full_reviews` from `ai_summary`, and `submission_id` identifies one version-specific survey submission.
+Likelihood answers are saved numerically from 1 to 5, and confidence answers from 1 to 3. The attribute IDs in `assigned_attribute_1_id` through `assigned_attribute_3_id` identify which randomized question each numbered answer column represents.
 
-Survey answers, popup timers, viewing completion, delivery queues, and completion state are stored separately for each condition. The randomized trip scenario, three assigned attributes, and hotel order are stored at participant level so they remain the same in both versions.
+`Browsing_Information` stores the shared `survey_user_id`, Prolific ID, survey condition, browsing stage, hotel, popup duration, scroll depth, direction changes, scrolling speed, and exit reason. It does not include `submission_id`, `SESSION_ID`, or `STUDY_ID`.
 
+The same `survey_user_id` appears once in each survey sheet, making the two answers directly pairable. Survey answers and popup state remain separate between versions, while the assigned Trip Scenario, three attributes, and hotel order remain the same.
 
-The script uses a write lock so simultaneous participants cannot overwrite each other. Questionnaire, hotel-visit, and raw event rows receive deterministic IDs so repeated network delivery does not create duplicate analysis rows.
+The script uses a write lock so simultaneous participants cannot overwrite each other. Repeated delivery updates the same participant row in the appropriate survey sheet, and hotel visits are deduplicated by visit ID.
 
-At the end of a completed survey, the browser also sends a `survey_completion_snapshot` event. Its `value_json` contains the participant's full answer object, assignment, completion time, and the no-review, review, and AI-summary hotel-view states. This is the recovery record: even if an earlier page-level request was interrupted, the completed response can be reconstructed from this one row by matching `submission_id`.
-
-Survey events and hotel interaction events use separate persistent browser outboxes. The stored survey state is scoped to the participant's Prolific or session ID, while every outgoing record also carries the random `survey_user_id`. Failed network dispatches remain in local storage and are retried on the next page load, when the connection comes back online, and when the page is hidden or closed. Stable `event_id` values make those retries safe to deduplicate with the current receiver.
-
-If the Sheet was previously connected to the older script, the existing `Completed_hotel_visits` and `Questionnaire_answers` tabs are left untouched as legacy data. New submissions use `Hotel_visits` and `Questionnaire_responses` after the updated Apps Script is redeployed.
+If the Sheet was connected to an older receiver, its old tabs are left untouched as legacy data. Only the three tabs above receive new data after the updated Apps Script is redeployed.
 
 After you change `backend/google-sheets-receiver.gs`, use **Deploy → Manage deployments → Edit → New version → Deploy** so the live Web App picks up changes.
 
 ### Troubleshooting (empty sheet)
 
-1. **`events` tab** - If this stays empty, the site is not reaching your Web App (wrong `/exec` URL in `index.html`, ad blocker, or Apps Script errors). In Apps Script, open **Executions** after you use the site; you should see `doPost` runs.
-2. **`Hotel_visits` tab** - Rows appear only when a participant **closes a hotel detail popup**. Open a hotel, close it, and then check the tab within a few seconds.
-3. **`Questionnaire_responses` tab** - Rows appear after participants click **Next** on survey/questionnaire pages. Transition pages are skipped so this tab stays focused on actual answers.
-4. **`Participants` tab** - A participant row is updated throughout the study. `completion_status` changes to `complete` only after the final survey completion event is received.
-5. **Script must write to the correct spreadsheet** - Prefer creating the script via **Extensions -> Apps Script** inside your Sheet. If the project is standalone, set Script property **`SPREADSHEET_ID`** to the Sheet ID from the URL (`/d/<ID>/edit`).
+1. **No new tabs** - Confirm the site is using the correct `/exec` URL. In Apps Script, open **Executions** and check that `doPost` runs are successful.
+2. **Survey sheet is empty** - A survey row is created or updated whenever a participant clicks **Next** on a question. Check the corresponding condition tab.
+3. **`Browsing_Information` is empty** - A browsing row is written only after a participant closes a hotel detail popup.
+4. **Wrong spreadsheet** - Prefer creating the script through **Extensions -> Apps Script** inside the target Sheet. For a standalone script, set the `SPREADSHEET_ID` script property to the ID from the Sheet URL.
 
 ### Completion audit
 
-For each completed participant, verify all three of the following:
+For a participant who completes both surveys, verify:
 
-1. `Participants.completion_status` is `complete` and `survey_user_id` is non-empty.
-2. The `events` tab contains `event_type = survey_completion_snapshot` with the same `survey_user_id` and a non-empty `submission_id` inside `value_json`.
-3. `Questionnaire_responses` contains the expected response rows with the same `survey_user_id`. If any page-level row is missing, recover it from the snapshot's `answers` object.
+1. The same `survey_user_id` appears in `Without_AI_Survey` and `AI_Summary_Survey`.
+2. Both rows show `completion_status = complete`.
+3. Both rows contain the same assigned Trip Scenario and three assigned attribute IDs.
+4. `Browsing_Information` contains visits for that `survey_user_id` from both `full_reviews` and `ai_summary` conditions.
 
-Streaming uses a **2s batch flush** plus persistent retry queues and forced dispatch on page hide. Because the live site sends cross-origin requests to Google Apps Script in `no-cors` mode, the browser can confirm dispatch but cannot read a row-level acknowledgement from Google Sheets. The completion snapshot, retries, and stable IDs provide at-least-once delivery and recovery; a separate same-origin backend would be required for a strict end-to-end acknowledgement before showing the Thank You page.
+Streaming uses persistent retry queues and forced dispatch when a page is hidden or closed. `all_answers_json` in each survey row preserves the full exact answer object as a recovery copy.
