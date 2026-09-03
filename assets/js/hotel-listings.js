@@ -10297,18 +10297,33 @@
 
   function participantStorageSuffix() {
     const params = new URLSearchParams(location.search || "");
-    return params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "anonymous";
+    const identity = params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") ||
+      params.get("SESSION_ID") || params.get("session_id") || "anonymous";
+    return encodeURIComponent(identity);
+  }
+
+  function studyCondition() {
+    const params = new URLSearchParams(location.search || "");
+    const explicit = (params.get("study_condition") || "").toLowerCase();
+    if (explicit === "ai_summary" || params.get("study_version") === "3" || aiSummaryRequested()) {
+      return "ai_summary";
+    }
+    return "full_reviews";
+  }
+
+  function studyRunStorageSuffix() {
+    return `${participantStorageSuffix()}:${studyCondition()}`;
   }
 
   function hotelViewStorageKey() {
-    return `${HOTEL_VIEW_STATE_KEY}:${participantStorageSuffix()}`;
+    return `${HOTEL_VIEW_STATE_KEY}:${studyRunStorageSuffix()}`;
   }
 
   function hotelReviewViewStorageKey() {
     const prefix = aiSummaryRequested()
       ? HOTEL_AI_REVIEW_VIEW_STATE_KEY
       : HOTEL_REVIEW_VIEW_STATE_KEY;
-    return `${prefix}:${participantStorageSuffix()}`;
+    return `${prefix}:${studyRunStorageSuffix()}`;
   }
 
   function hotelOrderStorageKey() {

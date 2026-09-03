@@ -11,6 +11,7 @@
     <script>
       (function () {
         const params = new URLSearchParams(location.search || "");
+        params.set("study_condition", "ai_summary");
         params.set("study_version", "3");
         const query = params.toString();
         location.replace(`index.html${query ? `?${query}` : ""}#q1`);

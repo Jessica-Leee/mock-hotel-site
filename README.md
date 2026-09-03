@@ -14,7 +14,9 @@ Hosted on [GitHub Pages](https://pages.github.com/) from the `main` branch. Push
 - **Search with reviews:** https://jessica-leee.github.io/mock-hotel-site/search-reviews.html?survey_stage=search_2
 - **Search with AI summaries:** https://jessica-leee.github.io/mock-hotel-site/search-ai-summaries.html?survey_stage=search_3
 
-`index.html` is the survey entry page. After the survey, participants are routed to one of the Chicago hotel pages. Hotel details are text-only; hotel photos and galleries are not rendered.
+`index.html` is the full-review survey entry page. `survey-ai-summaries.html` starts the parallel AI-summary survey. Participants can complete both versions in sequence. Hotel details are text-only; hotel photos and galleries are not rendered.
+
+For paired data, open both versions with the same Prolific parameters. For example, configure both Qualtrics links with the same `PROLIFIC_PID`, `STUDY_ID`, and `SESSION_ID` piped-text values. The two pages share one GitHub Pages origin, so the hidden random `survey_user_id` is reused for the same participant while each version creates its own `submission_id`.
 
 ## Project structure
 
@@ -71,7 +73,7 @@ or add `?stream=YOUR_WEB_APP_URL` to the study URL.
 
 The refined storage design maintains five tabs:
 
-- **`Participants`** - one up-to-date row per automatically generated `survey_user_id`. It contains their frequent hotel-booking scenarios, the assigned study scenario and three randomized attributes, prior hotel attributes, final hotel choice, satisfaction, switching answer, switching confidence, attribute-surprise ratings, completion status, and automated-response quality-control flags.
+- **`Participants`** - one up-to-date row per participant and study condition. A participant who completes both versions has two rows with the same `survey_user_id`, one marked `full_reviews` and one marked `ai_summary`; each row has a different `submission_id`. It contains their frequent hotel-booking scenarios, the assigned study scenario and three randomized attributes, prior hotel attributes, final hotel choice, satisfaction, switching answer, switching confidence, attribute-surprise ratings, completion status, and automated-response quality-control flags.
 - **`Questionnaire_responses`** - one row per individual response item. A three-attribute matrix therefore creates three rows, one for each attribute. Each row includes the original response code, an analysis-ready numeric value, a readable label, the scale range, hotel and stage metadata, and the original `answer_json` for auditing.
 - **`Hotel_visits`** - one row per completed hotel popup visit. Rows include participant identifiers, stage, hotel ID/name, numeric viewing duration, scroll depth, direction changes, scroll speed, and exit reason.
 - **`events`** - one row per raw streamed event, including clicks, hovers, mouse samples, and full JSON in `value_json`. Use this tab as the untouched audit trail rather than the main analysis table.
@@ -79,12 +81,14 @@ The refined storage design maintains five tabs:
 
 The main analysis grain is:
 
-- one participant = one row in `Participants`
+- one participant-condition submission = one row in `Participants`
 - one questionnaire item = one row in `Questionnaire_responses`
 - one opened-and-closed hotel popup = one row in `Hotel_visits`
 - one browser interaction = one row in `events`
 
-The browser silently creates a random `survey_user_id` when a participant first enters the survey. It is never displayed or added to the URL. The same ID is attached to questionnaire answers, hotel visits, raw events, and the completion snapshot, allowing all records from one participant to be joined across tabs. `submission_id` remains a separate identifier for one completed survey submission.
+The browser silently creates a random `survey_user_id` when a participant first enters the survey. It is never displayed or added to the URL. The same ID is attached to both versions' questionnaire answers, hotel visits, raw events, and completion snapshots, allowing the paired records to be joined across tabs. `study_condition` distinguishes `full_reviews` from `ai_summary`, and `submission_id` identifies one version-specific survey submission.
+
+Survey answers, popup timers, viewing completion, delivery queues, and completion state are stored separately for each condition. The randomized trip scenario, three assigned attributes, and hotel order are stored at participant level so they remain the same in both versions.
 
 
 The script uses a write lock so simultaneous participants cannot overwrite each other. Questionnaire, hotel-visit, and raw event rows receive deterministic IDs so repeated network delivery does not create duplicate analysis rows.

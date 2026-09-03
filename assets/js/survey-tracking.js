@@ -73,12 +73,36 @@
     try {
       var p = new URLSearchParams(location.search);
       var condition = (p.get("cond") || "none").toLowerCase();
-      var bodyVersion = (document.body && document.body.dataset.reviewVersion || "").toLowerCase();
-      if (condition === "vanilla" || condition === "newsworthy" || condition === "ai_summary") return condition;
-      return bodyVersion === "with-ai-summary" ? "ai_summary" : "none";
+      if (condition === "vanilla" || condition === "newsworthy") return condition;
+      return studyRunCondition();
     } catch (e) {
-      return "none";
+      return "full_reviews";
     }
+  }
+
+  function studyRunCondition() {
+    try {
+      var p = new URLSearchParams(location.search);
+      var explicit = (p.get("study_condition") || "").toLowerCase();
+      var stage = (p.get("survey_stage") || "").toLowerCase();
+      var bodyVersion = (document.body && document.body.dataset.reviewVersion || "").toLowerCase();
+      var path = (location.pathname || "").toLowerCase();
+      if (
+        explicit === "ai_summary" ||
+        p.get("study_version") === "3" ||
+        stage === "search_3" ||
+        stage === "post_review_ai" ||
+        bodyVersion === "with-ai-summary" ||
+        path.indexOf("search-ai-summaries") >= 0
+      ) return "ai_summary";
+      return "full_reviews";
+    } catch (e) {
+      return "full_reviews";
+    }
+  }
+
+  function studyRunVersion() {
+    return studyRunCondition() === "ai_summary" ? "3" : "2";
   }
 
   function getStreamUrl() {
@@ -156,7 +180,9 @@
   function streamOutboxStorageKey() {
     var prolific = prolificMeta();
     var participant = prolific.survey_user_id || prolific.prolific_pid || prolific.session_id || "anonymous";
-    return STREAM_OUTBOX_STORAGE_PREFIX + ":" + encodeURIComponent(participant);
+    var submission = prolific.submission_id || "pending";
+    return STREAM_OUTBOX_STORAGE_PREFIX + ":" + encodeURIComponent(participant) + ":" +
+      studyRunCondition() + ":" + encodeURIComponent(submission);
   }
 
   function loadStreamOutbox() {
@@ -425,7 +451,10 @@
       survey_user_id: surveyUserId || getOrCreateSurveyUserId(),
       prolific_pid: p.get("PROLIFIC_PID") || p.get("prolific_pid") || null,
       study_id: p.get("STUDY_ID") || p.get("study_id") || null,
-      session_id: p.get("SESSION_ID") || p.get("session_id") || null
+      session_id: p.get("SESSION_ID") || p.get("session_id") || null,
+      submission_id: p.get("submission_id") || null,
+      study_condition: studyRunCondition(),
+      study_version: studyRunVersion()
     };
   }
 

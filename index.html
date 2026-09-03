@@ -40,12 +40,13 @@
       </section>
     </main>
 
-    <script src="./assets/js/survey-tracking.js?v=20260902-2"></script>
+    <script src="./assets/js/survey-tracking.js?v=20260903-1"></script>
     <script>
       (function () {
         const SURVEY_STORAGE_PREFIX = "mock_hotel_survey_v1";
         const SURVEY_EVENT_STORAGE_PREFIX = "mock_hotel_survey_events_v1";
-        const SURVEY_OUTBOX_STORAGE_KEY = "mock_hotel_survey_outbox_v1";
+        const SURVEY_OUTBOX_STORAGE_PREFIX = "mock_hotel_survey_outbox_v1";
+        const SHARED_ASSIGNMENT_STORAGE_PREFIX = "mock_hotel_shared_assignment_v1";
         const HOTEL_VIEW_STATE_KEY = "mock_hotel_no_review_views_v1";
         const HOTEL_REVIEW_VIEW_STATE_KEY = "mock_hotel_review_views_v1";
         const HOTEL_AI_REVIEW_VIEW_STATE_KEY = "mock_hotel_ai_review_views_v1";
@@ -55,9 +56,17 @@
         const prolificId = params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "";
         const participantIdentity = prolificId || params.get("SESSION_ID") || params.get("session_id") || "";
         const participantStorageId = encodeURIComponent(participantIdentity || "anonymous");
+        const requestedStudyCondition = (params.get("study_condition") || "").toLowerCase();
+        const studyCondition = requestedStudyCondition === "ai_summary" || params.get("study_version") === "3"
+          ? "ai_summary"
+          : "full_reviews";
+        const studyVersion = studyCondition === "ai_summary" ? "3" : "2";
+        const runStorageSuffix = `${participantStorageId}:${studyCondition}`;
         const surveyUserId = getOrCreateSurveyUserId(participantIdentity);
-        const STORAGE_KEY = `${SURVEY_STORAGE_PREFIX}:${participantStorageId}`;
-        const SURVEY_EVENT_STORAGE_KEY = `${SURVEY_EVENT_STORAGE_PREFIX}:${participantStorageId}`;
+        const STORAGE_KEY = `${SURVEY_STORAGE_PREFIX}:${runStorageSuffix}`;
+        const SURVEY_EVENT_STORAGE_KEY = `${SURVEY_EVENT_STORAGE_PREFIX}:${runStorageSuffix}`;
+        const SURVEY_OUTBOX_STORAGE_KEY = `${SURVEY_OUTBOX_STORAGE_PREFIX}:${runStorageSuffix}`;
+        const SHARED_ASSIGNMENT_STORAGE_KEY = `${SHARED_ASSIGNMENT_STORAGE_PREFIX}:${participantStorageId}`;
         const surveyStage = params.get("survey_stage") || "";
         const hotelQuestionnaireMode = surveyStage === "hotel_questionnaire" || (location.hash || "").startsWith("#hq");
         const postReviewAiMode = surveyStage === "post_review_ai";
@@ -73,14 +82,12 @@
         ];
 
         function hotelViewStorageKey() {
-          const suffix = params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "anonymous";
-          return `${HOTEL_VIEW_STATE_KEY}:${suffix}`;
+          return `${HOTEL_VIEW_STATE_KEY}:${runStorageSuffix}`;
         }
 
         function hotelReviewViewStorageKey() {
-          const suffix = params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "anonymous";
-          const prefix = postReviewAiMode ? HOTEL_AI_REVIEW_VIEW_STATE_KEY : HOTEL_REVIEW_VIEW_STATE_KEY;
-          return `${prefix}:${suffix}`;
+          const prefix = studyCondition === "ai_summary" ? HOTEL_AI_REVIEW_VIEW_STATE_KEY : HOTEL_REVIEW_VIEW_STATE_KEY;
+          return `${prefix}:${runStorageSuffix}`;
         }
 
         function noReviewViewingComplete() {
@@ -414,9 +421,24 @@
           return copy;
         }
 
+        function getSharedAssignment() {
+          try {
+            const stored = localStorage.getItem(SHARED_ASSIGNMENT_STORAGE_KEY);
+            return stored ? JSON.parse(stored) : {};
+          } catch (_) {
+            return {};
+          }
+        }
+
+        function setSharedAssignment(assignment) {
+          try { localStorage.setItem(SHARED_ASSIGNMENT_STORAGE_KEY, JSON.stringify(assignment || {})); }
+          catch (_) { /* the condition-specific state remains as a fallback */ }
+        }
+
         function ensureRandomization() {
           const state = getState();
-          const assignment = state.assignment || {};
+          const sharedAssignment = getSharedAssignment();
+          const assignment = Object.assign({}, state.assignment || {}, sharedAssignment);
           let changed = false;
 
           if (!state.submission_id || !state.started_at) {
@@ -426,6 +448,12 @@
 
           if (!state.survey_user_id) {
             state.survey_user_id = surveyUserId;
+            changed = true;
+          }
+
+          if (state.study_condition !== studyCondition || state.study_version !== studyVersion) {
+            state.study_condition = studyCondition;
+            state.study_version = studyVersion;
             changed = true;
           }
 
@@ -460,6 +488,7 @@
             changed = true;
           }
 
+          setSharedAssignment(assignment);
           if (changed) {
             state.assignment = assignment;
             state.updated_at = new Date().toISOString();
@@ -525,7 +554,10 @@
             survey_user_id: (state && state.survey_user_id) || surveyUserId,
             prolific_pid: (state && state.prolific_id) || prolificId || params.get("PROLIFIC_PID") || params.get("prolific_pid") || "",
             study_id: params.get("STUDY_ID") || params.get("study_id") || "",
-            session_id: params.get("SESSION_ID") || params.get("session_id") || ""
+            session_id: params.get("SESSION_ID") || params.get("session_id") || "",
+            submission_id: (state && state.submission_id) || params.get("submission_id") || "",
+            study_condition: studyCondition,
+            study_version: studyVersion
           };
         }
 
@@ -639,7 +671,7 @@
             kind: "survey_event",
             page_url: location.href,
             phase: "survey",
-            cond: "none",
+            cond: studyCondition,
             reason: entry.event_type,
             prolific: prolificMeta(state),
             events: [entry]
@@ -694,14 +726,16 @@
                 snapshot_version: 1,
                 survey_user_id: state.survey_user_id || surveyUserId,
                 submission_id: submissionId,
+                study_condition: studyCondition,
+                study_version: studyVersion,
                 completion_status: "complete",
                 completed_at: state.completed_at,
                 prolific: prolificMeta(state),
                 assignment: state.assignment || null,
                 answers: state.answers || {},
                 no_review_viewing: storedJson(hotelViewStorageKey()),
-                with_review_viewing: storedJson(`${HOTEL_REVIEW_VIEW_STATE_KEY}:${params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "anonymous"}`),
-                with_ai_summary_viewing: storedJson(`${HOTEL_AI_REVIEW_VIEW_STATE_KEY}:${params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "anonymous"}`),
+                with_review_viewing: studyCondition === "full_reviews" ? storedJson(hotelReviewViewStorageKey()) : {},
+                with_ai_summary_viewing: studyCondition === "ai_summary" ? storedJson(hotelReviewViewStorageKey()) : {},
                 survey_event_count: existingEvents.length,
                 current_page_behavior_event_count: behaviorPayload && Array.isArray(behaviorPayload.events)
                   ? behaviorPayload.events.length
@@ -1093,10 +1127,13 @@
           } else if (page.type === "confidenceSurprise") {
             setQuestionHtml(confidenceSurpriseHtml());
           } else {
+            const secondStage = studyCondition === "ai_summary"
+              ? "the version with AI-generated review summaries"
+              : "the version with full reviews";
             setQuestionHtml(`
               <h1 class="survey-title">Next: Browse Hotel Listings</h1>
               <p class="survey-copy">You will now visit the hotel browsing platform to view 3 hotel listings. Browse each hotel carefully - examine photos, amenities, and descriptions.</p>
-              <p class="survey-copy">First you will see listings without reviews. After that, you will continue to the version with full reviews.</p>
+              <p class="survey-copy">First you will see listings without reviews. After that, you will continue to ${secondStage}.</p>
             `);
           }
         }
@@ -1239,23 +1276,33 @@
 
         function goToHotelBrowsing(state) {
           const nextParams = new URLSearchParams(location.search || "");
-          const pid = (state && state.prolific_id) || prolificId || "";
+          const surveyState = state || getState();
+          const pid = surveyState.prolific_id || prolificId || "";
           if (pid) nextParams.set("PROLIFIC_PID", pid);
+          nextParams.set("submission_id", ensureSubmissionId(surveyState));
+          nextParams.set("study_condition", studyCondition);
+          nextParams.set("study_version", studyVersion);
+          setState(surveyState);
           nextParams.set("survey_stage", "search_1");
-          logSurveyEvent({ id: "browse_intro", type: "transition" }, { value: "start_hotel_browsing" }, state || getState());
+          logSurveyEvent({ id: "browse_intro", type: "transition" }, { value: "start_hotel_browsing" }, surveyState);
           location.replace("search-no-reviews.html?" + nextParams.toString());
         }
 
         function goToReviewBrowsing(state) {
           const nextParams = new URLSearchParams(location.search || "");
-          const pid = (state && state.prolific_id) || prolificId || "";
+          const surveyState = state || getState();
+          const pid = surveyState.prolific_id || prolificId || "";
           if (pid) nextParams.set("PROLIFIC_PID", pid);
-          const useAiSummary = nextParams.get("study_version") === "3";
+          nextParams.set("submission_id", ensureSubmissionId(surveyState));
+          nextParams.set("study_condition", studyCondition);
+          nextParams.set("study_version", studyVersion);
+          setState(surveyState);
+          const useAiSummary = studyCondition === "ai_summary";
           nextParams.set("survey_stage", useAiSummary ? "search_3" : "search_2");
           logSurveyEvent(
             { id: "hotel_questionnaire_complete", type: "transition" },
             { value: useAiSummary ? "start_ai_summary_review_browsing" : "start_review_browsing" },
-            state || getState()
+            surveyState
           );
           location.replace((useAiSummary ? "search-ai-summaries.html?" : "search-reviews.html?") + nextParams.toString());
         }
@@ -1369,7 +1416,10 @@
         window.MOCK_HOTEL_SURVEY_STORAGE_STATUS = function () {
           const state = getState();
           return {
+            survey_user_id: state.survey_user_id || surveyUserId,
             submission_id: state.submission_id || "",
+            study_condition: studyCondition,
+            study_version: studyVersion,
             completion_status: state.completion_status || "in_progress",
             saved_answer_count: Object.keys(state.answers || {}).length,
             saved_event_count: getSurveyEvents().length,

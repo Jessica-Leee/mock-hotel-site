@@ -2,7 +2,7 @@
  * Google Apps Script receiver for hotel experiment tracking.
  *
  * Analysis-ready sheets:
- * 1) Participants - one up-to-date row per participant/session.
+ * 1) Participants - one up-to-date row per participant and study condition.
  * 2) Questionnaire_responses - one row per individual answer item.
  * 3) Hotel_visits - one row per completed hotel modal visit.
  * 4) events - one row per raw streamed event for auditing.
@@ -15,7 +15,7 @@
  *   <meta name="tracking-stream-url" content="https://script.google.com/macros/s/.../exec" />
  */
 
-const SCHEMA_VERSION = "6";
+const SCHEMA_VERSION = "7";
 const PARTICIPANTS_SHEET = "Participants";
 const QUESTIONNAIRE_SHEET = "Questionnaire_responses";
 const VISITS_SHEET = "Hotel_visits";
@@ -126,7 +126,10 @@ const PARTICIPANT_HEADERS = [
   "frequent_booking_scenario_other",
   "bot_detection_flag",
   "bot_detection_details",
-  "survey_user_id"
+  "survey_user_id",
+  "study_condition",
+  "study_version",
+  "submission_id"
 ];
 
 const QUESTIONNAIRE_HEADERS = [
@@ -158,7 +161,10 @@ const QUESTIONNAIRE_HEADERS = [
   "assigned_attribute_labels",
   "answer_json",
   "schema_version",
-  "survey_user_id"
+  "survey_user_id",
+  "study_condition",
+  "study_version",
+  "submission_id"
 ];
 
 const VISIT_HEADERS = [
@@ -180,7 +186,10 @@ const VISIT_HEADERS = [
   "scroll_speed_mean_px_ms",
   "exit_reason",
   "schema_version",
-  "survey_user_id"
+  "survey_user_id",
+  "study_condition",
+  "study_version",
+  "submission_id"
 ];
 
 const EVENT_HEADERS = [
@@ -199,7 +208,10 @@ const EVENT_HEADERS = [
   "batch_seq",
   "record_id",
   "schema_version",
-  "survey_user_id"
+  "survey_user_id",
+  "study_condition",
+  "study_version",
+  "submission_id"
 ];
 
 const CODEBOOK_HEADERS = [
@@ -324,6 +336,8 @@ function applySheetLayout_(sh, name, headers) {
     sh.setFrozenColumns(4);
     setWidthByHeader_(sh, headers, "participant_key", 210);
     setWidthByHeader_(sh, headers, "survey_user_id", 330);
+    setWidthByHeader_(sh, headers, "submission_id", 330);
+    setWidthByHeader_(sh, headers, "study_condition", 150);
     setWidthByHeader_(sh, headers, "assigned_scenario_title", 240);
     setWidthByHeader_(sh, headers, "prior_hotel_attributes", 320);
     setWidthByHeader_(sh, headers, "selected_hotel_name", 200);
@@ -334,6 +348,8 @@ function applySheetLayout_(sh, name, headers) {
     sh.setFrozenColumns(7);
     setWidthByHeader_(sh, headers, "response_id", 190);
     setWidthByHeader_(sh, headers, "survey_user_id", 330);
+    setWidthByHeader_(sh, headers, "submission_id", 330);
+    setWidthByHeader_(sh, headers, "study_condition", 150);
     setWidthByHeader_(sh, headers, "question_id", 260);
     setWidthByHeader_(sh, headers, "attribute_label", 190);
     setWidthByHeader_(sh, headers, "response_label", 220);
@@ -345,6 +361,8 @@ function applySheetLayout_(sh, name, headers) {
     sh.setFrozenColumns(7);
     setWidthByHeader_(sh, headers, "visit_id", 190);
     setWidthByHeader_(sh, headers, "survey_user_id", 330);
+    setWidthByHeader_(sh, headers, "submission_id", 330);
+    setWidthByHeader_(sh, headers, "study_condition", 150);
     setWidthByHeader_(sh, headers, "hotel_name", 210);
     setWidthByHeader_(sh, headers, "exit_reason", 200);
   }
@@ -355,6 +373,8 @@ function applySheetLayout_(sh, name, headers) {
     setWidthByHeader_(sh, headers, "value_json", 440);
     setWidthByHeader_(sh, headers, "record_id", 190);
     setWidthByHeader_(sh, headers, "survey_user_id", 330);
+    setWidthByHeader_(sh, headers, "submission_id", 330);
+    setWidthByHeader_(sh, headers, "study_condition", 150);
   }
 
   if (name === CODEBOOK_SHEET) {
@@ -513,7 +533,10 @@ function buildEventRows_(events, payload, receivedAtMs) {
       payload.seq_start != null ? payload.seq_start + i : "",
       recordId,
       SCHEMA_VERSION,
-      textCell_(prolific.survey_user_id || ev.survey_user_id || "")
+      textCell_(prolific.survey_user_id || ev.survey_user_id || ""),
+      textCell_(prolific.study_condition || ""),
+      textCell_(prolific.study_version || ""),
+      textCell_(prolific.submission_id || "")
     ]);
   }
   return out;
@@ -773,7 +796,10 @@ function addQuestionnaireRow_(out, base, item) {
     joinCell_(assignment.attribute_labels || []),
     jsonCell_(base.answer),
     SCHEMA_VERSION,
-    textCell_(base.prolific.survey_user_id || "")
+    textCell_(base.prolific.survey_user_id || ""),
+    textCell_(base.prolific.study_condition || ""),
+    textCell_(base.prolific.study_version || ""),
+    textCell_(base.prolific.submission_id || "")
   ]);
 }
 
@@ -810,7 +836,10 @@ function buildVisitRows_(events, payload, receivedAt) {
       numberOrBlank_(value.scroll_mean_px_per_ms),
       textCell_(value.exit_reason || ""),
       SCHEMA_VERSION,
-      textCell_(prolific.survey_user_id || ev.survey_user_id || "")
+      textCell_(prolific.survey_user_id || ev.survey_user_id || ""),
+      textCell_(prolific.study_condition || ""),
+      textCell_(prolific.study_version || ""),
+      textCell_(prolific.submission_id || "")
     ]);
   }
   return out;
@@ -837,6 +866,9 @@ function updateParticipant_(sh, events, payload, receivedAt) {
   summary.study_id = textCell_(prolific.study_id || summary.study_id || "");
   summary.session_id = textCell_(prolific.session_id || summary.session_id || "");
   summary.survey_user_id = textCell_(prolific.survey_user_id || summary.survey_user_id || "");
+  summary.study_condition = textCell_(prolific.study_condition || summary.study_condition || "");
+  summary.study_version = textCell_(prolific.study_version || summary.study_version || "");
+  summary.submission_id = textCell_(prolific.submission_id || summary.submission_id || "");
   summary.first_recorded_at = summary.first_recorded_at || receivedAt;
   summary.last_recorded_at = receivedAt;
   summary.completion_status = summary.completion_status || "in_progress";
@@ -969,6 +1001,22 @@ function ensureCodebook_(ss) {
   ]);
 
   rows.push([
+    "identifier",
+    "submission_id",
+    "Survey submission ID",
+    "Automatically generated random ID",
+    "Identifies one condition-specific survey attempt. The full-review and AI-summary surveys have different submission IDs even when they share one survey_user_id."
+  ]);
+
+  rows.push([
+    "study_design",
+    "study_condition",
+    "Study condition",
+    "full_reviews or ai_summary",
+    "Separates the participant's full-review survey from the AI-summary survey while preserving the shared survey_user_id for paired analysis."
+  ]);
+
+  rows.push([
     "quality_flag",
     "bot_detection_flag",
     "Automated-response detection",
@@ -1060,9 +1108,10 @@ function inferSurveyStageFromUrl_(pageUrl) {
 
 function participantKey_(prolific) {
   const meta = prolific || {};
-  if (meta.survey_user_id) return "survey_user:" + String(meta.survey_user_id);
-  if (meta.session_id) return "session:" + String(meta.session_id);
-  if (meta.prolific_pid) return "prolific:" + String(meta.prolific_pid);
+  const condition = meta.study_condition ? "|condition:" + String(meta.study_condition) : "";
+  if (meta.survey_user_id) return "survey_user:" + String(meta.survey_user_id) + condition;
+  if (meta.session_id) return "session:" + String(meta.session_id) + condition;
+  if (meta.prolific_pid) return "prolific:" + String(meta.prolific_pid) + condition;
   return "";
 }
 
