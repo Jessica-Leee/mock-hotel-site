@@ -75,7 +75,7 @@ The receiver writes new data to three tabs:
 
 - **`Without_AI_Survey`** - one row per participant who completes the survey with full reviews and no AI summary.
 - **`AI_Summary_Survey`** - one row per participant who completes the survey with AI review summaries.
-- **`Browsing_Information`** - one row per completed hotel-popup visit across both survey versions.
+- **`Browsing_Information`** - one aggregated row per participant across both survey versions.
 
 The two survey sheets have identical columns. Each participant's row contains:
 
@@ -89,11 +89,13 @@ The two survey sheets have identical columns. Each participant's row contains:
 
 Likelihood answers are saved numerically from 1 to 5, and confidence answers from 1 to 3. The attribute IDs in `assigned_attribute_1_id` through `assigned_attribute_3_id` identify which randomized question each numbered answer column represents.
 
-`Browsing_Information` stores the shared `survey_user_id`, Prolific ID, survey condition, browsing stage, hotel, popup duration, scroll depth, direction changes, scrolling speed, and exit reason. It does not include `submission_id`, `SESSION_ID`, or `STUDY_ID`.
+`Browsing_Information` stores one row per participant. Separate columns summarize each condition, browsing stage, and hotel: visit count, cumulative popup duration, maximum scroll depth, total direction changes, maximum and mean scrolling speed, latest exit reason, and latest visit time. `processed_visit_ids_json` is the deduplication audit: if the browser retries an event, that visit ID is recognized and is not counted twice. The sheet does not include `submission_id`, `SESSION_ID`, or `STUDY_ID`.
 
-The same `survey_user_id` appears once in each survey sheet, making the two answers directly pairable. Survey answers and popup state remain separate between versions, while the assigned Trip Scenario, three attributes, and hotel order remain the same.
+The same `survey_user_id` appears once in each survey sheet and once in the browsing sheet, making all three rows directly pairable. When a Prolific ID is available, the receiver derives the same pseudonymous `survey_user_id` from it, even if the participant reopens the survey or uses another browser. Survey answers and popup state remain separate between versions, while the assigned Trip Scenario, three attributes, and hotel order remain the same.
 
-The script uses a write lock so simultaneous participants cannot overwrite each other. Repeated delivery updates the same participant row in the appropriate survey sheet, and hotel visits are deduplicated by visit ID.
+The script uses a write lock so simultaneous requests cannot create duplicate rows. `survey_user_id` is the unique key in all three sheets: repeated delivery updates the existing row, duplicate legacy rows for that ID are collapsed, and hotel visits are deduplicated by visit ID before any totals are changed.
+
+If a previous `Browsing_Information` tab uses the old one-visit-per-row schema, the receiver preserves it by renaming it to `Browsing_Information_Legacy` and creates the new participant-level tab automatically.
 
 If the Sheet was connected to an older receiver, its old tabs are left untouched as legacy data. Only the three tabs above receive new data after the updated Apps Script is redeployed.
 
@@ -103,7 +105,7 @@ After you change `backend/google-sheets-receiver.gs`, use **Deploy → Manage de
 
 1. **No new tabs** - Confirm the site is using the correct `/exec` URL. In Apps Script, open **Executions** and check that `doPost` runs are successful.
 2. **Survey sheet is empty** - A survey row is created or updated whenever a participant clicks **Next** on a question. Check the corresponding condition tab.
-3. **`Browsing_Information` is empty** - A browsing row is written only after a participant closes a hotel detail popup.
+3. **`Browsing_Information` is empty** - A participant row is created or updated only after they close a hotel detail popup.
 4. **Wrong spreadsheet** - Prefer creating the script through **Extensions -> Apps Script** inside the target Sheet. For a standalone script, set the `SPREADSHEET_ID` script property to the ID from the Sheet URL.
 
 ### Completion audit
@@ -113,6 +115,6 @@ For a participant who completes both surveys, verify:
 1. The same `survey_user_id` appears in `Without_AI_Survey` and `AI_Summary_Survey`.
 2. Both rows show `completion_status = complete`.
 3. Both rows contain the same assigned Trip Scenario and three assigned attribute IDs.
-4. `Browsing_Information` contains visits for that `survey_user_id` from both `full_reviews` and `ai_summary` conditions.
+4. `Browsing_Information` contains one row for that `survey_user_id`, with separate columns populated for the `without_ai` and `ai_summary` conditions.
 
 Streaming uses persistent retry queues and forced dispatch when a page is hidden or closed. `all_answers_json` in each survey row preserves the full exact answer object as a recovery copy.

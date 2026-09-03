@@ -4,13 +4,13 @@
  * New submissions are written to exactly three analysis sheets:
  * 1) Without_AI_Survey - one row per participant for the full-review survey.
  * 2) AI_Summary_Survey - one row per participant for the AI-summary survey.
- * 3) Browsing_Information - one row per completed hotel-popup visit.
+ * 3) Browsing_Information - one aggregated row per participant.
  *
  * The sheets intentionally omit submission_id, session_id, and study_id.
  * Deploy as a Web App (Execute as: Me, Who has access: Anyone).
  */
 
-const SCHEMA_VERSION = "8";
+const SCHEMA_VERSION = "9";
 const WITHOUT_AI_SHEET = "Without_AI_Survey";
 const AI_SUMMARY_SHEET = "AI_Summary_Survey";
 const BROWSING_SHEET = "Browsing_Information";
@@ -34,25 +34,44 @@ const ATTRIBUTES = [
 
 const SURVEY_HEADERS = buildSurveyHeaders_();
 
-const BROWSING_HEADERS = [
-  "visit_id",
-  "recorded_at",
-  "event_time",
+const BROWSING_HEADERS = buildBrowsingHeaders_();
+
+function buildBrowsingHeaders_() {
+  const headers = [
   "survey_user_id",
   "prolific_id",
-  "survey_condition",
-  "browsing_stage",
-  "hotel_id",
-  "hotel_name",
-  "duration_seconds",
-  "scroll_depth_at_exit_pct",
-  "scroll_depth_max_pct",
-  "scroll_direction_changes",
-  "scroll_speed_max_px_ms",
-  "scroll_speed_mean_px_ms",
-  "exit_reason",
-  "browsing_details_json"
-];
+    "first_recorded_at",
+    "last_recorded_at",
+    "total_popup_visits",
+    "total_popup_duration_seconds",
+    "processed_visit_ids_json"
+  ];
+
+  const conditionStages = [
+    { condition: "without_ai", stage: "no_reviews" },
+    { condition: "without_ai", stage: "full_reviews" },
+    { condition: "ai_summary", stage: "no_reviews" },
+    { condition: "ai_summary", stage: "ai_summary_reviews" }
+  ];
+  const metrics = [
+    "visit_count",
+    "total_duration_seconds",
+    "max_scroll_depth_pct",
+    "total_scroll_direction_changes",
+    "max_scroll_speed_px_ms",
+    "mean_scroll_speed_px_ms",
+    "last_exit_reason",
+    "last_visited_at"
+  ];
+
+  for (let c = 0; c < conditionStages.length; c++) {
+    for (let h = 0; h < HOTELS.length; h++) {
+      const prefix = conditionStages[c].condition + "_" + conditionStages[c].stage + "_" + HOTELS[h].slug;
+      for (let m = 0; m < metrics.length; m++) headers.push(prefix + "_" + metrics[m]);
+    }
+  }
+  return headers;
+}
 
 function buildSurveyHeaders_() {
   const headers = [
@@ -135,17 +154,16 @@ function doPost(e) {
     const withoutAiSheet = ensureSheet_(ss, WITHOUT_AI_SHEET, SURVEY_HEADERS);
     const aiSummarySheet = ensureSheet_(ss, AI_SUMMARY_SHEET, SURVEY_HEADERS);
     const surveySheet = condition === "ai_summary" ? aiSummarySheet : withoutAiSheet;
-    const browsingSheet = ensureSheet_(ss, BROWSING_SHEET, BROWSING_HEADERS);
+    const browsingSheet = ensureBrowsingSheet_(ss);
 
     const surveyUpdated = updateSurveyRow_(surveySheet, events, payload, receivedAt);
-    const browsingRows = buildBrowsingRows_(events, payload, receivedAt);
-    const browsingAppended = appendUniqueRows_(browsingSheet, browsingRows, 1);
+    const browsingVisitsRecorded = updateBrowsingRow_(browsingSheet, events, payload, receivedAt);
 
     return jsonResponse_({
       ok: true,
       survey_sheet: surveySheetName,
       survey_row_updated: surveyUpdated ? 1 : 0,
-      browsing_rows_appended: browsingAppended,
+      browsing_visits_recorded: browsingVisitsRecorded,
       schema_version: SCHEMA_VERSION
     });
   } catch (err) {
@@ -172,13 +190,20 @@ function updateSurveyRow_(sheet, events, payload, receivedAt) {
   const surveyUserId = surveyUserIdFrom_(payload, surveyEvents);
   if (!surveyUserId) return false;
 
-  const rowNumber = findRowByValue_(sheet, 1, surveyUserId);
-  const record = rowNumber
-    ? rowObject_(SURVEY_HEADERS, sheet.getRange(rowNumber, 1, 1, SURVEY_HEADERS.length).getValues()[0])
-    : emptyRecord_(SURVEY_HEADERS);
+  const prolificId = prolificIdFrom_(payload, surveyEvents);
+  const rowNumbers = participantRows_(sheet, surveyUserId, prolificId);
+  const rowNumber = rowNumbers.length ? rowNumbers[0] : 0;
+  const record = emptyRecord_(SURVEY_HEADERS);
+  for (let i = 0; i < rowNumbers.length; i++) {
+    const candidate = rowObject_(
+      SURVEY_HEADERS,
+      sheet.getRange(rowNumbers[i], 1, 1, SURVEY_HEADERS.length).getValues()[0]
+    );
+    mergeSurveyRecord_(record, candidate);
+  }
 
   record.survey_user_id = textCell_(surveyUserId);
-  record.prolific_id = textCell_(prolificIdFrom_(payload, surveyEvents) || record.prolific_id || "");
+  record.prolific_id = textCell_(prolificId || record.prolific_id || "");
   record.first_recorded_at = record.first_recorded_at || receivedAt;
   record.last_recorded_at = receivedAt;
   record.completion_status = record.completion_status || "in_progress";
@@ -225,9 +250,32 @@ function updateSurveyRow_(sheet, events, payload, receivedAt) {
   const targetRow = rowNumber || sheet.getLastRow() + 1;
   ensureRowCapacity_(sheet, targetRow);
   sheet.getRange(targetRow, 1, 1, values.length).setValues([values]);
+  removeDuplicateRows_(sheet, rowNumbers.slice(1));
   formatSurveyRow_(sheet, targetRow);
   ensureFilter_(sheet);
   return true;
+}
+
+function mergeSurveyRecord_(target, source) {
+  const targetAnswers = parseJsonObject_(target.all_answers_json);
+  const sourceAnswers = parseJsonObject_(source.all_answers_json);
+  const answerIds = Object.keys(sourceAnswers);
+  for (let i = 0; i < answerIds.length; i++) targetAnswers[answerIds[i]] = sourceAnswers[answerIds[i]];
+
+  for (let i = 0; i < SURVEY_HEADERS.length; i++) {
+    const header = SURVEY_HEADERS[i];
+    if (header === "first_recorded_at" || header === "last_recorded_at" || header === "completed_at" ||
+        header === "completion_status" || header === "all_answers_json") continue;
+    if (!isBlank_(source[header])) target[header] = source[header];
+  }
+
+  target.first_recorded_at = earliestDate_(target.first_recorded_at, source.first_recorded_at);
+  target.last_recorded_at = latestDate_(target.last_recorded_at, source.last_recorded_at);
+  target.completed_at = latestDate_(target.completed_at, source.completed_at);
+  if (source.completion_status === "complete" || target.completion_status !== "complete") {
+    target.completion_status = source.completion_status || target.completion_status;
+  }
+  target.all_answers_json = jsonCell_(targetAnswers);
 }
 
 function applyAssignment_(record, assignment) {
@@ -309,13 +357,25 @@ function applyMatrixAnswer_(record, questionId, answer, assignment) {
   }
 }
 
-function buildBrowsingRows_(events, payload, receivedAt) {
-  const rows = [];
+function updateBrowsingRow_(sheet, events, payload, receivedAt) {
   const surveyUserId = surveyUserIdFrom_(payload, events);
-  if (!surveyUserId) return rows;
-  const condition = conditionFromPayload_(payload);
+  if (!surveyUserId) return 0;
+  const condition = browsingCondition_(conditionFromPayload_(payload));
   const browsingStage = browsingStageFromPayload_(payload);
+  if (!browsingPrefix_(condition, browsingStage, HOTELS[0])) return 0;
   const prolificId = prolificIdFrom_(payload, events);
+  const rowNumbers = participantRows_(sheet, surveyUserId, prolificId);
+  const rowNumber = rowNumbers.length ? rowNumbers[0] : 0;
+  const record = rowNumber
+    ? rowObject_(BROWSING_HEADERS, sheet.getRange(rowNumber, 1, 1, BROWSING_HEADERS.length).getValues()[0])
+    : emptyRecord_(BROWSING_HEADERS);
+  const processedVisitIds = parseJsonArray_(record.processed_visit_ids_json);
+  const processed = new Set(processedVisitIds.map(String));
+  let recorded = 0;
+
+  record.survey_user_id = textCell_(surveyUserId);
+  record.prolific_id = textCell_(prolificId || record.prolific_id || "");
+  record.first_recorded_at = record.first_recorded_at || receivedAt;
 
   for (let i = 0; i < events.length; i++) {
     const event = events[i] || {};
@@ -323,6 +383,8 @@ function buildBrowsingRows_(events, payload, receivedAt) {
     const value = objectValue_(event.value);
     if (value.context !== "hotel_modal") continue;
     const hotelId = event.element_id || value.hotel_id || "";
+    const hotel = hotelForId_(hotelId);
+    if (!hotel) continue;
     const visitId = event.event_id || recordId_([
       surveyUserId,
       condition,
@@ -331,27 +393,77 @@ function buildBrowsingRows_(events, payload, receivedAt) {
       event.timestamp || "",
       value.duration_ms || ""
     ]);
-    rows.push([
-      textCell_(visitId),
-      receivedAt,
-      dateValue_(event.timestamp),
-      textCell_(surveyUserId),
-      textCell_(prolificId),
-      textCell_(condition),
-      textCell_(browsingStage),
-      textCell_(hotelId),
-      textCell_(hotelName_(hotelId)),
-      value.duration_ms == null ? "" : Number(value.duration_ms) / 1000,
-      numberOrBlank_(value.scroll_depth_pct_at_exit),
-      numberOrBlank_(value.scroll_max_pct),
-      numberOrBlank_(value.scroll_dir_changes),
-      numberOrBlank_(value.scroll_max_px_per_ms),
-      numberOrBlank_(value.scroll_mean_px_per_ms),
-      textCell_(value.exit_reason || ""),
-      jsonCell_(value)
-    ]);
+    if (processed.has(String(visitId))) continue;
+
+    const prefix = browsingPrefix_(condition, browsingStage, hotel);
+    const previousCount = numericValue_(record[prefix + "_visit_count"]);
+    const durationSeconds = numericValue_(value.duration_ms) / 1000;
+    const scrollDepth = Math.max(
+      numericValue_(value.scroll_depth_pct_at_exit),
+      numericValue_(value.scroll_max_pct)
+    );
+    const directionChanges = numericValue_(value.scroll_dir_changes);
+    const maxScrollSpeed = numericValue_(value.scroll_max_px_per_ms);
+    const meanScrollSpeed = numberOrBlank_(value.scroll_mean_px_per_ms);
+
+    record[prefix + "_visit_count"] = previousCount + 1;
+    record[prefix + "_total_duration_seconds"] = roundNumber_(
+      numericValue_(record[prefix + "_total_duration_seconds"]) + durationSeconds,
+      3
+    );
+    record[prefix + "_max_scroll_depth_pct"] = Math.max(
+      numericValue_(record[prefix + "_max_scroll_depth_pct"]),
+      scrollDepth
+    );
+    record[prefix + "_total_scroll_direction_changes"] =
+      numericValue_(record[prefix + "_total_scroll_direction_changes"]) + directionChanges;
+    record[prefix + "_max_scroll_speed_px_ms"] = Math.max(
+      numericValue_(record[prefix + "_max_scroll_speed_px_ms"]),
+      maxScrollSpeed
+    );
+    if (meanScrollSpeed !== "") {
+      const previousMean = numericValue_(record[prefix + "_mean_scroll_speed_px_ms"]);
+      record[prefix + "_mean_scroll_speed_px_ms"] = roundNumber_(
+        ((previousMean * previousCount) + meanScrollSpeed) / (previousCount + 1),
+        6
+      );
+    }
+    record[prefix + "_last_exit_reason"] = textCell_(value.exit_reason || "");
+    record[prefix + "_last_visited_at"] = dateValue_(event.timestamp) || receivedAt;
+
+    record.total_popup_visits = numericValue_(record.total_popup_visits) + 1;
+    record.total_popup_duration_seconds = roundNumber_(
+      numericValue_(record.total_popup_duration_seconds) + durationSeconds,
+      3
+    );
+    processed.add(String(visitId));
+    processedVisitIds.push(String(visitId));
+    recorded += 1;
   }
-  return rows;
+
+  if (!recorded && rowNumbers.length <= 1) return 0;
+  record.last_recorded_at = receivedAt;
+  record.processed_visit_ids_json = jsonCell_(processedVisitIds);
+  const values = BROWSING_HEADERS.map(header => record[header] === undefined ? "" : record[header]);
+  const targetRow = rowNumber || sheet.getLastRow() + 1;
+  ensureRowCapacity_(sheet, targetRow);
+  sheet.getRange(targetRow, 1, 1, values.length).setValues([values]);
+  removeDuplicateRows_(sheet, rowNumbers.slice(1));
+  formatBrowsingRow_(sheet, targetRow);
+  ensureFilter_(sheet);
+  return recorded;
+}
+
+function browsingCondition_(condition) {
+  return condition === "ai_summary" ? "ai_summary" : "without_ai";
+}
+
+function browsingPrefix_(condition, stage, hotel) {
+  const valid =
+    (condition === "without_ai" && (stage === "no_reviews" || stage === "full_reviews")) ||
+    (condition === "ai_summary" && (stage === "no_reviews" || stage === "ai_summary_reviews"));
+  if (!valid || !hotel) return "";
+  return condition + "_" + stage + "_" + hotel.slug;
 }
 
 function conditionFromPayload_(payload) {
@@ -380,6 +492,13 @@ function browsingStageFromPayload_(payload) {
 }
 
 function surveyUserIdFrom_(payload, events) {
+  const prolificId = prolificIdFrom_(payload, events);
+  if (prolificId) {
+    return "survey_user_" + recordId_([
+      "hotel-survey-participant-v1",
+      String(prolificId).trim().toUpperCase()
+    ]);
+  }
   const prolific = objectValue_(payload.prolific);
   if (prolific.survey_user_id) return String(prolific.survey_user_id);
   for (let i = 0; i < events.length; i++) {
@@ -437,6 +556,24 @@ function ensureSheet_(ss, name, headers) {
   return sheet;
 }
 
+function ensureBrowsingSheet_(ss) {
+  const existing = ss.getSheetByName(BROWSING_SHEET);
+  if (existing && existing.getLastRow() > 0) {
+    const firstHeader = existing.getRange(1, 1).getDisplayValues()[0][0];
+    if (firstHeader && firstHeader !== BROWSING_HEADERS[0]) {
+      existing.setName(uniqueSheetName_(ss, BROWSING_SHEET + "_Legacy"));
+    }
+  }
+  return ensureSheet_(ss, BROWSING_SHEET, BROWSING_HEADERS);
+}
+
+function uniqueSheetName_(ss, base) {
+  if (!ss.getSheetByName(base)) return base;
+  let suffix = 2;
+  while (ss.getSheetByName(base + "_" + suffix)) suffix += 1;
+  return base + "_" + suffix;
+}
+
 function applySheetLayout_(sheet, name, headers) {
   for (let i = 1; i <= headers.length; i++) sheet.setColumnWidth(i, name === BROWSING_SHEET ? 145 : 125);
   sheet.setFrozenColumns(name === BROWSING_SHEET ? 5 : 2);
@@ -446,29 +583,7 @@ function applySheetLayout_(sheet, name, headers) {
   setWidthByHeader_(sheet, headers, "prior_hotel_attributes", 340);
   setWidthByHeader_(sheet, headers, "bot_detection_details", 320);
   setWidthByHeader_(sheet, headers, "all_answers_json", 500);
-  setWidthByHeader_(sheet, headers, "browsing_details_json", 420);
-}
-
-function appendUniqueRows_(sheet, rows, idColumn) {
-  if (!rows.length) return 0;
-  const existing = new Set();
-  if (sheet.getLastRow() > 1) {
-    const values = sheet.getRange(2, idColumn, sheet.getLastRow() - 1, 1).getDisplayValues();
-    for (let i = 0; i < values.length; i++) if (values[i][0]) existing.add(values[i][0]);
-  }
-  const unique = rows.filter(row => {
-    const id = String(row[idColumn - 1] || "");
-    if (!id || existing.has(id)) return false;
-    existing.add(id);
-    return true;
-  });
-  if (!unique.length) return 0;
-  const startRow = sheet.getLastRow() + 1;
-  ensureRowCapacity_(sheet, startRow + unique.length - 1);
-  sheet.getRange(startRow, 1, unique.length, unique[0].length).setValues(unique);
-  formatBrowsingRows_(sheet, startRow, unique.length);
-  ensureFilter_(sheet);
-  return unique.length;
+  setWidthByHeader_(sheet, headers, "processed_visit_ids_json", 420);
 }
 
 function formatSurveyRow_(sheet, row) {
@@ -479,10 +594,15 @@ function formatSurveyRow_(sheet, row) {
   wrapHeader_(sheet, SURVEY_HEADERS, row, 1, "all_answers_json");
 }
 
-function formatBrowsingRows_(sheet, startRow, count) {
-  formatDateHeader_(sheet, BROWSING_HEADERS, startRow, count, "recorded_at");
-  formatDateHeader_(sheet, BROWSING_HEADERS, startRow, count, "event_time");
-  wrapHeader_(sheet, BROWSING_HEADERS, startRow, count, "browsing_details_json");
+function formatBrowsingRow_(sheet, row) {
+  formatDateHeader_(sheet, BROWSING_HEADERS, row, 1, "first_recorded_at");
+  formatDateHeader_(sheet, BROWSING_HEADERS, row, 1, "last_recorded_at");
+  wrapHeader_(sheet, BROWSING_HEADERS, row, 1, "processed_visit_ids_json");
+  for (let i = 0; i < BROWSING_HEADERS.length; i++) {
+    if (/_last_visited_at$/.test(BROWSING_HEADERS[i])) {
+      sheet.getRange(row, i + 1, 1, 1).setNumberFormat("yyyy-mm-dd hh:mm:ss");
+    }
+  }
 }
 
 function formatDateHeader_(sheet, headers, startRow, count, header) {
@@ -519,13 +639,30 @@ function ensureRowCapacity_(sheet, required) {
   if (required > sheet.getMaxRows()) sheet.insertRowsAfter(sheet.getMaxRows(), Math.max(1000, required - sheet.getMaxRows()));
 }
 
-function findRowByValue_(sheet, column, value) {
-  if (sheet.getLastRow() < 2) return 0;
-  const match = sheet.getRange(2, column, sheet.getLastRow() - 1, 1)
-    .createTextFinder(String(value))
-    .matchEntireCell(true)
-    .findNext();
-  return match ? match.getRow() : 0;
+function findRowsByValue_(sheet, column, value) {
+  if (sheet.getLastRow() < 2) return [];
+  const values = sheet.getRange(2, column, sheet.getLastRow() - 1, 1).getDisplayValues();
+  const rows = [];
+  const expected = String(value);
+  for (let i = 0; i < values.length; i++) {
+    if (String(values[i][0]) === expected) rows.push(i + 2);
+  }
+  return rows;
+}
+
+function participantRows_(sheet, surveyUserId, prolificId) {
+  const rows = findRowsByValue_(sheet, 1, surveyUserId);
+  if (prolificId) {
+    const prolificRows = findRowsByValue_(sheet, 2, prolificId);
+    for (let i = 0; i < prolificRows.length; i++) {
+      if (rows.indexOf(prolificRows[i]) === -1) rows.push(prolificRows[i]);
+    }
+  }
+  return rows.sort((a, b) => a - b);
+}
+
+function removeDuplicateRows_(sheet, rows) {
+  for (let i = rows.length - 1; i >= 0; i--) sheet.deleteRow(rows[i]);
 }
 
 function assignedAttributeIdsFromRecord_(record) {
@@ -584,6 +721,36 @@ function parseJsonObject_(value) {
   catch (_) { return {}; }
 }
 
+function parseJsonArray_(value) {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(String(value));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function isBlank_(value) {
+  return value === "" || value == null;
+}
+
+function earliestDate_(first, second) {
+  const a = dateValue_(first);
+  const b = dateValue_(second);
+  if (!a) return b;
+  if (!b) return a;
+  return a.getTime() <= b.getTime() ? a : b;
+}
+
+function latestDate_(first, second) {
+  const a = dateValue_(first);
+  const b = dateValue_(second);
+  if (!a) return b;
+  if (!b) return a;
+  return a.getTime() >= b.getTime() ? a : b;
+}
+
 function dateValue_(value) {
   if (value === "" || value == null) return "";
   const date = value instanceof Date ? value : new Date(value);
@@ -594,6 +761,16 @@ function numberOrBlank_(value) {
   if (value === "" || value == null) return "";
   const number = Number(value);
   return isNaN(number) ? "" : number;
+}
+
+function numericValue_(value) {
+  const number = Number(value);
+  return value === "" || value == null || isNaN(number) ? 0 : number;
+}
+
+function roundNumber_(value, digits) {
+  const factor = Math.pow(10, digits);
+  return Math.round(Number(value) * factor) / factor;
 }
 
 function textCell_(value) {
