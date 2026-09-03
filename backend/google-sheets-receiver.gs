@@ -4,13 +4,13 @@
  * New submissions are written to exactly three analysis sheets:
  * 1) Without_AI_Survey - one row per participant for the full-review survey.
  * 2) AI_Summary_Survey - one row per participant for the AI-summary survey.
- * 3) Browsing_Information - one aggregated row per participant.
+ * 3) Browsing_Information - one row per participant, condition, stage, and hotel.
  *
  * The sheets intentionally omit submission_id, session_id, and study_id.
  * Deploy as a Web App (Execute as: Me, Who has access: Anyone).
  */
 
-const SCHEMA_VERSION = "9";
+const SCHEMA_VERSION = "10";
 const WITHOUT_AI_SHEET = "Without_AI_Survey";
 const AI_SUMMARY_SHEET = "AI_Summary_Survey";
 const BROWSING_SHEET = "Browsing_Information";
@@ -34,44 +34,29 @@ const ATTRIBUTES = [
 
 const SURVEY_HEADERS = buildSurveyHeaders_();
 
-const BROWSING_HEADERS = buildBrowsingHeaders_();
-
-function buildBrowsingHeaders_() {
-  const headers = [
+const BROWSING_HEADERS = [
   "survey_user_id",
   "prolific_id",
-    "first_recorded_at",
-    "last_recorded_at",
-    "total_popup_visits",
-    "total_popup_duration_seconds",
-    "processed_visit_ids_json"
-  ];
-
-  const conditionStages = [
-    { condition: "without_ai", stage: "no_reviews" },
-    { condition: "without_ai", stage: "full_reviews" },
-    { condition: "ai_summary", stage: "no_reviews" },
-    { condition: "ai_summary", stage: "ai_summary_reviews" }
-  ];
-  const metrics = [
-    "visit_count",
-    "total_duration_seconds",
-    "max_scroll_depth_pct",
-    "total_scroll_direction_changes",
-    "max_scroll_speed_px_ms",
-    "mean_scroll_speed_px_ms",
-    "last_exit_reason",
-    "last_visited_at"
-  ];
-
-  for (let c = 0; c < conditionStages.length; c++) {
-    for (let h = 0; h < HOTELS.length; h++) {
-      const prefix = conditionStages[c].condition + "_" + conditionStages[c].stage + "_" + HOTELS[h].slug;
-      for (let m = 0; m < metrics.length; m++) headers.push(prefix + "_" + metrics[m]);
-    }
-  }
-  return headers;
-}
+  "condition",
+  "browsing_stage",
+  "hotel_id",
+  "hotel_name",
+  "first_opened_at",
+  "last_opened_at",
+  "last_closed_at",
+  "record_updated_at",
+  "open_count",
+  "total_viewing_seconds",
+  "maximum_single_view_seconds",
+  "maximum_scroll_depth_pct",
+  "total_scroll_direction_changes",
+  "maximum_scroll_speed_px_ms",
+  "mean_scroll_speed_px_ms",
+  "last_exit_reason",
+  "time_limit_reached",
+  "five_minute_warning_shown",
+  "processed_visit_ids_json"
+];
 
 function buildSurveyHeaders_() {
   const headers = [
@@ -362,9 +347,42 @@ function updateBrowsingRow_(sheet, events, payload, receivedAt) {
   if (!surveyUserId) return 0;
   const condition = browsingCondition_(conditionFromPayload_(payload));
   const browsingStage = browsingStageFromPayload_(payload);
-  if (!browsingPrefix_(condition, browsingStage, HOTELS[0])) return 0;
+  if (!validBrowsingCombination_(condition, browsingStage)) return 0;
   const prolificId = prolificIdFrom_(payload, events);
-  const rowNumbers = participantRows_(sheet, surveyUserId, prolificId);
+  const eventsByHotel = {};
+
+  for (let i = 0; i < events.length; i++) {
+    const event = events[i] || {};
+    if (event.event_type !== "page_timing") continue;
+    const value = objectValue_(event.value);
+    if (value.context !== "hotel_modal") continue;
+    const hotelId = event.element_id || value.hotel_id || "";
+    const hotel = hotelForId_(hotelId);
+    if (!hotel) continue;
+    if (!eventsByHotel[hotel.id]) eventsByHotel[hotel.id] = [];
+    eventsByHotel[hotel.id].push(event);
+  }
+
+  let totalRecorded = 0;
+  const hotelIds = Object.keys(eventsByHotel);
+  for (let i = 0; i < hotelIds.length; i++) {
+    const hotel = hotelForId_(hotelIds[i]);
+    totalRecorded += updateBrowsingCombination_(
+      sheet,
+      eventsByHotel[hotel.id],
+      surveyUserId,
+      prolificId,
+      condition,
+      browsingStage,
+      hotel,
+      receivedAt
+    );
+  }
+  return totalRecorded;
+}
+
+function updateBrowsingCombination_(sheet, events, surveyUserId, prolificId, condition, stage, hotel, receivedAt) {
+  const rowNumbers = findBrowsingRows_(sheet, surveyUserId, prolificId, condition, stage, hotel.id);
   const rowNumber = rowNumbers.length ? rowNumbers[0] : 0;
   const record = rowNumber
     ? rowObject_(BROWSING_HEADERS, sheet.getRange(rowNumber, 1, 1, BROWSING_HEADERS.length).getValues()[0])
@@ -375,75 +393,76 @@ function updateBrowsingRow_(sheet, events, payload, receivedAt) {
 
   record.survey_user_id = textCell_(surveyUserId);
   record.prolific_id = textCell_(prolificId || record.prolific_id || "");
-  record.first_recorded_at = record.first_recorded_at || receivedAt;
+  record.condition = textCell_(condition);
+  record.browsing_stage = textCell_(stage);
+  record.hotel_id = textCell_(hotel.id);
+  record.hotel_name = textCell_(hotel.name);
 
   for (let i = 0; i < events.length; i++) {
     const event = events[i] || {};
-    if (event.event_type !== "page_timing") continue;
     const value = objectValue_(event.value);
-    if (value.context !== "hotel_modal") continue;
-    const hotelId = event.element_id || value.hotel_id || "";
-    const hotel = hotelForId_(hotelId);
-    if (!hotel) continue;
     const visitId = event.event_id || recordId_([
       surveyUserId,
       condition,
-      browsingStage,
-      hotelId,
+      stage,
+      hotel.id,
       event.timestamp || "",
       value.duration_ms || ""
     ]);
     if (processed.has(String(visitId))) continue;
 
-    const prefix = browsingPrefix_(condition, browsingStage, hotel);
-    const previousCount = numericValue_(record[prefix + "_visit_count"]);
+    const previousCount = numericValue_(record.open_count);
     const durationSeconds = numericValue_(value.duration_ms) / 1000;
+    const closedAt = dateValue_(event.timestamp) || receivedAt;
+    const openedAt = new Date(closedAt.getTime() - (durationSeconds * 1000));
     const scrollDepth = Math.max(
       numericValue_(value.scroll_depth_pct_at_exit),
       numericValue_(value.scroll_max_pct)
     );
-    const directionChanges = numericValue_(value.scroll_dir_changes);
-    const maxScrollSpeed = numericValue_(value.scroll_max_px_per_ms);
     const meanScrollSpeed = numberOrBlank_(value.scroll_mean_px_per_ms);
 
-    record[prefix + "_visit_count"] = previousCount + 1;
-    record[prefix + "_total_duration_seconds"] = roundNumber_(
-      numericValue_(record[prefix + "_total_duration_seconds"]) + durationSeconds,
+    record.first_opened_at = earliestDate_(record.first_opened_at, openedAt);
+    record.last_opened_at = latestDate_(record.last_opened_at, openedAt);
+    record.last_closed_at = latestDate_(record.last_closed_at, closedAt);
+    record.open_count = previousCount + 1;
+    record.total_viewing_seconds = roundNumber_(
+      numericValue_(record.total_viewing_seconds) + durationSeconds,
       3
     );
-    record[prefix + "_max_scroll_depth_pct"] = Math.max(
-      numericValue_(record[prefix + "_max_scroll_depth_pct"]),
+    record.maximum_single_view_seconds = Math.max(
+      numericValue_(record.maximum_single_view_seconds),
+      durationSeconds
+    );
+    record.maximum_scroll_depth_pct = Math.max(
+      numericValue_(record.maximum_scroll_depth_pct),
       scrollDepth
     );
-    record[prefix + "_total_scroll_direction_changes"] =
-      numericValue_(record[prefix + "_total_scroll_direction_changes"]) + directionChanges;
-    record[prefix + "_max_scroll_speed_px_ms"] = Math.max(
-      numericValue_(record[prefix + "_max_scroll_speed_px_ms"]),
-      maxScrollSpeed
+    record.total_scroll_direction_changes =
+      numericValue_(record.total_scroll_direction_changes) + numericValue_(value.scroll_dir_changes);
+    record.maximum_scroll_speed_px_ms = Math.max(
+      numericValue_(record.maximum_scroll_speed_px_ms),
+      numericValue_(value.scroll_max_px_per_ms)
     );
     if (meanScrollSpeed !== "") {
-      const previousMean = numericValue_(record[prefix + "_mean_scroll_speed_px_ms"]);
-      record[prefix + "_mean_scroll_speed_px_ms"] = roundNumber_(
-        ((previousMean * previousCount) + meanScrollSpeed) / (previousCount + 1),
+      record.mean_scroll_speed_px_ms = roundNumber_(
+        ((numericValue_(record.mean_scroll_speed_px_ms) * previousCount) + meanScrollSpeed) /
+          (previousCount + 1),
         6
       );
     }
-    record[prefix + "_last_exit_reason"] = textCell_(value.exit_reason || "");
-    record[prefix + "_last_visited_at"] = dateValue_(event.timestamp) || receivedAt;
-
-    record.total_popup_visits = numericValue_(record.total_popup_visits) + 1;
-    record.total_popup_duration_seconds = roundNumber_(
-      numericValue_(record.total_popup_duration_seconds) + durationSeconds,
-      3
-    );
+    record.last_exit_reason = textCell_(value.exit_reason || "");
     processed.add(String(visitId));
     processedVisitIds.push(String(visitId));
     recorded += 1;
   }
 
   if (!recorded && rowNumbers.length <= 1) return 0;
-  record.last_recorded_at = receivedAt;
+  record.record_updated_at = receivedAt;
+  record.time_limit_reached = stage === "no_reviews" && numericValue_(record.total_viewing_seconds) >= 29.5 ? 1 : 0;
+  record.five_minute_warning_shown = stage !== "no_reviews" &&
+    numericValue_(record.maximum_single_view_seconds) >= 299.5 ? 1 : 0;
   record.processed_visit_ids_json = jsonCell_(processedVisitIds);
+
   const values = BROWSING_HEADERS.map(header => record[header] === undefined ? "" : record[header]);
   const targetRow = rowNumber || sheet.getLastRow() + 1;
   ensureRowCapacity_(sheet, targetRow);
@@ -458,12 +477,11 @@ function browsingCondition_(condition) {
   return condition === "ai_summary" ? "ai_summary" : "without_ai";
 }
 
-function browsingPrefix_(condition, stage, hotel) {
-  const valid =
+function validBrowsingCombination_(condition, stage) {
+  return Boolean(
     (condition === "without_ai" && (stage === "no_reviews" || stage === "full_reviews")) ||
-    (condition === "ai_summary" && (stage === "no_reviews" || stage === "ai_summary_reviews"));
-  if (!valid || !hotel) return "";
-  return condition + "_" + stage + "_" + hotel.slug;
+    (condition === "ai_summary" && (stage === "no_reviews" || stage === "ai_summary_reviews"))
+  );
 }
 
 function conditionFromPayload_(payload) {
@@ -559,8 +577,10 @@ function ensureSheet_(ss, name, headers) {
 function ensureBrowsingSheet_(ss) {
   const existing = ss.getSheetByName(BROWSING_SHEET);
   if (existing && existing.getLastRow() > 0) {
-    const firstHeader = existing.getRange(1, 1).getDisplayValues()[0][0];
-    if (firstHeader && firstHeader !== BROWSING_HEADERS[0]) {
+    const width = Math.min(existing.getLastColumn(), BROWSING_HEADERS.length);
+    const existingHeaders = existing.getRange(1, 1, 1, width).getDisplayValues()[0];
+    const compatible = existingHeaders.every((header, index) => !header || header === BROWSING_HEADERS[index]);
+    if (!compatible) {
       existing.setName(uniqueSheetName_(ss, BROWSING_SHEET + "_Legacy"));
     }
   }
@@ -576,7 +596,7 @@ function uniqueSheetName_(ss, base) {
 
 function applySheetLayout_(sheet, name, headers) {
   for (let i = 1; i <= headers.length; i++) sheet.setColumnWidth(i, name === BROWSING_SHEET ? 145 : 125);
-  sheet.setFrozenColumns(name === BROWSING_SHEET ? 5 : 2);
+  sheet.setFrozenColumns(name === BROWSING_SHEET ? 6 : 2);
   setWidthByHeader_(sheet, headers, "survey_user_id", 330);
   setWidthByHeader_(sheet, headers, "prolific_id", 220);
   setWidthByHeader_(sheet, headers, "assigned_trip_scenario_title", 250);
@@ -595,14 +615,11 @@ function formatSurveyRow_(sheet, row) {
 }
 
 function formatBrowsingRow_(sheet, row) {
-  formatDateHeader_(sheet, BROWSING_HEADERS, row, 1, "first_recorded_at");
-  formatDateHeader_(sheet, BROWSING_HEADERS, row, 1, "last_recorded_at");
+  formatDateHeader_(sheet, BROWSING_HEADERS, row, 1, "first_opened_at");
+  formatDateHeader_(sheet, BROWSING_HEADERS, row, 1, "last_opened_at");
+  formatDateHeader_(sheet, BROWSING_HEADERS, row, 1, "last_closed_at");
+  formatDateHeader_(sheet, BROWSING_HEADERS, row, 1, "record_updated_at");
   wrapHeader_(sheet, BROWSING_HEADERS, row, 1, "processed_visit_ids_json");
-  for (let i = 0; i < BROWSING_HEADERS.length; i++) {
-    if (/_last_visited_at$/.test(BROWSING_HEADERS[i])) {
-      sheet.getRange(row, i + 1, 1, 1).setNumberFormat("yyyy-mm-dd hh:mm:ss");
-    }
-  }
 }
 
 function formatDateHeader_(sheet, headers, startRow, count, header) {
@@ -659,6 +676,21 @@ function participantRows_(sheet, surveyUserId, prolificId) {
     }
   }
   return rows.sort((a, b) => a - b);
+}
+
+function findBrowsingRows_(sheet, surveyUserId, prolificId, condition, stage, hotelId) {
+  if (sheet.getLastRow() < 2) return [];
+  const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, 5).getDisplayValues();
+  const rows = [];
+  for (let i = 0; i < values.length; i++) {
+    const sameParticipant = String(values[i][0]) === String(surveyUserId) ||
+      (prolificId && String(values[i][1]) === String(prolificId));
+    if (sameParticipant && String(values[i][2]) === String(condition) &&
+        String(values[i][3]) === String(stage) && String(values[i][4]) === String(hotelId)) {
+      rows.push(i + 2);
+    }
+  }
+  return rows;
 }
 
 function removeDuplicateRows_(sheet, rows) {
