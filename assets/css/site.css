@@ -632,18 +632,7 @@ body{
 }
 
 .app{max-width:1128px; margin:0 auto; padding:0 16px 42px}
-.layout{display:grid; grid-template-columns:260px 1fr; gap:16px}
-
-.filters{
-  background:var(--card);
-  border:1px solid #d1d5db;
-  border-radius:8px;
-  box-shadow:none;
-  padding:14px 14px 6px;
-  height:fit-content;
-}
-.booking-sidebar{position:sticky; top:14px}
-.h2{margin:0 0 10px; font-size:20px}
+.layout{display:grid; grid-template-columns:minmax(0,1fr); gap:16px}
 .scenario-card{
   border:1px solid #d9e5ff;
   border-radius:12px;
@@ -698,11 +687,6 @@ body{
   border-radius:999px;
   background:var(--brand);
 }
-.filter{padding:12px 0; border-top:1px solid #e5e7eb}
-.filter:first-of-type{border-top:0}
-.filter__label{color:#595959; font-size:13px}
-.filter__value{font-weight:750; margin-top:4px; line-height:1.3}
-
 .callout{
   margin-top:10px;
   border-radius:12px;
@@ -1879,7 +1863,6 @@ body{
   .search-box{grid-template-columns:1fr}
   .search-submit{min-height:48px}
   .layout{grid-template-columns:1fr}
-  .booking-sidebar{position:static}
   .card{grid-template-columns:1fr}
   .card__body{grid-template-columns:1fr}
   .priceBox{border-left:0; padding-left:0; border-top:1px solid var(--line); padding-top:10px; text-align:left}
