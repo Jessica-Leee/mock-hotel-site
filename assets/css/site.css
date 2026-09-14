@@ -101,6 +101,7 @@ body{
   font-size:13px;
   font-weight:900;
 }
+.survey-progress[hidden]{display:none}
 .survey-progress__bar{
   height:8px;
   border-radius:999px;

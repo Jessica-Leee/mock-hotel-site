@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbyBmS8V5n3M0smur248ScVqHNxYG5vZ8Ax9D9ZL38qc_TjiLPuDT04n0ErT57RX_o1V/exec"
     />
-    <link rel="stylesheet" href="./assets/css/site.css?v=20260902-1" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260914-1" />
   </head>
   <body data-survey-page="true">
     <header class="booking-header" aria-label="Site header">
@@ -24,8 +24,8 @@
 
     <main class="survey-shell" aria-label="Hotel booking survey">
       <section class="survey-card">
-        <div class="survey-progress" aria-live="polite">
-          <span id="surveyStepLabel">Question 1 of 4</span>
+        <div class="survey-progress" aria-live="polite" hidden>
+          <span id="surveyStepLabel"></span>
           <div class="survey-progress__bar" aria-hidden="true">
             <span id="surveyProgressFill"></span>
           </div>
@@ -131,16 +131,6 @@
           { id: "location_convenience", label: "Location convenience", likelihoodId: "convenient_location", likelihoodLabel: "Convenient location" },
           { id: "value_for_money", label: "Value for money", likelihoodId: "good_value_for_money", likelihoodLabel: "Good value for money" },
           { id: "breakfast_quality", label: "Breakfast quality", likelihoodId: "high_quality_breakfast", likelihoodLabel: "High-quality breakfast" }
-        ];
-
-        const bookingScenarioOptions = [
-          { id: "business", label: "Business trips or conferences" },
-          { id: "family_with_children", label: "Family trips with children" },
-          { id: "romantic_partner", label: "Romantic trips with a partner" },
-          { id: "solo_leisure", label: "Solo leisure or city trips" },
-          { id: "friends", label: "Trips with friends" },
-          { id: "elderly_relatives", label: "Trips with elderly parents or relatives" },
-          { id: "other", label: "Other" }
         ];
 
         const trueAttributeValues = {
@@ -316,8 +306,6 @@
           const scenario = assignedScenario();
           return [
             { id: "prolific_id", type: "prolific" },
-            { id: "hotel_scenarios_prior", type: "scenarioFrequency" },
-            { id: "hotel_attributes_prior", type: "attributes" },
             { id: scenario.id, type: "scenario", scenario },
             { id: "browse_intro", type: "browseIntro" }
           ];
@@ -333,6 +321,8 @@
             const stored = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY);
             const state = stored ? JSON.parse(stored) : { answers: {} };
             if (!state.answers || typeof state.answers !== "object") state.answers = {};
+            delete state.answers.hotel_scenarios_prior;
+            delete state.answers.hotel_attributes_prior;
             return state;
           }
           catch (_) { return { answers: {} }; }
@@ -1022,7 +1012,9 @@
           const fill = document.getElementById("surveyProgressFill");
           const submit = document.getElementById("surveySubmit");
           const card = document.querySelector(".survey-card");
+          const progress = document.querySelector(".survey-progress");
           submit.hidden = false;
+          if (progress) progress.hidden = !postReviewMode && !hotelQuestionnaireMode;
 
           if (postReviewMode) {
             stepLabel.textContent = `Post-review questionnaire ${index + 1} of ${pageSet.length}`;
@@ -1059,47 +1051,9 @@
                 <input id="answerInput" name="prolific_id" type="text" value="${escapeHtml(prolificId)}" required autocomplete="off" ${prolificId ? "readonly" : ""} />
               </label>
             `);
-          } else if (page.type === "scenarioFrequency") {
-            setQuestionHtml(`
-              <h1 class="survey-title">When do you most often need to book a hotel?</h1>
-              <p class="survey-copy">Select all travel scenarios that apply to you.</p>
-              <fieldset class="survey-multiselect" aria-describedby="scenarioSelectionError">
-                <legend>Travel scenarios</legend>
-                <div class="survey-option-list survey-option-list--compact">
-                  ${bookingScenarioOptions.map(option => {
-                    const inputId = `booking_scenario_${option.id}`;
-                    return `
-                      <label class="survey-option" for="${escapeHtml(inputId)}">
-                        <input id="${escapeHtml(inputId)}" type="checkbox" name="booking_scenario" value="${escapeHtml(option.id)}" />
-                        <span>${escapeHtml(option.label)}</span>
-                      </label>
-                    `;
-                  }).join("")}
-                </div>
-              </fieldset>
-              <label class="survey-field survey-field--short">
-                <span>If you selected Other, please specify (optional)</span>
-                <input id="bookingScenarioOther" name="booking_scenario_other" type="text" value="" autocomplete="off" />
-              </label>
-              <p id="scenarioSelectionError" class="survey-error" role="alert" hidden>Please select at least one travel scenario.</p>
-              ${botTrapHtml("travel_scenarios", "TRAVEL-CHECK-27")}
-            `);
-          } else if (page.type === "attributes") {
-            setQuestionHtml(`
-              <h1 class="survey-title">Before seeing your preference profile</h1>
-              <p class="survey-copy">Please list all hotel attributes you would consider when choosing a hotel for travel. Separate them with commas.</p>
-              <label class="survey-field">
-                <span>Hotel attributes</span>
-                <textarea id="answerInput" name="attributes" required placeholder="cleanliness, location"></textarea>
-              </label>
-              ${botTrapHtml("hotel_attributes", "ATTRIBUTE-CHECK-41")}
-            `);
           } else if (page.type === "scenario") {
             const scenario = page.scenario;
             setQuestionHtml(`
-              <h1 class="survey-title survey-title--scenario">${escapeHtml(scenario.title)}</h1>
-              <p class="survey-copy">${escapeHtml(scenario.description)}</p>
-              <div class="survey-divider"></div>
               <div class="survey-profile">
                 <h2>Your Attribute Preference Profile</h2>
                 <p>Importance scale: 1 = least important, 2 = moderately important, 3 = most important. <strong>Bold</strong> = top priorities for this trip.</p>
@@ -1107,7 +1061,7 @@
               </div>
               <label class="survey-check">
                 <input id="answerInput" type="checkbox" required />
-                <span>I have read this trip scenario and preference profile.</span>
+                <span>I have read this attribute preference profile.</span>
               </label>
             `);
           } else if (page.type === "hotelMatrix") {
@@ -1151,29 +1105,6 @@
             state.survey_user_id = state.survey_user_id || surveyUserId;
             persistSurveyUserId(state.survey_user_id, value);
             state.answers[page.id] = { value, submitted_at: state.updated_at };
-          } else if (page.type === "scenarioFrequency") {
-            const selectedIds = Array.from(document.querySelectorAll('input[name="booking_scenario"]:checked'))
-              .map(input => input.value);
-            const selectedLabels = selectedIds.map(id => {
-              const option = bookingScenarioOptions.find(item => item.id === id);
-              return option ? option.label : id;
-            });
-            const otherInput = document.getElementById("bookingScenarioOther");
-            state.answers[page.id] = {
-              selected_ids: selectedIds,
-              selected_labels: selectedLabels,
-              other_text: selectedIds.includes("other") && otherInput ? otherInput.value.trim() : "",
-              ...botDetectionData(),
-              submitted_at: state.updated_at
-            };
-          } else if (page.type === "attributes") {
-            const value = document.getElementById("answerInput").value.trim();
-            state.answers[page.id] = {
-              value,
-              attributes: value.split(",").map(item => item.trim()).filter(Boolean),
-              ...botDetectionData(),
-              submitted_at: state.updated_at
-            };
           } else if (page.type === "scenario") {
             state.answers[page.id] = {
               value: true,
@@ -1340,16 +1271,6 @@
         document.getElementById("surveyForm").addEventListener("input", function (event) {
           const input = event.target;
           if (!input) return;
-          if (input.name === "booking_scenario") {
-            const error = document.getElementById("scenarioSelectionError");
-            if (error && document.querySelector('input[name="booking_scenario"]:checked')) error.hidden = true;
-          }
-          if (input.id === "bookingScenarioOther" && input.value.trim()) {
-            const otherOption = document.getElementById("booking_scenario_other");
-            if (otherOption) otherOption.checked = true;
-            const error = document.getElementById("scenarioSelectionError");
-            if (error) error.hidden = true;
-          }
           if (input.type !== "range") return;
           input.classList.remove("is-unset");
           input.dataset.answered = "true";
@@ -1372,17 +1293,6 @@
             document.querySelectorAll(".range-selection-error").forEach(error => { error.hidden = false; });
             unansweredRanges[0].focus();
             return;
-          }
-          if (page.type === "scenarioFrequency") {
-            const selected = document.querySelectorAll('input[name="booking_scenario"]:checked');
-            const error = document.getElementById("scenarioSelectionError");
-            if (!selected.length) {
-              if (error) error.hidden = false;
-              const firstOption = document.querySelector('input[name="booking_scenario"]');
-              if (firstOption) firstOption.focus();
-              return;
-            }
-            if (error) error.hidden = true;
           }
           if (page.type === "browseIntro") {
             goToHotelBrowsing(getState());
