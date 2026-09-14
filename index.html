@@ -9,19 +9,9 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbyBmS8V5n3M0smur248ScVqHNxYG5vZ8Ax9D9ZL38qc_TjiLPuDT04n0ErT57RX_o1V/exec"
     />
-    <link rel="stylesheet" href="./assets/css/site.css?v=20260914-1" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260914-2" />
   </head>
   <body data-survey-page="true">
-    <header class="booking-header" aria-label="Site header">
-      <div class="booking-header__inner">
-        <div class="booking-logo">BookNow</div>
-        <div class="booking-header__links" aria-label="Study stage">
-          <span class="booking-nav-pill is-active">Survey</span>
-          <span class="booking-nav-pill">Chicago hotel task</span>
-        </div>
-      </div>
-    </header>
-
     <main class="survey-shell" aria-label="Hotel booking survey">
       <section class="survey-card">
         <div class="survey-progress" aria-live="polite" hidden>
@@ -41,6 +31,7 @@
     </main>
 
     <script src="./assets/js/survey-tracking.js?v=20260903-1"></script>
+    <script src="./assets/js/shopper-profile.js?v=20260914-1"></script>
     <script>
       (function () {
         const SURVEY_STORAGE_PREFIX = "mock_hotel_survey_v1";
@@ -789,6 +780,11 @@
 
         function setQuestionHtml(html) {
           document.getElementById("surveyQuestion").innerHTML = `
+            ${hotelQuestionnaireMode || postReviewMode ? `
+              <div class="survey-profile-tools">
+                <button class="btn2 shopper-profile-button" type="button" data-view-shopper-profile>View your shopper profile</button>
+              </div>
+            ` : ""}
             <div class="survey-notice">
               Continue carefully: you cannot return to earlier pages.
             </div>
@@ -918,7 +914,7 @@
           return `
             <div class="survey-reveal">
               <h1 class="survey-title">Revealed: Actual Hotel Attributes</h1>
-              <p class="survey-copy">The true quality values for <strong>${escapeHtml(hotel.name)}</strong> are now revealed from the review corpus.</p>
+              <p class="survey-copy">The true quality values for <strong>${escapeHtml(hotel.name)}</strong> are now revealed from the reviews.</p>
               <p class="survey-copy">Each attribute is shown as 1 = Positive or 0 = Negative.</p>
               <p class="survey-copy">Your post-review choices are shown for the three attributes assigned to you. The remaining attributes are marked “Not asked.”</p>
               ${trueAttributeTableHtml(hotel)}
