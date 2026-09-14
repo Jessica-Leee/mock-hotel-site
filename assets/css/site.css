@@ -408,7 +408,7 @@ body{
 .survey-range{
   margin-top:24px;
   display:grid;
-  grid-template-columns:minmax(180px, 260px) minmax(240px, 1fr) 44px;
+  grid-template-columns:minmax(180px, 260px) minmax(240px, 1fr) 48px;
   gap:16px;
   align-items:center;
   color:#555;
@@ -419,17 +419,72 @@ body{
   margin-top:0;
 }
 .survey-range input[type="range"]{
+  -webkit-appearance:none;
+  appearance:none;
   width:100%;
-  accent-color:#0071c2;
+  height:28px;
+  margin:0;
+  background:transparent;
+  cursor:pointer;
+  --range-progress:50%;
 }
-.survey-range input[type="range"].is-unset{
-  accent-color:#c5d0de;
+.survey-range input[type="range"]::-webkit-slider-runnable-track{
+  height:8px;
+  border:1px solid #b8c2d0;
+  border-radius:999px;
+  background:linear-gradient(
+    to right,
+    #0071c2 0,
+    #0071c2 var(--range-progress),
+    #dce2ea var(--range-progress),
+    #dce2ea 100%
+  );
 }
-.survey-range input[type="range"].is-unset::-webkit-slider-thumb{
-  opacity:0;
+.survey-range input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:22px;
+  height:22px;
+  margin-top:-7px;
+  border:3px solid #0071c2;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 1px 4px rgba(0,0,0,.22);
 }
+.survey-range input[type="range"]::-moz-range-track{
+  height:8px;
+  border:1px solid #b8c2d0;
+  border-radius:999px;
+  background:#dce2ea;
+}
+.survey-range input[type="range"]::-moz-range-progress{
+  height:8px;
+  border-radius:999px;
+  background:#0071c2;
+}
+.survey-range input[type="range"]::-moz-range-thumb{
+  width:18px;
+  height:18px;
+  border:3px solid #0071c2;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 1px 4px rgba(0,0,0,.22);
+}
+.survey-range input[type="range"].is-unset::-webkit-slider-runnable-track{
+  background:#dce2ea;
+}
+.survey-range input[type="range"].is-unset::-webkit-slider-thumb,
 .survey-range input[type="range"].is-unset::-moz-range-thumb{
-  opacity:0;
+  border-color:#7b8798;
+  background:#f8fafc;
+}
+.survey-range input[type="range"].is-unset::-moz-range-progress{
+  background:#dce2ea;
+}
+.survey-range input[type="range"]:focus-visible{
+  outline:2px solid #0057a3;
+  outline-offset:3px;
+  border-radius:999px;
 }
 .survey-range output{
   color:#1f2937;

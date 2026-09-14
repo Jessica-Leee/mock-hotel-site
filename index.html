@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbyBmS8V5n3M0smur248ScVqHNxYG5vZ8Ax9D9ZL38qc_TjiLPuDT04n0ErT57RX_o1V/exec"
     />
-    <link rel="stylesheet" href="./assets/css/site.css?v=20260914-2" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260914-3" />
   </head>
   <body data-survey-page="true">
     <main class="survey-shell" aria-label="Hotel booking survey">
@@ -954,14 +954,15 @@
         }
 
         function unsetRangeInput(name, min, max, extraAttrs) {
+          const initialValue = Math.round((Number(min) + Number(max)) / 2);
           return `
-            <input ${extraAttrs || ""} name="${escapeHtml(name)}" type="range" min="${min}" max="${max}" step="1" value="${min}" class="is-unset" data-answered="false" aria-invalid="true" />
+            <input ${extraAttrs || ""} name="${escapeHtml(name)}" type="range" min="${min}" max="${max}" step="1" value="${initialValue}" class="is-unset" data-answered="false" aria-invalid="true" style="--range-progress:50%" />
             <output class="is-unset">—</output>
           `;
         }
 
         function rangeErrorHtml() {
-          return `<p class="survey-error range-selection-error" role="alert" hidden>Please move each slider to record your answer.</p>`;
+          return `<p class="survey-error range-selection-error" role="alert" hidden>Please select a value for each slider.</p>`;
         }
 
         function confidenceRangeHtml() {
@@ -1264,10 +1265,13 @@
           history.replaceState(null, "", location.pathname + (location.search || "") + "#complete");
         }
 
-        document.getElementById("surveyForm").addEventListener("input", function (event) {
-          const input = event.target;
-          if (!input) return;
-          if (input.type !== "range") return;
+        function markRangeAnswered(input) {
+          if (!input || input.type !== "range") return;
+          const min = Number(input.min || 0);
+          const max = Number(input.max || 100);
+          const value = Number(input.value || min);
+          const progress = max > min ? ((value - min) / (max - min)) * 100 : 0;
+          input.style.setProperty("--range-progress", `${Math.max(0, Math.min(100, progress))}%`);
           input.classList.remove("is-unset");
           input.dataset.answered = "true";
           input.removeAttribute("aria-invalid");
@@ -1277,6 +1281,14 @@
             output.textContent = input.value;
           }
           document.querySelectorAll(".range-selection-error").forEach(error => { error.hidden = true; });
+        }
+
+        document.getElementById("surveyForm").addEventListener("input", function (event) {
+          markRangeAnswered(event.target);
+        });
+
+        document.getElementById("surveyForm").addEventListener("pointerup", function (event) {
+          markRangeAnswered(event.target);
         });
 
         document.getElementById("surveyForm").addEventListener("submit", function (event) {
