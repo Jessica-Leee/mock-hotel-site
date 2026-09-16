@@ -10,7 +10,7 @@
  * Deploy as a Web App (Execute as: Me, Who has access: Anyone).
  */
 
-const SCHEMA_VERSION = "11";
+const SCHEMA_VERSION = "12";
 const WITHOUT_AI_SHEET = "Without_AI_Survey";
 const AI_SUMMARY_SHEET = "AI_Summary_Survey";
 const BROWSING_SHEET = "Browsing_Information";
@@ -108,7 +108,14 @@ function buildSurveyHeaders_() {
   }
 
   headers.push("bot_detection_flag", "bot_detection_details", "all_answers_json");
+  // Legacy continuous-scale columns remain above so existing survey tabs keep
+  // their current column order. Current five-point answers are appended here.
   headers.push("switch_likelihood_0_to_100");
+  headers.push("switch_likelihood_1_to_5", "switch_likelihood_label");
+  for (let i = 0; i < ATTRIBUTES.length; i++) {
+    headers.push("surprise_" + ATTRIBUTES[i].id + "_1_to_5");
+    headers.push("surprise_" + ATTRIBUTES[i].id + "_label");
+  }
   return headers;
 }
 
@@ -303,10 +310,13 @@ function applyAnswer_(record, questionId, answer, assignment) {
   } else if (questionId === "post_review_switch") {
     record.would_switch_hotel = textCell_(answer.value || "");
   } else if (questionId === "post_review_likelihood_surprise") {
-    record.switch_likelihood_0_to_100 = numberOrBlank_(answer.switch_likelihood);
+    record.switch_likelihood_1_to_5 = switchLikelihoodNumeric_(answer.switch_likelihood);
+    record.switch_likelihood_label = fivePointLabel_(answer.switch_likelihood);
     const surprise = objectValue_(answer.surprise_values);
     for (let i = 0; i < ATTRIBUTES.length; i++) {
-      record["surprise_" + ATTRIBUTES[i].id + "_0_to_10"] = numberOrBlank_(surprise[ATTRIBUTES[i].id]);
+      const rawSurprise = surprise[ATTRIBUTES[i].id];
+      record["surprise_" + ATTRIBUTES[i].id + "_1_to_5"] = surpriseNumeric_(rawSurprise);
+      record["surprise_" + ATTRIBUTES[i].id + "_label"] = fivePointLabel_(rawSurprise);
     }
   }
 
@@ -724,6 +734,44 @@ function attributeLabel_(id) {
 function likelihoodNumeric_(value) {
   const map = { extremely_unlikely: 1, somewhat_unlikely: 2, neither: 3, somewhat_likely: 4, extremely_likely: 5 };
   return map[String(value || "")] || "";
+}
+
+function switchLikelihoodNumeric_(value) {
+  const map = {
+    very_unlikely: 1,
+    unlikely: 2,
+    neither_likely_nor_unlikely: 3,
+    likely: 4,
+    very_likely: 5
+  };
+  return map[String(value || "")] || "";
+}
+
+function surpriseNumeric_(value) {
+  const map = {
+    not_at_all_surprised: 1,
+    slightly_surprised: 2,
+    moderately_surprised: 3,
+    very_surprised: 4,
+    extremely_surprised: 5
+  };
+  return map[String(value || "")] || "";
+}
+
+function fivePointLabel_(value) {
+  const labels = {
+    very_unlikely: "Very unlikely",
+    unlikely: "Unlikely",
+    neither_likely_nor_unlikely: "Neither likely nor unlikely",
+    likely: "Likely",
+    very_likely: "Very likely",
+    not_at_all_surprised: "Not at all surprised",
+    slightly_surprised: "Slightly surprised",
+    moderately_surprised: "Moderately surprised",
+    very_surprised: "Very surprised",
+    extremely_surprised: "Extremely surprised"
+  };
+  return textCell_(labels[String(value || "")] || value || "");
 }
 
 function confidenceNumeric_(value) {

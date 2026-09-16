@@ -80,14 +80,13 @@ The receiver writes new data to three tabs:
 The two survey sheets have identical columns. Each participant's row contains:
 
 - the shared random `survey_user_id` and their Prolific ID answer;
-- their frequent hotel-booking scenarios and open-text hotel attributes;
-- the assigned Trip Scenario;
+- the assigned Solo City Exploration scenario and acknowledgement of its preference profile;
 - the three randomly assigned hotel attributes;
 - their pre-review and post-review likelihood answers for Pendry, Nobu, and Arlo;
 - their chosen hotel, revealed-value acknowledgement, satisfaction, switching answer, likelihood of changing that answer, and surprise ratings;
 - automated-response checks and `all_answers_json` as a complete recovery copy.
 
-Likelihood answers are saved numerically from 1 to 5. The attribute IDs in `assigned_attribute_1_id` through `assigned_attribute_3_id` identify which randomized question each numbered answer column represents. Legacy confidence columns remain in existing Sheets for schema compatibility but are no longer populated.
+Hotel-attribute likelihood answers are saved numerically from 1 to 5. The attribute IDs in `assigned_attribute_1_id` through `assigned_attribute_3_id` identify which randomized question each numbered answer column represents. The final likelihood-of-changing answer and every surprise answer are also stored in new five-point columns: one numeric `1_to_5` column and one exact-text `label` column per answer. Legacy confidence, `0_to_100`, and `0_to_10` columns remain in existing Sheets for schema compatibility but are no longer populated.
 
 `Browsing_Information` uses a long format. Its unique combination is `survey_user_id + condition + browsing_stage + hotel_id`. Reopening the same hotel in the same stage updates that row's open count, cumulative viewing time, longest single visit, scrolling measures, and latest exit reason instead of adding another row. Moving to another condition, stage, or hotel creates a separate observation row. `processed_visit_ids_json` is the deduplication audit: if the browser retries an event, that visit ID is recognized and is not counted twice. The sheet does not include `submission_id`, `SESSION_ID`, or `STUDY_ID`.
 
@@ -116,7 +115,7 @@ For a participant who completes both surveys, verify:
 
 1. The same `survey_user_id` appears in `Without_AI_Survey` and `AI_Summary_Survey`.
 2. Both rows show `completion_status = complete`.
-3. Both rows contain the same assigned Trip Scenario and three assigned attribute IDs.
+3. Both rows contain the Solo City Exploration scenario and the same three assigned attribute IDs.
 4. `Browsing_Information` contains the expected condition × stage × hotel rows for that `survey_user_id`, with no repeated four-field key.
 
 Streaming uses persistent retry queues and forced dispatch when a page is hidden or closed. `all_answers_json` in each survey row preserves the full exact answer object as a recovery copy.
