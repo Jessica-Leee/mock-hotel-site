@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbyBmS8V5n3M0smur248ScVqHNxYG5vZ8Ax9D9ZL38qc_TjiLPuDT04n0ErT57RX_o1V/exec"
     />
-    <link rel="stylesheet" href="./assets/css/site.css?v=20260914-3" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260915-1" />
   </head>
   <body data-survey-page="true">
     <main class="survey-shell" aria-label="Hotel booking survey">
@@ -31,7 +31,7 @@
     </main>
 
     <script src="./assets/js/survey-tracking.js?v=20260903-1"></script>
-    <script src="./assets/js/shopper-profile.js?v=20260914-1"></script>
+    <script src="./assets/js/shopper-profile.js?v=20260915-1"></script>
     <script>
       (function () {
         const SURVEY_STORAGE_PREFIX = "mock_hotel_survey_v1";
@@ -41,6 +41,7 @@
         const HOTEL_VIEW_STATE_KEY = "mock_hotel_no_review_views_v1";
         const HOTEL_REVIEW_VIEW_STATE_KEY = "mock_hotel_review_views_v1";
         const HOTEL_AI_REVIEW_VIEW_STATE_KEY = "mock_hotel_ai_review_views_v1";
+        const HOTEL_ORDER_STORAGE_PREFIX = "mock_hotel_visible_order_v1";
         const SURVEY_USER_ID_STORAGE_PREFIX = "mock_hotel_survey_user_id_v1";
         const SURVEY_USER_ID_CURRENT_KEY = `${SURVEY_USER_ID_STORAGE_PREFIX}:current`;
         const params = new URLSearchParams(location.search);
@@ -67,9 +68,9 @@
         let surveyOutboxRetryTimer = null;
 
         const hotels = [
-          { id: "pendry-chicago", name: "Pendry Chicago" },
-          { id: "nobu-hotel-chicago", name: "Nobu Hotel Chicago" },
-          { id: "arlo-chicago", name: "Arlo Chicago" }
+          { id: "pendry-chicago", name: "Pendry Hotel" },
+          { id: "nobu-hotel-chicago", name: "Nobu Hotel" },
+          { id: "arlo-chicago", name: "Arlo Hotel" }
         ];
 
         function hotelViewStorageKey() {
@@ -118,7 +119,7 @@
           { id: "service_quality", label: "Service quality", likelihoodId: "good_service_quality", likelihoodLabel: "Good Service quality" },
           { id: "room_comfort", label: "Room comfort", likelihoodId: "comfortable_rooms", likelihoodLabel: "Comfortable rooms" },
           { id: "wifi_reliability", label: "Wi-Fi reliability", likelihoodId: "reliable_wifi", likelihoodLabel: "Reliable Wi-Fi" },
-          { id: "noise_level", label: "Noise level", questionnaireLabel: "Low Noise Level", likelihoodId: "low_noise_level", likelihoodLabel: "Low Noise Level" },
+          { id: "noise_level", label: "Low Noise Level", questionnaireLabel: "Low Noise Level", likelihoodId: "low_noise_level", likelihoodLabel: "Low Noise Level" },
           { id: "location_convenience", label: "Location convenience", likelihoodId: "convenient_location", likelihoodLabel: "Convenient location" },
           { id: "value_for_money", label: "Value for money", likelihoodId: "good_value_for_money", likelihoodLabel: "Good value for money" },
           { id: "breakfast_quality", label: "Breakfast quality", likelihoodId: "high_quality_breakfast", likelihoodLabel: "High-quality breakfast" }
@@ -132,7 +133,7 @@
             wifi_reliability: 1,
             noise_level: 0,
             location_convenience: 1,
-            value_for_money: 1,
+            value_for_money: 0,
             breakfast_quality: 1
           },
           "nobu-hotel-chicago": {
@@ -149,10 +150,10 @@
             cleanliness: 1,
             service_quality: 1,
             room_comfort: 1,
-            wifi_reliability: 1,
+            wifi_reliability: 0,
             noise_level: 0,
             location_convenience: 1,
-            value_for_money: 1,
+            value_for_money: 0,
             breakfast_quality: 1
           }
         };
@@ -168,64 +169,10 @@
               ["somewhat_likely", "Somewhat likely"],
               ["extremely_likely", "Extremely likely"]
             ]
-          },
-          confidence: {
-            title: () => "How confident are you in each rating above?",
-            rows: () => selectedAttributeRows("attribute"),
-            columns: [
-              ["low", "Low"],
-              ["medium", "Medium"],
-              ["high", "High"]
-            ]
           }
         };
 
         const scenarios = [
-          {
-            id: "business_conference",
-            title: "Trip Scenario: Business Conference",
-            description: "You are booking for yourself as a business traveler attending a multi-day conference. Duration: 3 nights. Budget: up to $200/night. You need reliable internet, minimal noise, and easy access to the conference venue.",
-            rows: [
-              ["Cleanliness", "2 moderately important", false],
-              ["Service quality", "2 - moderately important", false],
-              ["Room comfort", "2 - moderately important", false],
-              ["Wi-Fi reliability", "3 - most important", true],
-              ["Noise level", "3 - most important", true],
-              ["Location convenience", "3 - most important", true],
-              ["Value for money", "1 - moderately important", false],
-              ["Breakfast quality", "1 - least important", false]
-            ]
-          },
-          {
-            id: "family_vacation",
-            title: "Trip Scenario: Family Vacation",
-            description: "You are booking for yourself, your spouse, and two young children (ages 5 and 8). Duration: 4 nights. Budget: up to $180/night. Safety and comfort for the children are the top priority.",
-            rows: [
-              ["Cleanliness", "3 - most important", true],
-              ["Service quality", "2 - moderately important", false],
-              ["Room comfort", "3 - most important", true],
-              ["Wi-Fi reliability", "2 - moderately important", false],
-              ["Noise level", "2 - moderately important", false],
-              ["Location convenience", "2 - moderately important", false],
-              ["Value for money", "2 - moderately important", false],
-              ["Breakfast quality", "2 - moderately important", false]
-            ]
-          },
-          {
-            id: "romantic_getaway",
-            title: "Trip Scenario: Romantic Getaway",
-            description: "You are booking for yourself and your partner for a romantic weekend trip. Duration: 2 nights. Budget: up to $220/night. You want a relaxing, comfortable, and memorable experience.",
-            rows: [
-              ["Cleanliness", "2 - moderately important", false],
-              ["Service quality", "3 - most important", true],
-              ["Room comfort", "3 - most important", true],
-              ["Wi-Fi reliability", "1 - least important", false],
-              ["Noise level", "3 - most important", true],
-              ["Location convenience", "2 - moderately important", false],
-              ["Value for money", "2 - moderately important", false],
-              ["Breakfast quality", "2 - moderately important", false]
-            ]
-          },
           {
             id: "solo_city_exploration",
             title: "Trip Scenario: Solo City Exploration",
@@ -240,44 +187,13 @@
               ["Value for money", "3 - most important", true],
               ["Breakfast quality", "1 - least important", false]
             ]
-          },
-          {
-            id: "friends_group_trip",
-            title: "Trip Scenario: Friends Group Trip",
-            description: "You are booking for yourself and three close friends for a social weekend. Duration: 3 nights. Budget: up to $160/night. You want a lively, central location to enjoy the city together.",
-            rows: [
-              ["Cleanliness", "2 - moderately important", false],
-              ["Service quality", "2 - moderately important", false],
-              ["Room comfort", "2 - moderately important", false],
-              ["Wi-Fi reliability", "2 - moderately important", false],
-              ["Noise level", "2 - moderately important", false],
-              ["Location convenience", "3 - most important", true],
-              ["Value for money", "2 - moderately important", false],
-              ["Breakfast quality", "2 - moderately important", false]
-            ]
-          },
-          {
-            id: "elderly_parents",
-            title: "Trip Scenario: Visit with Elderly Parents",
-            description: "You are booking for your elderly parents (both in their 70s, with limited mobility). Duration: 4 nights. Budget: up to $190/night. Comfort, accessibility, and attentive service are top priorities.",
-            rows: [
-              ["Cleanliness", "2 - moderately important", false],
-              ["Service quality", "3 - most important", true],
-              ["Room comfort", "3 - most important", true],
-              ["Wi-Fi reliability", "1 - least important", false],
-              ["Noise level", "3 - most important", true],
-              ["Location convenience", "2 - moderately important", false],
-              ["Value for money", "2 - moderately important", false],
-              ["Breakfast quality", "2 - moderately important", false]
-            ]
           }
         ];
 
         function hotelMatrixPages(prefix) {
-          return hotels.flatMap(hotel => [
-            { id: `${prefix}_${hotel.id}_likelihood`, type: "hotelMatrix", matrix: "likelihood", hotel },
-            { id: `${prefix}_${hotel.id}_confidence`, type: "hotelMatrix", matrix: "confidence", hotel }
-          ]);
+          return hotels.map(hotel => (
+            { id: `${prefix}_${hotel.id}_likelihood`, type: "hotelMatrix", matrix: "likelihood", hotel }
+          ));
         }
 
         const hotelQuestionnairePages = hotelMatrixPages("hotelq");
@@ -286,7 +202,7 @@
           { id: "post_review_reveal", type: "actualReveal" },
           { id: "post_review_satisfaction", type: "likert7" },
           { id: "post_review_switch", type: "switchChoice" },
-          { id: "post_review_confidence_surprise", type: "confidenceSurprise" }
+          { id: "post_review_likelihood_surprise", type: "likelihoodSurprise" }
         ];
         const postReviewPages = [
           ...hotelMatrixPages("postreview"),
@@ -314,6 +230,10 @@
             if (!state.answers || typeof state.answers !== "object") state.answers = {};
             delete state.answers.hotel_scenarios_prior;
             delete state.answers.hotel_attributes_prior;
+            Object.keys(state.answers).forEach(answerId => {
+              if (/^(hotelq|postreview)_.+_confidence$/.test(answerId)) delete state.answers[answerId];
+            });
+            delete state.answers.post_review_confidence_surprise;
             return state;
           }
           catch (_) { return { answers: {} }; }
@@ -438,8 +358,8 @@
             changed = true;
           }
 
-          if (!scenarios.some(scenario => scenario.id === assignment.scenario_id)) {
-            const scenario = scenarios[randomInteger(scenarios.length)];
+          const scenario = scenarios[0];
+          if (assignment.scenario_id !== scenario.id || assignment.scenario_title !== scenario.title) {
             assignment.scenario_id = scenario.id;
             assignment.scenario_title = scenario.title;
             changed = true;
@@ -783,6 +703,7 @@
             ${hotelQuestionnaireMode || postReviewMode ? `
               <div class="survey-profile-tools">
                 <button class="btn2 shopper-profile-button" type="button" data-view-shopper-profile>View your shopper profile</button>
+                <button class="btn2 hotel-order-button" type="button" data-view-hotel-order>View hotel browsing order</button>
               </div>
             ` : ""}
             <div class="survey-notice">
@@ -803,6 +724,73 @@
               `).join("")}
             </div>
           `;
+        }
+
+        function hotelOrderStorageKey() {
+          return `${HOTEL_ORDER_STORAGE_PREFIX}:${participantStorageId}`;
+        }
+
+        function hotelBrowsingOrder() {
+          const hotelById = new Map(hotels.map(hotel => [hotel.id, hotel]));
+          try {
+            const stored = JSON.parse(localStorage.getItem(hotelOrderStorageKey()) || "[]");
+            const ordered = Array.isArray(stored) ? stored.map(id => hotelById.get(id)).filter(Boolean) : [];
+            if (ordered.length === hotels.length && new Set(ordered.map(hotel => hotel.id)).size === hotels.length) {
+              return ordered;
+            }
+          } catch (_) { /* use the default order below */ }
+          return hotels.slice();
+        }
+
+        function ensureHotelOrderModalRoot() {
+          let root = document.getElementById("hotelOrderModalRoot");
+          if (root) return root;
+          root = document.createElement("div");
+          root.id = "hotelOrderModalRoot";
+          root.className = "modal-root hotel-order-modal-root";
+          root.setAttribute("aria-hidden", "true");
+          document.body.appendChild(root);
+          return root;
+        }
+
+        function openHotelOrderModal(trigger) {
+          const root = ensureHotelOrderModalRoot();
+          const order = hotelBrowsingOrder();
+          root.dataset.previousOverflow = document.body.style.overflow || "";
+          root.dataset.triggerId = trigger && trigger.id ? trigger.id : "";
+          root.innerHTML = `
+            <div class="modal-backdrop" data-close-hotel-order></div>
+            <section class="modal hotel-order-modal" role="dialog" aria-modal="true" aria-labelledby="hotelOrderTitle">
+              <div class="modal__top">
+                <h2 class="modal__title" id="hotelOrderTitle">Hotel browsing order</h2>
+                <button class="xbtn" type="button" data-close-hotel-order aria-label="Close">x</button>
+              </div>
+              <div class="hotel-order-modal__body">
+                <p>The hotels appeared in this order on the browsing pages:</p>
+                <ol class="hotel-order-list">
+                  ${order.map(hotel => `<li><span>${escapeHtml(hotel.name)}</span></li>`).join("")}
+                </ol>
+              </div>
+            </section>
+          `;
+          root._lastTrigger = trigger || document.activeElement;
+          root.classList.add("is-open");
+          root.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+          const closeButton = root.querySelector("[data-close-hotel-order]");
+          if (closeButton) closeButton.focus();
+        }
+
+        function closeHotelOrderModal() {
+          const root = document.getElementById("hotelOrderModalRoot");
+          if (!root || !root.classList.contains("is-open")) return;
+          const trigger = root._lastTrigger;
+          root.classList.remove("is-open");
+          root.setAttribute("aria-hidden", "true");
+          root.innerHTML = "";
+          document.body.style.overflow = root.dataset.previousOverflow || "";
+          if (trigger && typeof trigger.focus === "function") trigger.focus();
+          root._lastTrigger = null;
         }
 
         function matrixHtml(page) {
@@ -965,13 +953,13 @@
           return `<p class="survey-error range-selection-error" role="alert" hidden>Please select a value for each slider.</p>`;
         }
 
-        function confidenceRangeHtml() {
+        function switchingLikelihoodHtml() {
           return `
-            <h1 class="survey-title">Confidence in your switching answer</h1>
-            <p class="survey-copy">0 = not at all confident, 100 = completely confident.</p>
+            <h1 class="survey-title">How likely are you to change your answer?</h1>
+            <p class="survey-copy">0 = not at all likely, 100 = completely likely.</p>
             <label class="survey-range">
-              <span>Confidence in switching decision</span>
-              ${unsetRangeInput("switch_confidence", 0, 100, 'id="answerInput"')}
+              <span>Likelihood of changing your answer</span>
+              ${unsetRangeInput("switch_likelihood", 0, 100, 'id="answerInput"')}
             </label>
             ${rangeErrorHtml()}
           `;
@@ -993,9 +981,9 @@
           `;
         }
 
-        function confidenceSurpriseHtml() {
+        function likelihoodSurpriseHtml() {
           return `
-            ${confidenceRangeHtml()}
+            ${switchingLikelihoodHtml()}
             <div class="survey-divider"></div>
             ${attributeSurpriseHtml()}
           `;
@@ -1051,6 +1039,10 @@
           } else if (page.type === "scenario") {
             const scenario = page.scenario;
             setQuestionHtml(`
+              <section class="survey-scenario-summary">
+                <h1 class="survey-title">${escapeHtml(scenario.title)}</h1>
+                <p class="survey-copy">${escapeHtml(scenario.description)}</p>
+              </section>
               <div class="survey-profile">
                 <h2>Your Attribute Preference Profile</h2>
                 <p>Importance scale: 1 = least important, 2 = moderately important, 3 = most important. <strong>Bold</strong> = top priorities for this trip.</p>
@@ -1071,12 +1063,12 @@
             setQuestionHtml(likert7Html());
           } else if (page.type === "switchChoice") {
             setQuestionHtml(switchChoiceHtml());
-          } else if (page.type === "rangeConfidence") {
-            setQuestionHtml(confidenceRangeHtml());
+          } else if (page.type === "rangeLikelihood") {
+            setQuestionHtml(switchingLikelihoodHtml());
           } else if (page.type === "attributeSurprise") {
             setQuestionHtml(attributeSurpriseHtml());
-          } else if (page.type === "confidenceSurprise") {
-            setQuestionHtml(confidenceSurpriseHtml());
+          } else if (page.type === "likelihoodSurprise") {
+            setQuestionHtml(likelihoodSurpriseHtml());
           } else {
             const secondStage = studyCondition === "ai_summary"
               ? "the version with AI-generated review summaries"
@@ -1162,7 +1154,7 @@
               hotel_name: chosenHotel().name,
               submitted_at: state.updated_at
             };
-          } else if (page.type === "rangeConfidence") {
+          } else if (page.type === "rangeLikelihood") {
             const input = document.getElementById("answerInput");
             state.answers[page.id] = {
               value: input ? input.value : "",
@@ -1182,8 +1174,8 @@
               values,
               submitted_at: state.updated_at
             };
-          } else if (page.type === "confidenceSurprise") {
-            const confidenceInput = document.querySelector(`input[name="switch_confidence"]`);
+          } else if (page.type === "likelihoodSurprise") {
+            const likelihoodInput = document.querySelector(`input[name="switch_likelihood"]`);
             const values = {};
             attributePool.forEach(attribute => {
               const input = document.querySelector(`input[name="${attribute.id}"]`);
@@ -1192,7 +1184,7 @@
             state.answers[page.id] = {
               hotel_id: chosenHotel().id,
               hotel_name: chosenHotel().name,
-              switch_confidence: confidenceInput ? confidenceInput.value : "",
+              switch_likelihood: likelihoodInput ? likelihoodInput.value : "",
               surprise_values: values,
               submitted_at: state.updated_at
             };
@@ -1290,6 +1282,24 @@
         document.getElementById("surveyForm").addEventListener("pointerup", function (event) {
           markRangeAnswered(event.target);
         });
+
+        document.addEventListener("click", function (event) {
+          const openButton = event.target && event.target.closest && event.target.closest("[data-view-hotel-order]");
+          if (openButton) {
+            openHotelOrderModal(openButton);
+            return;
+          }
+          const closeButton = event.target && event.target.closest && event.target.closest("[data-close-hotel-order]");
+          if (closeButton) closeHotelOrderModal();
+        });
+
+        document.addEventListener("keydown", function (event) {
+          const root = document.getElementById("hotelOrderModalRoot");
+          if (event.key !== "Escape" || !root || !root.classList.contains("is-open")) return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          closeHotelOrderModal();
+        }, true);
 
         document.getElementById("surveyForm").addEventListener("submit", function (event) {
           event.preventDefault();

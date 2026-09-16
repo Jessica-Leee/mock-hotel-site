@@ -10523,7 +10523,7 @@
       .replace(/[\u{1F3FB}-\u{1F3FF}]/gu, "")
       .replace(/[\uFE0E\uFE0F]/g, "")
       .replace(/\p{Extended_Pictographic}/gu, "")
-      .replace(/[:;=8xX][-']?[)(DPpOo]/g, "")
+      .replace(/(^|\s)[:;=8xX][-']?[)(DPpOo](?=\s|$)/g, "$1")
       .replace(/\s+([.,!?;:])/g, "$1")
       .replace(/[ \t]{2,}/g, " ")
       .trim();
@@ -10536,7 +10536,7 @@
   const HOTELS = [
       {
           "id": "pendry-chicago",
-          "name": "Pendry Chicago",
+          "name": "Pendry Hotel",
           "brand": "Lifestyle hotel",
           "hotelClass": "4-star hotel",
           "stars": 4,
@@ -10561,7 +10561,7 @@
               "Tea/Coffee Maker in All Rooms",
               "Good Breakfast"
           ],
-          "about": "Pendry Chicago is located in Chicago city center on North Michigan Avenue, with easy access to key attractions, restaurants, transit and the lakefront. Rooms include private bathrooms, air-conditioning, city or river views, mini-bars and flat-screen TVs.",
+          "about": "Pendry Hotel is located in Chicago city center on North Michigan Avenue, with easy access to key attractions, restaurants, transit and the lakefront. Rooms include private bathrooms, air-conditioning, city or river views, mini-bars and flat-screen TVs.",
           "aboutSections": [
               {
                   "title": "Exceptional facilities",
@@ -10569,7 +10569,7 @@
               },
               {
                   "title": "Prime location",
-                  "text": "Pendry Chicago is located in Chicago city center, offering easy access to key attractions. Ohio Street Beach is a 19-minute walk away, while the Art Institute of Chicago lies less than 0.6 mi from the hotel."
+                  "text": "Pendry Hotel is located in Chicago city center, offering easy access to key attractions. Ohio Street Beach is a 19-minute walk away, while the Art Institute of Chicago lies less than 0.6 mi from the hotel."
               },
               {
                   "title": "Comfortable accommodations",
@@ -11146,7 +11146,7 @@
       },
       {
           "id": "nobu-hotel-chicago",
-          "name": "Nobu Hotel Chicago",
+          "name": "Nobu Hotel",
           "brand": "Lifestyle hotel",
           "hotelClass": "5-star hotel",
           "stars": 5,
@@ -11171,11 +11171,11 @@
               "Bar",
               "Good Breakfast"
           ],
-          "about": "Nobu Hotel Chicago offers luxurious rooms with private bathrooms, free WiFi and modern amenities in Chicago's West Loop. Guests can use the sauna, fitness center, indoor swimming pool and steam room, with Japanese and Asian dining on site.",
+          "about": "Nobu Hotel offers luxurious rooms with private bathrooms, free WiFi and modern amenities in Chicago's West Loop. Guests can use the sauna, fitness center, indoor swimming pool and steam room, with Japanese and Asian dining on site.",
           "aboutSections": [
               {
                   "title": "Elegant accommodations",
-                  "text": "Nobu Hotel Chicago offers luxurious rooms with private bathrooms, free WiFi and modern amenities. Guests enjoy a sauna, fitness center, indoor swimming pool and steam room."
+                  "text": "Nobu Hotel offers luxurious rooms with private bathrooms, free WiFi and modern amenities. Guests enjoy a sauna, fitness center, indoor swimming pool and steam room."
               },
               {
                   "title": "Dining experience",
@@ -11293,7 +11293,7 @@
       },
       {
           "id": "arlo-chicago",
-          "name": "Arlo Chicago",
+          "name": "Arlo Hotel",
           "brand": "Independent-style hotel",
           "hotelClass": "4-star hotel",
           "stars": 4,
@@ -11330,7 +11330,7 @@
               },
               {
                   "title": "Breakfast and dining",
-                  "text": "An American breakfast is available every morning at Arlo Chicago. About Last Knife, the on-site steakhouse restaurant, offers American, seafood and local cuisine."
+                  "text": "An American breakfast is available every morning at Arlo Hotel. About Last Knife, the on-site steakhouse restaurant, offers American, seafood and local cuisine."
               },
               {
                   "title": "Front desk guidance",
@@ -11338,14 +11338,13 @@
               },
               {
                   "title": "Nearby attractions",
-                  "text": "Chicago Symphony Orchestra and Shops at Northbridge are less than a 10-minute walk away. DePaul University is less than 0.6 mi from Arlo Chicago, while Chicago Board of Trade Building is a 12-minute walk from the property."
+                  "text": "Chicago Symphony Orchestra and Shops at Northbridge are less than a 10-minute walk away. DePaul University is less than 0.6 mi from Arlo Hotel, while Chicago Board of Trade Building is a 12-minute walk from the property."
               }
           ],
           "detailNotes": [
               "Couples in particular like the location - they rated it 9.7 for a two-person trip."
           ],
           "facts": [
-              "Overall guest score rated 9.6/10 from 1,955 reviews.",
               "Room option: Standard King Room, 220 sq ft, 1 king bed.",
               "Subway/metro and train access is 550 ft walking from Millennium Station station.",
               "Couples in particular like the location, rating it 9.8 for a two-person trip.",
@@ -11455,7 +11454,7 @@
 
   const AI_REVIEW_SUMMARIES = {
     "pendry-chicago": {
-      overview: "Guests consistently describe Pendry Chicago as a polished, welcoming hotel with attentive service, distinctive historic design, and comfortable rooms.",
+      overview: "Guests consistently describe Pendry Hotel as a polished, welcoming hotel with attentive service, distinctive historic design, and comfortable rooms.",
       strengths: [
         "Staff, concierge, front desk, and valet service are frequently described as friendly, proactive, and especially helpful for celebrations or special requests.",
         "Guests often praise the clean rooms, comfortable beds, spacious layouts in many room types, and the building's Art Deco character.",
@@ -11468,7 +11467,7 @@
       ]
     },
     "nobu-hotel-chicago": {
-      overview: "Guests most often describe Nobu Hotel Chicago as a design-forward luxury stay with spacious rooms, strong service, and memorable dining in the West Loop.",
+      overview: "Guests most often describe Nobu Hotel as a design-forward luxury stay with spacious rooms, strong service, and memorable dining in the West Loop.",
       strengths: [
         "The minimalist Japanese-inspired interiors, comfortable beds, large bathrooms, soaking tubs in selected rooms, and thoughtful in-room amenities receive frequent praise.",
         "Staff are commonly described as warm, attentive, accommodating, and helpful with celebrations or special requests.",
@@ -11481,7 +11480,7 @@
       ]
     },
     "arlo-chicago": {
-      overview: "Guests most often highlight Arlo Chicago's central setting, friendly staff, clean modern rooms, comfortable beds, and convenient on-site dining.",
+      overview: "Guests most often highlight Arlo Hotel's central setting, friendly staff, clean modern rooms, comfortable beds, and convenient on-site dining.",
       strengths: [
         "The hotel is repeatedly described as convenient for walking to central Chicago attractions and public transportation.",
         "Front desk and restaurant staff are frequently praised as welcoming, responsive, and helpful.",
@@ -11490,10 +11489,80 @@
       considerations: [
         "Street noise, sirens, thin walls, and noise from neighboring rooms affect some stays; higher rooms facing away from the main street are often described as quieter.",
         "A smaller group of guests report inconsistent housekeeping, including floors, towels, or bathroom details.",
-        "Parking and in-room extras can feel expensive, while some rooms have limited views and the coffee setup receives mixed reactions."
+        "Parking and in-room extras can feel expensive, and a few guests report unreliable or spotty Wi-Fi; some rooms also have limited views and mixed feedback on the coffee setup."
       ]
     }
   };
+
+  // Keep the review copy verbatim, but lead with a balanced set of positive and
+  // critical experiences so the corpus evidence is visible without deep scrolling.
+  const REVIEW_PRIORITY_BY_HOTEL = {
+    "pendry-chicago": [
+      ["Bernadette", "June 11, 2026"],
+      ["Todd", "May 25, 2026"],
+      ["Abigail", "March 16, 2026"],
+      ["Spriha", "January 18, 2026"],
+      ["Mikew49", "October 13, 2025"],
+      ["Diego", "August 31, 2025"],
+      ["Justin", "July 17, 2025"],
+      ["Mariella", "July 10, 2025"],
+      ["Julie", "May 29, 2024"],
+      ["Zabin", "April 30, 2024"],
+      ["Ruedi", "May 13, 2024"],
+      ["Stephanie", "March 14, 2025"]
+    ],
+    "nobu-hotel-chicago": [
+      ["Nikhil", "June 20, 2026"],
+      ["Leandro", "June 14, 2026"],
+      ["Ela", "May 19, 2026"],
+      ["Vernon", "May 9, 2026"],
+      ["Ian", "May 5, 2026"],
+      ["Kathryn", "April 28, 2026"],
+      ["Steven", "January 5, 2026"],
+      ["Creighton", "July 2, 2025"],
+      ["Brittany", "June 24, 2025"],
+      ["Francesco", "January 4, 2025"],
+      ["Ashley", "January 1, 2025"],
+      ["Perdomo", "November 18, 2024"]
+    ],
+    "arlo-chicago": [
+      ["Raine", "June 29, 2026"],
+      ["Lucinda", "June 28, 2026"],
+      ["Maxine", "June 22, 2026"],
+      ["Liam", "June 18, 2026"],
+      ["Louise", "June 15, 2026"],
+      ["Josh", "April 27, 2026"],
+      ["Freeman", "April 26, 2026"],
+      ["Letícia", "January 30, 2026"],
+      ["Engstrand", "January 5, 2026"],
+      ["Brookhart", "January 5, 2026"],
+      ["Charlotte", "November 8, 2025"],
+      ["Jacki", "November 15, 2025"]
+    ]
+  };
+
+  const REVIEWER_NAME_FIXES = {
+    "Not helpfulTulba": "Tulba",
+    "A general view of Chicago or a view of the city taken from the hotelMark": "Mark",
+    "Little Japanese influence, over-priced.Hughes": "Hughes",
+    "Not helpfulGlenn": "Glenn",
+    "Not helpfulHeleanna": "Heleanna",
+    "Not helpfulEllen": "Ellen",
+    "Thank you for your review. We appreciate your feedback!Waldo": "Waldo",
+    "Thank you for your review. We appreciate your feedback!Cedric": "Cedric",
+    "Not helpfulGail": "Gail",
+    "Not helpfulEphantus": "Ephantus",
+    "Thank you for your review. We appreciate your feedback!Manuel": "Manuel"
+  };
+
+  const REVIEW_MEDIA_CAPTIONS = [
+    /^user uploaded image of /i,
+    /^a (bed|bathroom|seating area|restaurant|television|building|general view|natural landscape|fitness center|swimming pool)\b/i,
+    /^a (bird's-eye|general sea) view\b/i,
+    /^guests staying at /i,
+    /^food at or somewhere near /i,
+    /^drinks at /i
+  ];
 
   function formatCount(n) {
     return Number(n || 0).toLocaleString();
@@ -11528,7 +11597,10 @@
   }
 
   function visibleFacts(hotel) {
-    return (hotel.facts || []).filter(fact => !isLocationInfoText(fact));
+    return (hotel.facts || []).filter(fact => {
+      const text = String(fact || "");
+      return !isLocationInfoText(text) && !/^Overall guest score\b/i.test(text) && !/^Guest rating\b/i.test(text);
+    });
   }
 
   function visibleAboutSections(hotel) {
@@ -11614,7 +11686,17 @@
   function balancedReviews(hotel) {
     const reviews = Array.isArray(hotel.reviews) ? hotel.reviews : [];
     const limit = balancedReviewCount();
-    return limit > 0 ? reviews.slice(0, limit) : reviews;
+    if (limit <= 0) return reviews;
+
+    const priorities = REVIEW_PRIORITY_BY_HOTEL[hotel.id] || [];
+    const priorityKeys = new Set(priorities.map(([reviewer, reviewed]) => `${reviewer}|${reviewed}`));
+    const byKey = new Map(reviews.map(review => [`${normalizedReviewerName(review.reviewer)}|${review.reviewed || ""}`, review]));
+    const prioritized = priorities.map(([reviewer, reviewed]) => byKey.get(`${reviewer}|${reviewed}`)).filter(Boolean);
+    const remainder = reviews.filter(review => {
+      const key = `${normalizedReviewerName(review.reviewer)}|${review.reviewed || ""}`;
+      return !priorityKeys.has(key);
+    });
+    return prioritized.concat(remainder).slice(0, limit);
   }
 
   function renderVersionLinks() {
@@ -11738,17 +11820,10 @@
       card.className = "card card--text";
       card.setAttribute("data-hotel-id", h.id);
 
-      const score10 = bookingScore(h.guestRating);
       const displayedReviewCount = state.showReviews ? balancedReviews(h).length : h.guestReviewCount;
       const displayedReviewCountLabel = reviewCountLabel(displayedReviewCount, state.showReviews);
       const scoreBox = state.showReviews ? `
-        <div class="booking-scoreline">
-          <div>
-            <div class="booking-scoreword">${escapeXml(bookingScoreWord(score10))}</div>
-            <div class="booking-reviewcount">${escapeXml(displayedReviewCountLabel)}</div>
-          </div>
-          <div class="booking-score">${escapeXml(score10)}</div>
-        </div>
+        <div class="booking-reviewcount booking-reviewcount--standalone">${escapeXml(displayedReviewCountLabel)}</div>
       ` : "";
 
       const isCompletedNoReviewView = !state.showReviews && completedNoReviewViews.has(h.id);
@@ -11875,9 +11950,19 @@
     }
     return {
       title: stripEmoji(title),
-      positive: stripEmoji(positive),
-      negative: stripEmoji(negative)
+      positive: cleanReviewComment(positive),
+      negative: cleanReviewComment(negative)
     };
+  }
+
+  function normalizedReviewerName(value) {
+    const name = String(value || "").trim();
+    return REVIEWER_NAME_FIXES[name] || name;
+  }
+
+  function cleanReviewComment(value) {
+    const text = stripEmoji(value).trim();
+    return REVIEW_MEDIA_CAPTIONS.some(pattern => pattern.test(text)) ? "" : text;
   }
 
   function reviewDisplay(review) {
@@ -11885,7 +11970,7 @@
     const room = review.room || chips.find(c => !isGuestTypeChip(c) && !isStayChip(c)) || "";
     const stay = review.stay || chips.find(isStayChip) || "";
     const guestType = review.guestType || chips.find(isGuestTypeChip) || "";
-    const reviewer = review.reviewer || review.who || "Guest reviewer";
+    const reviewer = normalizedReviewerName(review.reviewer || review.who || "Guest reviewer");
     const scoreText = review.scoreText || (typeof review.score10 === "number"
       ? String(review.score10)
       : typeof review.score5 === "number"

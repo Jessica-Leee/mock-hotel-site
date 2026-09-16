@@ -1,51 +1,5 @@
 (() => {
-  const ASSIGNMENT_STORAGE_PREFIX = "mock_hotel_shared_assignment_v1";
   const SCENARIOS = [
-    {
-      id: "business_conference",
-      title: "Trip Scenario: Business Conference",
-      description: "You are booking for yourself as a business traveler attending a multi-day conference. Duration: 3 nights. Budget: up to $200/night. You need reliable internet, minimal noise, and easy access to the conference venue.",
-      rows: [
-        ["Cleanliness", "2 moderately important", false],
-        ["Service quality", "2 - moderately important", false],
-        ["Room comfort", "2 - moderately important", false],
-        ["Wi-Fi reliability", "3 - most important", true],
-        ["Noise level", "3 - most important", true],
-        ["Location convenience", "3 - most important", true],
-        ["Value for money", "1 - moderately important", false],
-        ["Breakfast quality", "1 - least important", false]
-      ]
-    },
-    {
-      id: "family_vacation",
-      title: "Trip Scenario: Family Vacation",
-      description: "You are booking for yourself, your spouse, and two young children (ages 5 and 8). Duration: 4 nights. Budget: up to $180/night. Safety and comfort for the children are the top priority.",
-      rows: [
-        ["Cleanliness", "3 - most important", true],
-        ["Service quality", "2 - moderately important", false],
-        ["Room comfort", "3 - most important", true],
-        ["Wi-Fi reliability", "2 - moderately important", false],
-        ["Noise level", "2 - moderately important", false],
-        ["Location convenience", "2 - moderately important", false],
-        ["Value for money", "2 - moderately important", false],
-        ["Breakfast quality", "2 - moderately important", false]
-      ]
-    },
-    {
-      id: "romantic_getaway",
-      title: "Trip Scenario: Romantic Getaway",
-      description: "You are booking for yourself and your partner for a romantic weekend trip. Duration: 2 nights. Budget: up to $220/night. You want a relaxing, comfortable, and memorable experience.",
-      rows: [
-        ["Cleanliness", "2 - moderately important", false],
-        ["Service quality", "3 - most important", true],
-        ["Room comfort", "3 - most important", true],
-        ["Wi-Fi reliability", "1 - least important", false],
-        ["Noise level", "3 - most important", true],
-        ["Location convenience", "2 - moderately important", false],
-        ["Value for money", "2 - moderately important", false],
-        ["Breakfast quality", "2 - moderately important", false]
-      ]
-    },
     {
       id: "solo_city_exploration",
       title: "Trip Scenario: Solo City Exploration",
@@ -59,36 +13,6 @@
         ["Location convenience", "3 - most important", true],
         ["Value for money", "3 - most important", true],
         ["Breakfast quality", "1 - least important", false]
-      ]
-    },
-    {
-      id: "friends_group_trip",
-      title: "Trip Scenario: Friends Group Trip",
-      description: "You are booking for yourself and three close friends for a social weekend. Duration: 3 nights. Budget: up to $160/night. You want a lively, central location to enjoy the city together.",
-      rows: [
-        ["Cleanliness", "2 - moderately important", false],
-        ["Service quality", "2 - moderately important", false],
-        ["Room comfort", "2 - moderately important", false],
-        ["Wi-Fi reliability", "2 - moderately important", false],
-        ["Noise level", "2 - moderately important", false],
-        ["Location convenience", "3 - most important", true],
-        ["Value for money", "2 - moderately important", false],
-        ["Breakfast quality", "2 - moderately important", false]
-      ]
-    },
-    {
-      id: "elderly_parents",
-      title: "Trip Scenario: Visit with Elderly Parents",
-      description: "You are booking for your elderly parents (both in their 70s, with limited mobility). Duration: 4 nights. Budget: up to $190/night. Comfort, accessibility, and attentive service are top priorities.",
-      rows: [
-        ["Cleanliness", "2 - moderately important", false],
-        ["Service quality", "3 - most important", true],
-        ["Room comfort", "3 - most important", true],
-        ["Wi-Fi reliability", "1 - least important", false],
-        ["Noise level", "3 - most important", true],
-        ["Location convenience", "2 - moderately important", false],
-        ["Value for money", "2 - moderately important", false],
-        ["Breakfast quality", "2 - moderately important", false]
       ]
     }
   ];
@@ -104,19 +28,8 @@
       .replace(/'/g, "&#39;");
   }
 
-  function participantStorageSuffix() {
-    const params = new URLSearchParams(location.search || "");
-    const identity = params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") ||
-      params.get("SESSION_ID") || params.get("session_id") || "anonymous";
-    return encodeURIComponent(identity);
-  }
-
   function assignedScenario() {
-    const key = `${ASSIGNMENT_STORAGE_PREFIX}:${participantStorageSuffix()}`;
-    let assignment = {};
-    try { assignment = JSON.parse(localStorage.getItem(key)) || {}; }
-    catch (_) { assignment = {}; }
-    return SCENARIOS.find(scenario => scenario.id === assignment.scenario_id) || null;
+    return SCENARIOS[0];
   }
 
   function profileRowsHtml(rows) {

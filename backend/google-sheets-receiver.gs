@@ -10,15 +10,15 @@
  * Deploy as a Web App (Execute as: Me, Who has access: Anyone).
  */
 
-const SCHEMA_VERSION = "10";
+const SCHEMA_VERSION = "11";
 const WITHOUT_AI_SHEET = "Without_AI_Survey";
 const AI_SUMMARY_SHEET = "AI_Summary_Survey";
 const BROWSING_SHEET = "Browsing_Information";
 
 const HOTELS = [
-  { id: "pendry-chicago", slug: "pendry_chicago", name: "Pendry Chicago" },
-  { id: "nobu-hotel-chicago", slug: "nobu_hotel_chicago", name: "Nobu Hotel Chicago" },
-  { id: "arlo-chicago", slug: "arlo_chicago", name: "Arlo Chicago" }
+  { id: "pendry-chicago", slug: "pendry_chicago", name: "Pendry Hotel" },
+  { id: "nobu-hotel-chicago", slug: "nobu_hotel_chicago", name: "Nobu Hotel" },
+  { id: "arlo-chicago", slug: "arlo_chicago", name: "Arlo Hotel" }
 ];
 
 const ATTRIBUTES = [
@@ -87,6 +87,7 @@ function buildSurveyHeaders_() {
     for (let s = 0; s < stages.length; s++) {
       for (let slot = 1; slot <= 3; slot++) {
         headers.push(matrixColumn_(stages[s], HOTELS[h].slug, slot, "likelihood"));
+        // Retained as empty legacy columns so existing deployed Sheets remain schema-compatible.
         headers.push(matrixColumn_(stages[s], HOTELS[h].slug, slot, "confidence"));
       }
     }
@@ -107,6 +108,7 @@ function buildSurveyHeaders_() {
   }
 
   headers.push("bot_detection_flag", "bot_detection_details", "all_answers_json");
+  headers.push("switch_likelihood_0_to_100");
   return headers;
 }
 
@@ -300,8 +302,8 @@ function applyAnswer_(record, questionId, answer, assignment) {
     record.satisfaction_1_to_7 = numberOrBlank_(answer.value);
   } else if (questionId === "post_review_switch") {
     record.would_switch_hotel = textCell_(answer.value || "");
-  } else if (questionId === "post_review_confidence_surprise") {
-    record.switch_confidence_0_to_100 = numberOrBlank_(answer.switch_confidence);
+  } else if (questionId === "post_review_likelihood_surprise") {
+    record.switch_likelihood_0_to_100 = numberOrBlank_(answer.switch_likelihood);
     const surprise = objectValue_(answer.surprise_values);
     for (let i = 0; i < ATTRIBUTES.length; i++) {
       record["surprise_" + ATTRIBUTES[i].id + "_0_to_10"] = numberOrBlank_(surprise[ATTRIBUTES[i].id]);
@@ -319,7 +321,7 @@ function applyAnswer_(record, questionId, answer, assignment) {
 }
 
 function applyMatrixAnswer_(record, questionId, answer, assignment) {
-  const match = questionId.match(/^(hotelq|postreview)_(.+)_(likelihood|confidence)$/);
+  const match = questionId.match(/^(hotelq|postreview)_(.+)_likelihood$/);
   if (!match) return;
   const stage = match[1] === "hotelq" ? "pre_review" : "post_review";
   const hotel = hotelForId_(answer.hotel_id || match[2]);
@@ -335,10 +337,8 @@ function applyMatrixAnswer_(record, questionId, answer, assignment) {
   for (let i = 0; i < Math.min(3, assignedIds.length); i++) {
     const attribute = attributeForId_(assignedIds[i]);
     if (!attribute) continue;
-    const raw = match[3] === "likelihood" ? values[attribute.likelihoodKey] : values[attribute.id];
-    record[matrixColumn_(stage, hotel.slug, i + 1, match[3])] = match[3] === "likelihood"
-      ? likelihoodNumeric_(raw)
-      : confidenceNumeric_(raw);
+    const raw = values[attribute.likelihoodKey];
+    record[matrixColumn_(stage, hotel.slug, i + 1, "likelihood")] = likelihoodNumeric_(raw);
   }
 }
 

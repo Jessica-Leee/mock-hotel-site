@@ -83,11 +83,11 @@ The two survey sheets have identical columns. Each participant's row contains:
 - their frequent hotel-booking scenarios and open-text hotel attributes;
 - the assigned Trip Scenario;
 - the three randomly assigned hotel attributes;
-- their pre-review and post-review likelihood and confidence answers for Pendry, Nobu, and Arlo;
-- their chosen hotel, revealed-value acknowledgement, satisfaction, switching answer, switching confidence, and surprise ratings;
+- their pre-review and post-review likelihood answers for Pendry, Nobu, and Arlo;
+- their chosen hotel, revealed-value acknowledgement, satisfaction, switching answer, likelihood of changing that answer, and surprise ratings;
 - automated-response checks and `all_answers_json` as a complete recovery copy.
 
-Likelihood answers are saved numerically from 1 to 5, and confidence answers from 1 to 3. The attribute IDs in `assigned_attribute_1_id` through `assigned_attribute_3_id` identify which randomized question each numbered answer column represents.
+Likelihood answers are saved numerically from 1 to 5. The attribute IDs in `assigned_attribute_1_id` through `assigned_attribute_3_id` identify which randomized question each numbered answer column represents. Legacy confidence columns remain in existing Sheets for schema compatibility but are no longer populated.
 
 `Browsing_Information` uses a long format. Its unique combination is `survey_user_id + condition + browsing_stage + hotel_id`. Reopening the same hotel in the same stage updates that row's open count, cumulative viewing time, longest single visit, scrolling measures, and latest exit reason instead of adding another row. Moving to another condition, stage, or hotel creates a separate observation row. `processed_visit_ids_json` is the deduplication audit: if the browser retries an event, that visit ID is recognized and is not counted twice. The sheet does not include `submission_id`, `SESSION_ID`, or `STUDY_ID`.
 
