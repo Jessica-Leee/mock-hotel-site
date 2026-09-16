@@ -11460,33 +11460,33 @@
 
   const AI_REVIEW_SUMMARIES = {
     "pendry-chicago": {
-      overview: "Guests consistently describe Pendry Hotel as a polished, welcoming hotel with attentive service, distinctive historic design, and comfortable rooms.",
+      overview: "Across the current review set, guests describe Pendry Hotel as a polished historic hotel with attentive service, clean and comfortable rooms, and convenient access to central Chicago.",
       strengths: [
-        "Staff, concierge, front desk, and valet service are frequently described as friendly, proactive, and especially helpful for celebrations or special requests.",
-        "Guests often praise the clean rooms, comfortable beds, spacious layouts in many room types, and the building's Art Deco character.",
-        "The lobby, bar, cafe, fitness center, and rooftop spaces are commonly appreciated when they are available."
+        "Staff, concierge, front desk, and valet service are frequently described as friendly, proactive, and helpful with celebrations or special requests.",
+        "Guests often praise room cleanliness, comfortable beds, spacious layouts in many room types, and the building's Art Deco character.",
+        "The central setting, breakfast or dining options, fitness center, lobby, bar, and rooftop spaces receive positive mentions when available."
       ],
       considerations: [
-        "Some rooms receive noticeable traffic, siren, or Michigan Avenue street noise.",
+        "Traffic, sirens, and Michigan Avenue street noise are recurring concerns, including in some higher-floor rooms.",
         "Elevator waits can be slow, and rooftop access may be limited by opening hours or private events.",
-        "Parking, incidental holds, in-room dining, and other service charges can feel expensive; a smaller number of reviews mention limited views or maintenance details."
+        "Parking, incidental holds, in-room dining, and other charges can weaken perceived value; some reviews also mention limited views, Wi-Fi inconsistency, or maintenance details."
       ]
     },
     "nobu-hotel-chicago": {
-      overview: "Guests most often describe Nobu Hotel as a design-forward luxury stay with spacious rooms, strong service, and memorable dining in the West Loop.",
+      overview: "Across the current review set, guests describe Nobu Hotel as a clean, design-forward luxury stay with spacious comfortable rooms, attentive service, and memorable dining.",
       strengths: [
         "The minimalist Japanese-inspired interiors, comfortable beds, large bathrooms, soaking tubs in selected rooms, and thoughtful in-room amenities receive frequent praise.",
-        "Staff are commonly described as warm, attentive, accommodating, and helpful with celebrations or special requests.",
-        "Guests regularly highlight the Nobu restaurant, rooftop, pool, steam facilities, and access to nearby restaurants."
+        "Staff are commonly described as warm, attentive, accommodating, and helpful with celebrations or special requests, while the surrounding restaurant area is considered convenient.",
+        "Guests regularly highlight the Nobu restaurant, breakfast or dining experiences, rooftop, pool, steam facilities, and generally well-equipped rooms."
       ],
       considerations: [
-        "Parking, room service, bottled water, and breakfast can add substantial cost.",
+        "Parking, room service, bottled water, breakfast, and other extras can add substantial cost and reduce perceived value.",
         "Several guests find the room or bathroom lighting too dim, particularly for working or applying makeup.",
-        "Some reviews mention street or rooftop noise and limited hours, size, or availability for the rooftop, pool, gym, or sauna."
+        "Street or rooftop noise appears in several reviews, alongside limited hours, size, or availability for the rooftop, pool, gym, or sauna."
       ]
     },
     "arlo-chicago": {
-      overview: "Guests most often highlight Arlo Hotel's central setting, friendly staff, clean modern rooms, comfortable beds, and convenient on-site dining.",
+      overview: "Across the current review set, guests highlight Arlo Hotel's central setting, friendly staff, clean modern rooms, comfortable beds, and convenient on-site dining.",
       strengths: [
         "The hotel is repeatedly described as convenient for walking to central Chicago attractions and public transportation.",
         "Front desk and restaurant staff are frequently praised as welcoming, responsive, and helpful.",
@@ -11494,8 +11494,8 @@
       ],
       considerations: [
         "Street noise, sirens, thin walls, and noise from neighboring rooms affect some stays; higher rooms facing away from the main street are often described as quieter.",
-        "A smaller group of guests report inconsistent housekeeping, including floors, towels, or bathroom details.",
-        "Parking and in-room extras can feel expensive, and a few guests report unreliable or spotty Wi-Fi; some rooms also have limited views and mixed feedback on the coffee setup."
+        "A smaller group of guests report inconsistent housekeeping, including floors, towels, or bathroom details, and several mention unreliable or spotty Wi-Fi.",
+        "Parking and in-room extras can feel expensive, while some rooms have limited views and the coffee setup receives mixed feedback."
       ]
     }
   };
@@ -12038,7 +12038,15 @@
   function aiReviewSummaryHtml(hotel) {
     const summary = AI_REVIEW_SUMMARIES[hotel.id];
     if (!summary) return "";
-    const reviewCount = balancedReviews(hotel).length;
+    const currentReviews = balancedReviews(hotel);
+    const reviewCount = currentReviews.length;
+    const latestReview = currentReviews
+      .map(review => ({ label: review.reviewed || review.when || "", time: Date.parse(review.reviewed || review.when || "") }))
+      .filter(review => review.label && Number.isFinite(review.time))
+      .sort((a, b) => b.time - a.time)[0];
+    const corpusLabel = latestReview
+      ? `${formatCount(reviewCount)} reviews summarized · Current through ${latestReview.label}`
+      : `${formatCount(reviewCount)} reviews summarized`;
     const listHtml = items => items.map(item => `<li>${escapeXml(item)}</li>`).join("");
 
     return `
@@ -12048,7 +12056,7 @@
             <div class="ai-review-summary__label">AI-generated review summary</div>
             <h3 id="aiSummaryTitle-${escapeXml(hotel.id)}">What guests consistently mention</h3>
           </div>
-          <div class="ai-review-summary__count">${formatCount(reviewCount)} reviews summarized</div>
+          <div class="ai-review-summary__count">${escapeXml(corpusLabel)}</div>
         </div>
         <p class="ai-review-summary__overview">${escapeXml(summary.overview)}</p>
         <div class="ai-review-summary__grid">
@@ -12061,7 +12069,7 @@
             <ul>${listHtml(summary.considerations)}</ul>
           </div>
         </div>
-        <p class="ai-review-summary__note">This AI-generated summary covers all reviews shown below and may miss nuance. Read the individual reviews for details.</p>
+        <p class="ai-review-summary__note">This AI-generated summary covers the current review corpus shown below and may miss nuance. Read the individual reviews for details.</p>
       </section>
     `;
   }
