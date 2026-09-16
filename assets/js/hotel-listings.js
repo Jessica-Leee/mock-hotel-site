@@ -11786,7 +11786,7 @@
     const state = pageState();
     if (state.showReviews) {
       notice.textContent = state.showAiSummary
-        ? "You cannot return to earlier pages. Open the reviews and AI summary for each hotel before continuing."
+        ? "Continue carefully: you cannot return to earlier pages. Open the review popup and AI summary for each hotel before continuing."
         : "Continue carefully: you cannot return to earlier pages. Open the review popup for each hotel before continuing.";
     } else {
       notice.textContent = "Continue carefully: you cannot return to earlier pages. Open each hotel detail popup before continuing.";
