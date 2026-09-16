@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbyBmS8V5n3M0smur248ScVqHNxYG5vZ8Ax9D9ZL38qc_TjiLPuDT04n0ErT57RX_o1V/exec"
     />
-    <link rel="stylesheet" href="./assets/css/site.css?v=20260915-1" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260915-2" />
   </head>
   <body data-survey-page="true">
     <main class="survey-shell" aria-label="Hotel booking survey">
@@ -68,9 +68,9 @@
         let surveyOutboxRetryTimer = null;
 
         const hotels = [
-          { id: "pendry-chicago", name: "Pendry Hotel" },
-          { id: "nobu-hotel-chicago", name: "Nobu Hotel" },
-          { id: "arlo-chicago", name: "Arlo Hotel" }
+          { id: "pendry-chicago", name: "Pendry Hotel", priceNightly: 299 },
+          { id: "nobu-hotel-chicago", name: "Nobu Hotel", priceNightly: 303 },
+          { id: "arlo-chicago", name: "Arlo Hotel", priceNightly: 304 }
         ];
 
         function hotelViewStorageKey() {
@@ -762,14 +762,31 @@
             <div class="modal-backdrop" data-close-hotel-order></div>
             <section class="modal hotel-order-modal" role="dialog" aria-modal="true" aria-labelledby="hotelOrderTitle">
               <div class="modal__top">
-                <h2 class="modal__title" id="hotelOrderTitle">Hotel browsing order</h2>
+                <h2 class="modal__title" id="hotelOrderTitle">Hotel browsing page preview</h2>
                 <button class="xbtn" type="button" data-close-hotel-order aria-label="Close">x</button>
               </div>
               <div class="hotel-order-modal__body">
-                <p>The hotels appeared in this order on the browsing pages:</p>
-                <ol class="hotel-order-list">
-                  ${order.map(hotel => `<li><span>${escapeHtml(hotel.name)}</span></li>`).join("")}
-                </ol>
+                <p>Your randomized hotel order is shown in the browsing-page preview below.</p>
+                <div class="hotel-order-preview" role="img" aria-label="Hotel browsing page with ${order.map(hotel => escapeHtml(hotel.name)).join(", ")}">
+                  <div class="hotel-order-preview__search">
+                    <span><small>Destination</small><strong>Chicago, Illinois</strong></span>
+                    <span><small>Dates</small><strong>2-night stay</strong></span>
+                    <span><small>Occupancy</small><strong>1 room, 1 adult</strong></span>
+                    <b>Search</b>
+                  </div>
+                  <div class="hotel-order-preview__results">
+                    <strong class="hotel-order-preview__heading">Chicago: 3 properties found</strong>
+                    ${order.map((hotel, position) => `
+                      <div class="hotel-order-preview__card">
+                        <span class="hotel-order-preview__position">${position + 1}</span>
+                        <span class="hotel-order-preview__photo" aria-hidden="true"></span>
+                        <span class="hotel-order-preview__name"><strong>${escapeHtml(hotel.name)}</strong><small>Chicago hotel listing</small></span>
+                        <span class="hotel-order-preview__price"><strong>$${hotel.priceNightly}</strong><small>per night</small></span>
+                        <span class="hotel-order-preview__button">View hotel</span>
+                      </div>
+                    `).join("")}
+                  </div>
+                </div>
               </div>
             </section>
           `;
@@ -941,43 +958,50 @@
           `;
         }
 
-        function unsetRangeInput(name, min, max, extraAttrs) {
-          const initialValue = Math.round((Number(min) + Number(max)) / 2);
+        function fiveChoiceScaleHtml(name, legend, options) {
           return `
-            <input ${extraAttrs || ""} name="${escapeHtml(name)}" type="range" min="${min}" max="${max}" step="1" value="${initialValue}" class="is-unset" data-answered="false" aria-invalid="true" style="--range-progress:50%" />
-            <output class="is-unset">—</output>
+            <fieldset class="survey-five-scale">
+              <legend>${escapeHtml(legend)}</legend>
+              <div class="survey-five-scale__options">
+                ${options.map(option => `
+                  <label class="survey-five-scale__choice">
+                    <input type="radio" name="${escapeHtml(name)}" value="${escapeHtml(option[0])}" required />
+                    <span>${escapeHtml(option[1])}</span>
+                  </label>
+                `).join("")}
+              </div>
+            </fieldset>
           `;
-        }
-
-        function rangeErrorHtml() {
-          return `<p class="survey-error range-selection-error" role="alert" hidden>Please select a value for each slider.</p>`;
         }
 
         function switchingLikelihoodHtml() {
           return `
             <h1 class="survey-title">How likely are you to change your answer?</h1>
-            <p class="survey-copy">0 = not at all likely, 100 = completely likely.</p>
-            <label class="survey-range">
-              <span>Likelihood of changing your answer</span>
-              ${unsetRangeInput("switch_likelihood", 0, 100, 'id="answerInput"')}
-            </label>
-            ${rangeErrorHtml()}
+            <p class="survey-copy">Select one response.</p>
+            ${fiveChoiceScaleHtml("switch_likelihood", "Likelihood of changing your answer", [
+              ["very_unlikely", "Very unlikely"],
+              ["unlikely", "Unlikely"],
+              ["neither_likely_nor_unlikely", "Neither likely nor unlikely"],
+              ["likely", "Likely"],
+              ["very_likely", "Very likely"]
+            ])}
           `;
         }
 
         function attributeSurpriseHtml() {
+          const surpriseOptions = [
+            ["not_at_all_surprised", "Not at all surprised"],
+            ["slightly_surprised", "Slightly surprised"],
+            ["moderately_surprised", "Moderately surprised"],
+            ["very_surprised", "Very surprised"],
+            ["extremely_surprised", "Extremely surprised"]
+          ];
           return `
             <h1 class="survey-title">For each attribute of your chosen hotel, how surprised are you by the true value revealed?</h1>
-            <p class="survey-copy">0 = not surprised at all, 10 = completely surprised.</p>
-            <div class="survey-range-list">
-              ${attributePool.map(attribute => `
-                <label class="survey-range survey-range--row">
-                  <span>${escapeHtml(attribute.label)}</span>
-                  ${unsetRangeInput(attribute.id, 0, 10)}
-                </label>
-              `).join("")}
+            <p class="survey-copy">Select one response for each attribute.</p>
+            <div class="survey-five-scale-list">
+              ${attributePool.map(attribute => fiveChoiceScaleHtml(attribute.id, attribute.label, surpriseOptions)).join("")}
             </div>
-            ${rangeErrorHtml()}
           `;
         }
 
@@ -1155,7 +1179,7 @@
               submitted_at: state.updated_at
             };
           } else if (page.type === "rangeLikelihood") {
-            const input = document.getElementById("answerInput");
+            const input = document.querySelector('input[name="switch_likelihood"]:checked');
             state.answers[page.id] = {
               value: input ? input.value : "",
               hotel_id: chosenHotel().id,
@@ -1165,7 +1189,7 @@
           } else if (page.type === "attributeSurprise") {
             const values = {};
             attributePool.forEach(attribute => {
-              const input = document.querySelector(`input[name="${attribute.id}"]`);
+              const input = document.querySelector(`input[name="${attribute.id}"]:checked`);
               values[attribute.id] = input ? input.value : "";
             });
             state.answers[page.id] = {
@@ -1175,10 +1199,10 @@
               submitted_at: state.updated_at
             };
           } else if (page.type === "likelihoodSurprise") {
-            const likelihoodInput = document.querySelector(`input[name="switch_likelihood"]`);
+            const likelihoodInput = document.querySelector(`input[name="switch_likelihood"]:checked`);
             const values = {};
             attributePool.forEach(attribute => {
-              const input = document.querySelector(`input[name="${attribute.id}"]`);
+              const input = document.querySelector(`input[name="${attribute.id}"]:checked`);
               values[attribute.id] = input ? input.value : "";
             });
             state.answers[page.id] = {
@@ -1257,32 +1281,6 @@
           history.replaceState(null, "", location.pathname + (location.search || "") + "#complete");
         }
 
-        function markRangeAnswered(input) {
-          if (!input || input.type !== "range") return;
-          const min = Number(input.min || 0);
-          const max = Number(input.max || 100);
-          const value = Number(input.value || min);
-          const progress = max > min ? ((value - min) / (max - min)) * 100 : 0;
-          input.style.setProperty("--range-progress", `${Math.max(0, Math.min(100, progress))}%`);
-          input.classList.remove("is-unset");
-          input.dataset.answered = "true";
-          input.removeAttribute("aria-invalid");
-          const output = input.parentElement && input.parentElement.querySelector("output");
-          if (output) {
-            output.classList.remove("is-unset");
-            output.textContent = input.value;
-          }
-          document.querySelectorAll(".range-selection-error").forEach(error => { error.hidden = true; });
-        }
-
-        document.getElementById("surveyForm").addEventListener("input", function (event) {
-          markRangeAnswered(event.target);
-        });
-
-        document.getElementById("surveyForm").addEventListener("pointerup", function (event) {
-          markRangeAnswered(event.target);
-        });
-
         document.addEventListener("click", function (event) {
           const openButton = event.target && event.target.closest && event.target.closest("[data-view-hotel-order]");
           if (openButton) {
@@ -1306,12 +1304,6 @@
           const index = currentIndex();
           const pageSet = activePages();
           const page = pageSet[index];
-          const unansweredRanges = Array.from(document.querySelectorAll('input[type="range"][data-answered="false"]'));
-          if (unansweredRanges.length) {
-            document.querySelectorAll(".range-selection-error").forEach(error => { error.hidden = false; });
-            unansweredRanges[0].focus();
-            return;
-          }
           if (page.type === "browseIntro") {
             goToHotelBrowsing(getState());
             return;

@@ -10608,9 +10608,11 @@
               "Facilities": 4.45,
               "Cleanliness": 4.6,
               "Comfort": 4.7,
-              "Value for money": 4.1,
+              "Value for money": 3.5,
               "Location": 4.8,
-              "Free Wifi": 4.35
+              "Free Wifi": 4.35,
+              "Low noise level": 3.35,
+              "Breakfast quality": 4.25
           },
           "areaInfo": [
               {
@@ -11213,9 +11215,11 @@
               "Facilities": 4.55,
               "Cleanliness": 4.75,
               "Comfort": 4.8,
-              "Value for money": 4.35,
+              "Value for money": 3.6,
               "Location": 4.7,
-              "Free Wifi": 4.2
+              "Free Wifi": 4.2,
+              "Low noise level": 3.4,
+              "Breakfast quality": 4.3
           },
           "areaInfo": [
               {
@@ -11366,9 +11370,11 @@
               "Facilities": 4.55,
               "Cleanliness": 4.65,
               "Comfort": 4.65,
-              "Value for money": 4.3,
+              "Value for money": 3.55,
               "Location": 4.85,
-              "Free Wifi": 4.55
+              "Free Wifi": 3.5,
+              "Low noise level": 3.25,
+              "Breakfast quality": 4.4
           },
           "areaInfo": [
               {
@@ -12203,7 +12209,7 @@
                   ${hotel.amenities.map(a => amenityChipHtml(a)).join("")}
                 </div>
               </div>
-              ${["pendry-chicago", "nobu-hotel-chicago", "arlo-chicago"].includes(hotel.id) ? categoryBarsHtml(hotel) : ""}
+              ${!state.showReviews && ["pendry-chicago", "nobu-hotel-chicago", "arlo-chicago"].includes(hotel.id) ? categoryBarsHtml(hotel) : ""}
             </div>
 
             ${state.showReviews ? `
