@@ -10,7 +10,7 @@
  * Deploy as a Web App (Execute as: Me, Who has access: Anyone).
  */
 
-const SCHEMA_VERSION = "12";
+const SCHEMA_VERSION = "13";
 const WITHOUT_AI_SHEET = "Without_AI_Survey";
 const AI_SUMMARY_SHEET = "AI_Summary_Survey";
 const BROWSING_SHEET = "Browsing_Information";
@@ -26,10 +26,23 @@ const ATTRIBUTES = [
   { id: "service_quality", likelihoodKey: "good_service_quality", label: "Service quality" },
   { id: "room_comfort", likelihoodKey: "comfortable_rooms", label: "Room comfort" },
   { id: "wifi_reliability", likelihoodKey: "reliable_wifi", label: "Wi-Fi reliability" },
-  { id: "noise_level", likelihoodKey: "low_noise_level", label: "Low Noise Level" },
+  { id: "noise_level", likelihoodKey: "low_noise_level", label: "Noise level (quietness)" },
   { id: "location_convenience", likelihoodKey: "convenient_location", label: "Location convenience" },
-  { id: "value_for_money", likelihoodKey: "good_value_for_money", label: "Value for money" },
+  { id: "fitness_facilities", likelihoodKey: "fitness_facilities", label: "Fitness facilities" },
   { id: "breakfast_quality", likelihoodKey: "high_quality_breakfast", label: "Breakfast quality" }
+];
+
+// Preserve the existing surprise columns in their original positions. The
+// current fitness columns are appended so deployed Sheets upgrade in place.
+const LEGACY_SURPRISE_ATTRIBUTE_IDS = [
+  "cleanliness",
+  "service_quality",
+  "room_comfort",
+  "wifi_reliability",
+  "noise_level",
+  "location_convenience",
+  "value_for_money",
+  "breakfast_quality"
 ];
 
 const SURVEY_HEADERS = buildSurveyHeaders_();
@@ -103,8 +116,8 @@ function buildSurveyHeaders_() {
     "switch_confidence_0_to_100"
   );
 
-  for (let i = 0; i < ATTRIBUTES.length; i++) {
-    headers.push("surprise_" + ATTRIBUTES[i].id + "_0_to_10");
+  for (let i = 0; i < LEGACY_SURPRISE_ATTRIBUTE_IDS.length; i++) {
+    headers.push("surprise_" + LEGACY_SURPRISE_ATTRIBUTE_IDS[i] + "_0_to_10");
   }
 
   headers.push("bot_detection_flag", "bot_detection_details", "all_answers_json");
@@ -112,10 +125,12 @@ function buildSurveyHeaders_() {
   // their current column order. Current five-point answers are appended here.
   headers.push("switch_likelihood_0_to_100");
   headers.push("switch_likelihood_1_to_5", "switch_likelihood_label");
-  for (let i = 0; i < ATTRIBUTES.length; i++) {
-    headers.push("surprise_" + ATTRIBUTES[i].id + "_1_to_5");
-    headers.push("surprise_" + ATTRIBUTES[i].id + "_label");
+  for (let i = 0; i < LEGACY_SURPRISE_ATTRIBUTE_IDS.length; i++) {
+    headers.push("surprise_" + LEGACY_SURPRISE_ATTRIBUTE_IDS[i] + "_1_to_5");
+    headers.push("surprise_" + LEGACY_SURPRISE_ATTRIBUTE_IDS[i] + "_label");
   }
+  headers.push("surprise_fitness_facilities_1_to_5", "surprise_fitness_facilities_label");
+  headers.push("ai_use_frequency_1_to_7", "ai_use_frequency_label");
   return headers;
 }
 
@@ -318,6 +333,9 @@ function applyAnswer_(record, questionId, answer, assignment) {
       record["surprise_" + ATTRIBUTES[i].id + "_1_to_5"] = surpriseNumeric_(rawSurprise);
       record["surprise_" + ATTRIBUTES[i].id + "_label"] = fivePointLabel_(rawSurprise);
     }
+  } else if (questionId === "post_review_ai_use_frequency") {
+    record.ai_use_frequency_1_to_7 = numberOrBlank_(answer.value);
+    record.ai_use_frequency_label = aiUseFrequencyLabel_(answer.value);
   }
 
   if (answer.bot_detection_triggered || answer.bot_detection_response) {
@@ -772,6 +790,13 @@ function fivePointLabel_(value) {
     extremely_surprised: "Extremely surprised"
   };
   return textCell_(labels[String(value || "")] || value || "");
+}
+
+function aiUseFrequencyLabel_(value) {
+  const numeric = Number(value);
+  if (numeric === 1) return "Never";
+  if (numeric === 7) return "Always every time I shop online";
+  return Number.isFinite(numeric) && numeric >= 2 && numeric <= 6 ? String(numeric) : "";
 }
 
 function confidenceNumeric_(value) {

@@ -5,13 +5,16 @@
   const HOTEL_REVIEW_VIEW_STATE_KEY = "mock_hotel_review_views_v1";
   const HOTEL_AI_REVIEW_VIEW_STATE_KEY = "mock_hotel_ai_review_views_v1";
   const HOTEL_ORDER_STATE_KEY = "mock_hotel_visible_order_v1";
+  const BROWSE_COUNTDOWN_STATE_KEY = "mock_hotel_browse_countdown_v1";
   const REVIEW_WARNING_SECONDS = 5 * 60;
+  const BROWSE_COUNTDOWN_SECONDS = 90;
 
   let activeHotelSession = null;
   let modalScrollCleanup = null;
   let randomizedVisibleHotelIds = null;
   let balancedVisibleReviewCount = null;
   let reviewWarningTimer = null;
+  let browseCountdownTimer = null;
   const REVIEW_INITIAL_VISIBLE = 12;
   const REVIEW_BATCH_VISIBLE = 24;
 
@@ -10540,7 +10543,7 @@
           "brand": "Lifestyle hotel",
           "hotelClass": "4-star hotel",
           "stars": 4,
-          "priceNightly": 299,
+          "priceNightly": 147,
           "neighborhood": "Chicago Loop",
           "address": "230 North Michigan Avenue, Chicago Loop, Chicago, IL 60601, United States",
           "distance": "1,100 ft walking from State/Lake station",
@@ -10604,15 +10607,14 @@
           "guestRating": 3.9,
           "guestReviewCount": 798,
           "ratingBreakdown": {
-              "Staff": 4.6,
-              "Facilities": 4.45,
-              "Cleanliness": 4.6,
-              "Comfort": 4.7,
-              "Value for money": 3.5,
-              "Location": 4.8,
-              "Free Wifi": 4.35,
-              "Low noise level": 3.35,
-              "Breakfast quality": 4.25
+              "Cleanliness": 4.5,
+              "Service quality": 4.25,
+              "Room comfort": 4.0,
+              "Wi-Fi reliability": 3.0,
+              "Noise level (quietness)": 2.75,
+              "Location convenience": 4.75,
+              "Fitness facilities": 3.25,
+              "Breakfast quality": 4.5
           },
           "areaInfo": [
               {
@@ -11152,7 +11154,7 @@
           "brand": "Lifestyle hotel",
           "hotelClass": "5-star hotel",
           "stars": 5,
-          "priceNightly": 303,
+          "priceNightly": 145,
           "neighborhood": "West Loop",
           "address": "155 North Peoria Street, Chicago, IL 60607",
           "distance": "0.6 mi walking from Ogilvie Transportation Center station",
@@ -11211,15 +11213,14 @@
           "guestRating": 3.7,
           "guestReviewCount": 373,
           "ratingBreakdown": {
-              "Staff": 4.6,
-              "Facilities": 4.55,
-              "Cleanliness": 4.75,
-              "Comfort": 4.8,
-              "Value for money": 3.6,
-              "Location": 4.7,
-              "Free Wifi": 4.2,
-              "Low noise level": 3.4,
-              "Breakfast quality": 4.3
+              "Cleanliness": 3.25,
+              "Service quality": 4.5,
+              "Room comfort": 4.75,
+              "Wi-Fi reliability": 4.0,
+              "Noise level (quietness)": 4.5,
+              "Location convenience": 3.25,
+              "Fitness facilities": 3.0,
+              "Breakfast quality": 2.75
           },
           "areaInfo": [
               {
@@ -11301,7 +11302,7 @@
           "brand": "Independent-style hotel",
           "hotelClass": "4-star hotel",
           "stars": 4,
-          "priceNightly": 304,
+          "priceNightly": 143,
           "neighborhood": "Chicago Loop",
           "address": "168 North Michigan Avenue, Chicago Loop, Chicago, IL 60601, United States",
           "distance": "550 ft walking from Millennium Station station",
@@ -11366,15 +11367,14 @@
           "guestRating": 4.0,
           "guestReviewCount": 1955,
           "ratingBreakdown": {
-              "Staff": 4.65,
-              "Facilities": 4.55,
-              "Cleanliness": 4.65,
-              "Comfort": 4.65,
-              "Value for money": 3.55,
-              "Location": 4.85,
-              "Free Wifi": 3.5,
-              "Low noise level": 3.25,
-              "Breakfast quality": 4.4
+              "Cleanliness": 4.0,
+              "Service quality": 3.0,
+              "Room comfort": 3.25,
+              "Wi-Fi reliability": 4.75,
+              "Noise level (quietness)": 3.5,
+              "Location convenience": 4.25,
+              "Fitness facilities": 4.5,
+              "Breakfast quality": 3.75
           },
           "areaInfo": [
               {
@@ -11720,6 +11720,79 @@
     return query ? `?${query}` : "";
   }
 
+  function browseCountdownStorageKey() {
+    return `${BROWSE_COUNTDOWN_STATE_KEY}:${studyRunStorageSuffix()}:${pageState().phase}`;
+  }
+
+  function nextSurveyHref() {
+    const state = pageState();
+    if (!state.showReviews) return `index.html${surveyQueryString("hotel_questionnaire")}#hq1`;
+    return `index.html${surveyQueryString(state.showAiSummary ? "post_review_ai" : "post_review")}#pr1`;
+  }
+
+  function formatCountdown(milliseconds) {
+    const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${String(seconds).padStart(2, "0")}`;
+  }
+
+  function markStageCompleteForCountdown() {
+    const viewedState = {
+      viewedHotelIds: requiredHotelIds(),
+      updatedAt: new Date().toISOString(),
+      completedByTimeLimit: true
+    };
+    if (pageState().showReviews) setHotelReviewViewState(viewedState);
+    else setHotelViewState(viewedState);
+  }
+
+  function expireBrowseCountdown() {
+    if (browseCountdownTimer) {
+      clearInterval(browseCountdownTimer);
+      browseCountdownTimer = null;
+    }
+    const timer = document.getElementById("browseCountdown");
+    if (timer) {
+      timer.classList.add("is-expired");
+      const value = timer.querySelector("[data-countdown-value]");
+      if (value) value.textContent = "0:00";
+    }
+    markStageCompleteForCountdown();
+    logEvent("browse_countdown_expired", {
+      phase: pageState().phase,
+      seconds: BROWSE_COUNTDOWN_SECONDS,
+      next: nextSurveyHref()
+    });
+    location.replace(nextSurveyHref());
+  }
+
+  function startBrowseCountdown() {
+    const timer = document.getElementById("browseCountdown");
+    if (!timer) return;
+    const key = browseCountdownStorageKey();
+    let deadline = Number(localStorage.getItem(key) || 0);
+    if (!Number.isFinite(deadline) || deadline <= 0) {
+      deadline = Date.now() + BROWSE_COUNTDOWN_SECONDS * 1000;
+      localStorage.setItem(key, String(deadline));
+      logEvent("browse_countdown_started", {
+        phase: pageState().phase,
+        seconds: BROWSE_COUNTDOWN_SECONDS
+      });
+    }
+
+    const renderCountdown = () => {
+      const remaining = deadline - Date.now();
+      const value = timer.querySelector("[data-countdown-value]");
+      if (value) value.textContent = formatCountdown(remaining);
+      timer.classList.toggle("is-urgent", remaining > 0 && remaining <= 30000);
+      if (remaining <= 0) expireBrowseCountdown();
+    };
+
+    renderCountdown();
+    if (Date.now() < deadline) browseCountdownTimer = window.setInterval(renderCountdown, 1000);
+  }
+
   function renderStudyFlowCta() {
     const results = document.getElementById("results");
     if (!results) return;
@@ -11845,7 +11918,8 @@
             ${scoreBox}
             <div>
               <div class="price price--words">$${h.priceNightly}</div>
-              <div class="per">per night</div>
+              <div class="per">per night, including taxes and fees</div>
+              <div class="stay-total">$${h.priceNightly * 3} total for 3 nights</div>
             </div>
             <div class="cta">
               <button class="btn" type="button" data-open="${h.id}">${state.showReviews ? "Read reviews" : (isCompletedNoReviewView ? "View again" : "View details")}</button>
@@ -12512,6 +12586,7 @@
     updateBrowseNotice();
     renderResults();
     wireGlobalHandlers();
+    startBrowseCountdown();
 
     logEvent("page_load", {
       phase: pageState().phase,
@@ -12529,6 +12604,10 @@
       location.hash = "#results";
     }
   }
+
+  window.addEventListener("pagehide", () => {
+    if (browseCountdownTimer) clearInterval(browseCountdownTimer);
+  });
 
   init();
 })();

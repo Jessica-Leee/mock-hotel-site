@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbyBmS8V5n3M0smur248ScVqHNxYG5vZ8Ax9D9ZL38qc_TjiLPuDT04n0ErT57RX_o1V/exec"
     />
-    <link rel="stylesheet" href="./assets/css/site.css?v=20260915-2" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260917-1" />
   </head>
   <body data-survey-page="true">
     <main class="survey-shell" aria-label="Hotel booking survey">
@@ -68,9 +68,9 @@
         let surveyOutboxRetryTimer = null;
 
         const hotels = [
-          { id: "pendry-chicago", name: "Pendry Hotel", priceNightly: 299 },
-          { id: "nobu-hotel-chicago", name: "Nobu Hotel", priceNightly: 303 },
-          { id: "arlo-chicago", name: "Arlo Hotel", priceNightly: 304 }
+          { id: "pendry-chicago", name: "Pendry Hotel", priceNightly: 147 },
+          { id: "nobu-hotel-chicago", name: "Nobu Hotel", priceNightly: 145 },
+          { id: "arlo-chicago", name: "Arlo Hotel", priceNightly: 143 }
         ];
 
         function hotelViewStorageKey() {
@@ -119,42 +119,53 @@
           { id: "service_quality", label: "Service quality", likelihoodId: "good_service_quality", likelihoodLabel: "Good Service quality" },
           { id: "room_comfort", label: "Room comfort", likelihoodId: "comfortable_rooms", likelihoodLabel: "Comfortable rooms" },
           { id: "wifi_reliability", label: "Wi-Fi reliability", likelihoodId: "reliable_wifi", likelihoodLabel: "Reliable Wi-Fi" },
-          { id: "noise_level", label: "Low Noise Level", questionnaireLabel: "Low Noise Level", likelihoodId: "low_noise_level", likelihoodLabel: "Low Noise Level" },
+          { id: "noise_level", label: "Noise level (quietness)", questionnaireLabel: "Low Noise Level", likelihoodId: "low_noise_level", likelihoodLabel: "Low Noise Level" },
           { id: "location_convenience", label: "Location convenience", likelihoodId: "convenient_location", likelihoodLabel: "Convenient location" },
-          { id: "value_for_money", label: "Value for money", likelihoodId: "good_value_for_money", likelihoodLabel: "Good value for money" },
+          { id: "fitness_facilities", label: "Fitness facilities", likelihoodId: "fitness_facilities", likelihoodLabel: "Fitness facilities" },
           { id: "breakfast_quality", label: "Breakfast quality", likelihoodId: "high_quality_breakfast", likelihoodLabel: "High-quality breakfast" }
         ];
 
+        const revealedAttributePool = attributePool.concat([
+          { id: "parking_convenience", label: "Parking convenience", likelihoodId: "parking_convenience" },
+          { id: "physical_accessibility", label: "Physical accessibility", likelihoodId: "physical_accessibility" }
+        ]);
+
         const trueAttributeValues = {
           "pendry-chicago": {
-            cleanliness: 1,
-            service_quality: 1,
-            room_comfort: 1,
-            wifi_reliability: 1,
-            noise_level: 0,
-            location_convenience: 1,
-            value_for_money: 0,
-            breakfast_quality: 1
+            cleanliness: 9.0,
+            service_quality: 8.5,
+            room_comfort: 8.0,
+            wifi_reliability: 6.0,
+            noise_level: 5.5,
+            location_convenience: 9.5,
+            fitness_facilities: 6.5,
+            breakfast_quality: 9.0,
+            parking_convenience: 6.0,
+            physical_accessibility: 9.0
           },
           "nobu-hotel-chicago": {
-            cleanliness: 1,
-            service_quality: 1,
-            room_comfort: 1,
-            wifi_reliability: 1,
-            noise_level: 0,
-            location_convenience: 1,
-            value_for_money: 0,
-            breakfast_quality: 1
+            cleanliness: 6.5,
+            service_quality: 9.0,
+            room_comfort: 9.5,
+            wifi_reliability: 8.0,
+            noise_level: 9.0,
+            location_convenience: 6.5,
+            fitness_facilities: 6.0,
+            breakfast_quality: 5.5,
+            parking_convenience: 9.0,
+            physical_accessibility: 7.5
           },
           "arlo-chicago": {
-            cleanliness: 1,
-            service_quality: 1,
-            room_comfort: 1,
-            wifi_reliability: 0,
-            noise_level: 0,
-            location_convenience: 1,
-            value_for_money: 0,
-            breakfast_quality: 1
+            cleanliness: 8.0,
+            service_quality: 6.0,
+            room_comfort: 6.5,
+            wifi_reliability: 9.5,
+            noise_level: 7.0,
+            location_convenience: 8.5,
+            fitness_facilities: 9.0,
+            breakfast_quality: 7.5,
+            parking_convenience: 7.5,
+            physical_accessibility: 6.0
           }
         };
 
@@ -202,7 +213,8 @@
           { id: "post_review_reveal", type: "actualReveal" },
           { id: "post_review_satisfaction", type: "likert7" },
           { id: "post_review_switch", type: "switchChoice" },
-          { id: "post_review_likelihood_surprise", type: "likelihoodSurprise" }
+          { id: "post_review_likelihood_surprise", type: "likelihoodSurprise" },
+          { id: "post_review_ai_use_frequency", type: "aiUseFrequency" }
         ];
         const postReviewPages = [
           ...hotelMatrixPages("postreview"),
@@ -770,7 +782,7 @@
                 <div class="hotel-order-preview" role="img" aria-label="Hotel browsing page with ${order.map(hotel => escapeHtml(hotel.name)).join(", ")}">
                   <div class="hotel-order-preview__search">
                     <span><small>Destination</small><strong>Chicago, Illinois</strong></span>
-                    <span><small>Dates</small><strong>2-night stay</strong></span>
+                    <span><small>Dates</small><strong>3-night stay</strong></span>
                     <span><small>Occupancy</small><strong>1 room, 1 adult</strong></span>
                     <b>Search</b>
                   </div>
@@ -781,7 +793,7 @@
                         <span class="hotel-order-preview__position">${position + 1}</span>
                         <span class="hotel-order-preview__photo" aria-hidden="true"></span>
                         <span class="hotel-order-preview__name"><strong>${escapeHtml(hotel.name)}</strong><small>Chicago hotel listing</small></span>
-                        <span class="hotel-order-preview__price"><strong>$${hotel.priceNightly}</strong><small>per night</small></span>
+                        <span class="hotel-order-preview__price"><strong>$${hotel.priceNightly}</strong><small>per night, taxes and fees included</small><small>$${hotel.priceNightly * 3} total for 3 nights</small></span>
                         <span class="hotel-order-preview__button">View hotel</span>
                       </div>
                     `).join("")}
@@ -900,13 +912,13 @@
                 <div role="columnheader">Your post-review choice</div>
                 <div role="columnheader">Actual value</div>
               </div>
-              ${attributePool.map(attribute => {
+              ${revealedAttributePool.map(attribute => {
                 const value = Number(values[attribute.id] || 0);
                 return `
                   <div class="actual-attr-row" role="row">
                     <div role="cell">${escapeHtml(attribute.label)}</div>
                     <div role="cell">${escapeHtml(postReviewChoiceFor(hotel.id, attribute))}</div>
-                    <div role="cell"><strong>${value}</strong> - ${value ? "Positive" : "Negative"}</div>
+                    <div role="cell"><strong>${value.toFixed(1)}</strong> / 10</div>
                   </div>
                 `;
               }).join("")}
@@ -920,7 +932,7 @@
             <div class="survey-reveal">
               <h1 class="survey-title">Revealed: Actual Hotel Attributes</h1>
               <p class="survey-copy">The true quality values for <strong>${escapeHtml(hotel.name)}</strong> are now revealed from the reviews.</p>
-              <p class="survey-copy">Each attribute is shown as 1 = Positive or 0 = Negative.</p>
+              <p class="survey-copy">Each attribute is shown as a score out of 10.</p>
               <p class="survey-copy">Your post-review choices are shown for the three attributes assigned to you. The remaining attributes are marked “Not asked.”</p>
               ${trueAttributeTableHtml(hotel)}
             </div>
@@ -1013,6 +1025,21 @@
           `;
         }
 
+        function aiUseFrequencyHtml() {
+          return `
+            <h1 class="survey-title">How often do you use AI-generated summaries or recommendations when shopping or booking online?</h1>
+            ${radioOptionList("ai_use_frequency", [
+              ["1", "1 - Never"],
+              ["2", "2"],
+              ["3", "3"],
+              ["4", "4"],
+              ["5", "5"],
+              ["6", "6"],
+              ["7", "7 - Always every time I shop online"]
+            ])}
+          `;
+        }
+
         function render() {
           const index = currentIndex();
           const pageSet = activePages();
@@ -1093,6 +1120,8 @@
             setQuestionHtml(attributeSurpriseHtml());
           } else if (page.type === "likelihoodSurprise") {
             setQuestionHtml(likelihoodSurpriseHtml());
+          } else if (page.type === "aiUseFrequency") {
+            setQuestionHtml(aiUseFrequencyHtml());
           } else {
             const secondStage = studyCondition === "ai_summary"
               ? "the version with AI-generated review summaries"
@@ -1210,6 +1239,12 @@
               hotel_name: chosenHotel().name,
               switch_likelihood: likelihoodInput ? likelihoodInput.value : "",
               surprise_values: values,
+              submitted_at: state.updated_at
+            };
+          } else if (page.type === "aiUseFrequency") {
+            const selected = document.querySelector('input[name="ai_use_frequency"]:checked');
+            state.answers[page.id] = {
+              value: selected ? selected.value : "",
               submitted_at: state.updated_at
             };
           }
