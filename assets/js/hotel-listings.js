@@ -8186,13 +8186,10 @@
                   "text": "Guests can participate in bike tours, visit an ice-skating rink, or engage in kayaking or canoeing. Midway International Airport is 11 mi away."
               }
           ],
-          "detailNotes": [
-              "Couples in particular like the location - they rated it 9.5 for a two-person trip."
-          ],
+          "detailNotes": [],
           "facts": [
               "Room option: King Guestroom, 295 sq ft, 1 king bed.",
-              "Subway/metro and train access is 1,100 ft walking from State/Lake station.",
-              "Real guests, real stays and real opinions."
+              "Subway/metro and train access is 1,100 ft walking from State/Lake station."
           ],
           "locationNotes": [
               "Millennium Park",
@@ -8342,8 +8339,7 @@
           ],
           "facts": [
               "Modern guest rooms include flat-screen cable TV, plush lounge seating, complimentary WiFi, minibar and coffee machine.",
-              "Subway access is 1,250 ft walking from Clark/Division station.",
-              "Couples in particular like the location, rating it 9.5 for a two-person trip."
+              "Subway access is 1,250 ft walking from Clark/Division station."
           ],
           "locationNotes": [
               "Oak Street Beach",
@@ -8487,8 +8483,7 @@
           ],
           "facts": [
               "Room option: King Room, 330 sq ft, 1 king bed.",
-              "Subway access is 300 ft walking from Damen station.",
-              "Couples in particular like the location, rating it 9.6 for a two-person trip."
+              "Subway access is 300 ft walking from Damen station."
           ],
           "locationNotes": [
               "Damen station",
@@ -8651,8 +8646,7 @@
           ],
           "facts": [
               "Room option: Standard King Room, 290 sq ft, 1 king bed.",
-              "Subway access is 600 ft walking from Morgan station.",
-              "Couples in particular like the location, rating it 9.4 for a two-person trip."
+              "Subway access is 600 ft walking from Morgan station."
           ],
           "locationNotes": [
               "Morgan station",
@@ -8793,12 +8787,9 @@
                   "text": "The hotel offers a 24-hour front desk, concierge and room service. Additional amenities include a paid shuttle, car hire and paid off-site private parking."
               }
           ],
-          "detailNotes": [
-              "Couples in particular like the location - they rated it 9.5 for a two-person trip."
-          ],
+          "detailNotes": [],
           "facts": [
               "Room option: Yubune King, 439 sq ft, 1 king bed.",
-              "Couples in particular like the location, rating it 9.5 for a two-person trip.",
               "Nearby transit includes Ogilvie Transportation Center and Union Station."
           ],
           "locationNotes": [
@@ -8945,13 +8936,10 @@
                   "text": "Chicago Symphony Orchestra and Shops at Northbridge are less than a 10-minute walk away. DePaul University is less than 0.6 mi from Arlo Hotel, while Chicago Board of Trade Building is a 12-minute walk from the property."
               }
           ],
-          "detailNotes": [
-              "Couples in particular like the location - they rated it 9.7 for a two-person trip."
-          ],
+          "detailNotes": [],
           "facts": [
               "Room option: Standard King Room, 220 sq ft, 1 king bed.",
               "Subway/metro and train access is 550 ft walking from Millennium Station station.",
-              "Couples in particular like the location, rating it 9.8 for a two-person trip.",
               "The nearest airport is Midway International Airport, 9.3 mi from the property."
           ],
           "locationNotes": [
