@@ -9,9 +9,9 @@
         ["Service quality", "2 - moderately important", false],
         ["Room comfort", "2 - moderately important", false],
         ["Wi-Fi reliability", "2 - moderately important", false],
-        ["Noise level", "2 - moderately important", false],
+        ["Noise level (quietness)", "2 - moderately important", false],
         ["Location convenience", "3 - most important", true],
-        ["Value for money", "3 - most important", true],
+        ["Fitness facilities", "3 - most important", true],
         ["Breakfast quality", "1 - least important", false]
       ]
     }
