@@ -44,6 +44,7 @@
   var streamSeq = 0;
   var streamFlushInFlight = false;
   var eventSeq = 0;
+  var REVIEW_READ_MIN_MS = 750;
 
   function now() {
     return Date.now();
@@ -578,6 +579,7 @@
     if (b.liveStateIv) clearInterval(b.liveStateIv);
     if (b.scrollEl && b.scrollHandler) b.scrollEl.removeEventListener("scroll", b.scrollHandler);
     if (b.io) b.io.disconnect();
+    if (b.reviewIo) b.reviewIo.disconnect();
     if (b.detailsEl && b.onDetailsToggle) b.detailsEl.removeEventListener("toggle", b.onDetailsToggle);
     modalBindings = null;
   }
@@ -608,6 +610,52 @@
 
     var sectionVisibleSince = {};
     var sectionAccumMs = {};
+    var reviewVisibleSince = {};
+    var reviewAccumMs = {};
+    var reviewSeenOrder = [];
+    var reviewReadOrder = [];
+    var reviewSeen = {};
+    var reviewRead = {};
+
+    function reviewPosition(node) {
+      return Number(node.getAttribute("data-review-position") || Number(node.getAttribute("data-review-index") || 0) + 1);
+    }
+
+    function reviewId(node) {
+      return node.getAttribute("data-review-id") || "review_position_" + reviewPosition(node);
+    }
+
+    function reviewKey(node) {
+      return String(reviewPosition(node));
+    }
+
+    function markReviewSeen(node) {
+      var key = reviewKey(node);
+      if (reviewSeen[key]) return;
+      reviewSeen[key] = true;
+      reviewSeenOrder.push(reviewPosition(node));
+    }
+
+    function markReviewRead(node) {
+      var key = reviewKey(node);
+      if (reviewRead[key] || numericValue(reviewAccumMs[key]) < REVIEW_READ_MIN_MS) return;
+      reviewRead[key] = true;
+      reviewReadOrder.push(reviewPosition(node));
+    }
+
+    function numericValue(value) {
+      var number = Number(value);
+      return Number.isFinite(number) ? number : 0;
+    }
+
+    function finishReviewVisibility(node, ts) {
+      var key = reviewKey(node);
+      if (reviewVisibleSince[key]) {
+        reviewAccumMs[key] = numericValue(reviewAccumMs[key]) + (ts - reviewVisibleSince[key]);
+        delete reviewVisibleSince[key];
+      }
+      markReviewRead(node);
+    }
 
     function denom() {
       return Math.max(1, scrollEl.scrollHeight - scrollEl.clientHeight);
@@ -649,7 +697,7 @@
         entries.forEach(function (en) {
           var sid = en.target.getAttribute("data-track-section") || "section";
           var key = hotelId + ":" + sid;
-          var vis = en.isIntersecting && en.intersectionRatio > 0.08;
+          var vis = en.isIntersecting && (sid === "reviews" ? en.intersectionRect.height > 0 : en.intersectionRatio > 0.08);
           if (vis) {
             if (!sectionVisibleSince[key]) sectionVisibleSince[key] = ts;
           } else {
@@ -665,6 +713,35 @@
     sections.forEach(function (s) {
       io.observe(s);
     });
+
+    var reviewNodes = root.querySelectorAll("[data-review-index]");
+    var reviewNodeByPosition = {};
+    reviewNodes.forEach(function (node) {
+      reviewNodeByPosition[reviewKey(node)] = node;
+    });
+    var reviewIo = null;
+    if (reviewNodes.length) {
+      reviewIo = new IntersectionObserver(
+        function (entries) {
+          var ts = now();
+          entries.forEach(function (entry) {
+            var node = entry.target;
+            var key = reviewKey(node);
+            var visible = entry.isIntersecting && entry.intersectionRatio >= 0.5;
+            if (visible) {
+              markReviewSeen(node);
+              if (!reviewVisibleSince[key]) reviewVisibleSince[key] = ts;
+            } else {
+              finishReviewVisibility(node, ts);
+            }
+          });
+        },
+        { root: scrollEl, threshold: [0, 0.5, 1] }
+      );
+      reviewNodes.forEach(function (node) {
+        reviewIo.observe(node);
+      });
+    }
 
     var detailsEl = root.querySelector("[data-track-section='room_types']");
     var onDetailsToggle = null;
@@ -712,6 +789,7 @@
       scrollEl: scrollEl,
       scrollHandler: onScroll,
       io: io,
+      reviewIo: reviewIo,
       hotelId: hotelId,
       sessionStart: sessionStart,
       detailsEl: detailsEl,
@@ -726,6 +804,12 @@
         });
         sectionVisibleSince = {};
 
+        Object.keys(reviewVisibleSince).forEach(function (key) {
+          var node = reviewNodeByPosition[key];
+          if (node) finishReviewVisibility(node, ts);
+        });
+        reviewVisibleSince = {};
+
         var visBySection = {};
         Object.keys(sectionAccumMs).forEach(function (k) {
           var part = k.split(":");
@@ -739,6 +823,35 @@
         var depthAtExitPct = Math.round(Math.min(1, Math.max(0, scrollEl.scrollTop / denom())) * 1000) / 10;
         var maxSp = Math.round(maxSpeed * 1000000) / 1000000;
         var meanSp = Math.round(meanSpeed * 1000000) / 1000000;
+        var maxReviewPositionSeen = reviewSeenOrder.length ? Math.max.apply(null, reviewSeenOrder) : 0;
+        var lastReviewPositionSeen = reviewSeenOrder.length ? reviewSeenOrder[reviewSeenOrder.length - 1] : 0;
+        var hotelOrderIds = Array.prototype.map.call(
+          document.querySelectorAll("#results [data-hotel-id]"),
+          function (card) { return card.getAttribute("data-hotel-id") || ""; }
+        ).filter(Boolean);
+        var hotelDisplayPosition = hotelOrderIds.indexOf(hotelId) + 1;
+        var reviewVisibility = Object.keys(reviewAccumMs).map(function (key) {
+          var node = reviewNodeByPosition[key];
+          return {
+            position: Number(key),
+            review_id: node ? reviewId(node) : "",
+            visible_ms: Math.round(numericValue(reviewAccumMs[key]))
+          };
+        }).sort(function (a, b) { return a.position - b.position; });
+        var readingPattern = "none";
+        if (reviewReadOrder.length) {
+          var monotonic = true;
+          var contiguousFromStart = reviewReadOrder[0] === 1;
+          for (var r = 1; r < reviewReadOrder.length; r++) {
+            if (reviewReadOrder[r] <= reviewReadOrder[r - 1]) monotonic = false;
+            if (reviewReadOrder[r] !== reviewReadOrder[r - 1] + 1) contiguousFromStart = false;
+          }
+          readingPattern = contiguousFromStart ? "sequential" : (monotonic ? "skipping" : "nonsequential");
+        }
+        var readIds = reviewReadOrder.map(function (position) {
+          var node = reviewNodeByPosition[String(position)];
+          return node ? reviewId(node) : "";
+        }).filter(Boolean);
 
         log("page_timing", hotelId, {
           context: "hotel_modal",
@@ -748,7 +861,19 @@
           scroll_max_pct: maxPct,
           scroll_dir_changes: dirChanges,
           scroll_max_px_per_ms: maxSp,
-          scroll_mean_px_per_ms: meanSp
+          scroll_mean_px_per_ms: meanSp,
+          summary_viewing_ms: Math.round(numericValue(visBySection.ai_review_summary)),
+          individual_reviews_viewing_ms: Math.round(numericValue(visBySection.reviews)),
+          review_seen_count: reviewSeenOrder.length,
+          review_read_count: reviewReadOrder.length,
+          review_seen_order: reviewSeenOrder.slice(),
+          review_read_order: reviewReadOrder.slice(),
+          review_read_ids: readIds,
+          review_stopping_position: lastReviewPositionSeen,
+          review_furthest_position_seen: maxReviewPositionSeen,
+          review_reading_pattern: readingPattern,
+          review_visibility: reviewVisibility,
+          hotel_display_position: hotelDisplayPosition > 0 ? hotelDisplayPosition : null
         });
         log("scroll_depth_max", hotelId, { max_pct: maxPct });
         log("scroll_speed", hotelId, {
@@ -936,6 +1061,9 @@
     };
     window.HOTEL_EXPERIMENT_GET_PAYLOAD = function () {
       return buildPayload();
+    };
+    window.HOTEL_EXPERIMENT_TRACK = function (eventType, elementId, value) {
+      log(eventType, elementId, value);
     };
     window.HOTEL_EXPERIMENT_FLUSH = function () {
       persistSync();

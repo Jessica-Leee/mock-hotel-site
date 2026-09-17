@@ -22,1050 +22,1050 @@
     "pendry-chicago": [
       {
         "reviewer": "Callaghan",
-        "title": "",
+        "title": "Very good",
         "positive": "Location",
         "negative": "Parking",
         "body": "Location\nParking"
       },
       {
         "reviewer": "Bernadette",
-        "title": "",
+        "title": "Lost my booking halfway through",
         "positive": "",
         "negative": "Halfway through making an online reservation, the internet dropped and I lost my progress. It happened again later while I was checking email.",
         "body": "Halfway through making an online reservation, the internet dropped and I lost my progress. It happened again later while I was checking email."
       },
       {
         "reviewer": "Lisa",
-        "title": "",
+        "title": "Not much variety for a full workout",
         "positive": "",
         "negative": "The fitness room had too few types of equipment for the routine I wanted to do. I ended up cutting the session short rather than repeating the same exercises.",
         "body": "The fitness room had too few types of equipment for the routine I wanted to do. I ended up cutting the session short rather than repeating the same exercises."
       },
       {
         "reviewer": "Kirrily",
-        "title": "",
+        "title": "Dry bread and lukewarm eggs",
         "positive": "",
         "negative": "Dry bread and lukewarm eggs made breakfast something to get through rather than enjoy.",
         "body": "Dry bread and lukewarm eggs made breakfast something to get through rather than enjoy."
       },
       {
         "reviewer": "Jasmin",
-        "title": "",
+        "title": "Wonderful",
         "positive": "Everything... the hotel is beautiful and the staff is exceptional",
         "negative": "",
         "body": "Everything... the hotel is beautiful and the staff is exceptional"
       },
       {
         "reviewer": "Todd",
-        "title": "",
+        "title": "Something different each morning",
         "positive": "Plenty of choice at breakfast without feeling like a lot of the same thing. I ate something different each morning and enjoyed all of it.",
         "negative": "",
         "body": "Plenty of choice at breakfast without feeling like a lot of the same thing. I ate something different each morning and enjoyed all of it."
       },
       {
         "reviewer": "Abigail",
-        "title": "",
+        "title": "Just enough cushioning",
         "positive": "Just the right bit of spring in the mattress for me, with enough cushioning to get comfortable straight away.",
         "negative": "",
         "body": "Just the right bit of spring in the mattress for me, with enough cushioning to get comfortable straight away."
       },
       {
         "reviewer": "Andrea",
-        "title": "",
+        "title": "Too much chatter in the corridor",
         "positive": "",
         "negative": "Guests chatting outside their doors might as well have been standing inside mine. The corridor noise was particularly irritating when I wanted an early night.",
         "body": "Guests chatting outside their doors might as well have been standing inside mine. The corridor noise was particularly irritating when I wanted an early night."
       },
       {
         "reviewer": "Zabin",
-        "title": "",
+        "title": "An exceptional location with large clean rooms and friendly staff.",
         "positive": "Clean rooms. Good wifi. Felt very safe. Friendly staff.",
         "negative": "Gym was being renovated. Didn’t want to go to a gym down the road, although it was offered.",
         "body": "Clean rooms. Good wifi. Felt very safe. Friendly staff.\nGym was being renovated. Didn’t want to go to a gym down the road, although it was offered."
       },
       {
         "reviewer": "Moises",
-        "title": "",
+        "title": "Convenient for part of my plans",
         "positive": "Easy walks to a few of my planned stops.",
         "negative": "Longer journeys to the rest, so the location worked better on some days than others.",
         "body": "Easy walks to a few of my planned stops.\nLonger journeys to the rest, so the location worked better on some days than others."
       },
       {
         "reviewer": "Kortni",
-        "title": "",
+        "title": "No noisy interruptions overnight",
         "positive": "Three nights here without being woken by doors banging or people shouting, which was a relief.",
         "negative": "",
         "body": "Three nights here without being woken by doors banging or people shouting, which was a relief."
       },
       {
         "reviewer": "Spriha",
-        "title": "",
+        "title": "Cleaner than I expected under the bed!",
         "positive": "Dropped an earring beside the bed and was pleasantly surprised to find even the floor underneath was clean.",
         "negative": "",
         "body": "Dropped an earring beside the bed and was pleasantly surprised to find even the floor underneath was clean."
       },
       {
         "reviewer": "Magalie",
-        "title": "",
+        "title": "Exceptional",
         "positive": "A beautiful historic hotel in a great location . Friendly staff. Great restaurant and bar.",
         "negative": "That the rooftop bar was closed for an event. I wished I could’ve experienced that.",
         "body": "A beautiful historic hotel in a great location . Friendly staff. Great restaurant and bar.\nThat the rooftop bar was closed for an event. I wished I could’ve experienced that."
       },
       {
         "reviewer": "Cathy",
-        "title": "",
+        "title": "My back appreciated this mattress",
         "positive": "No dipping toward the middle of the bed or feeling the mattress underneath me. It supported my back properly, which I really appreciated.",
         "negative": "",
         "body": "No dipping toward the middle of the bed or feeling the mattress underneath me. It supported my back properly, which I really appreciated."
       },
       {
         "reviewer": "Nassyre",
-        "title": "",
+        "title": "No trouble calling home",
         "positive": "A long video call home went smoothly over the Wi-Fi, with no frozen pictures or dropped sound.",
         "negative": "",
         "body": "A long video call home went smoothly over the Wi-Fi, with no frozen pictures or dropped sound."
       },
       {
         "reviewer": "Dalila",
-        "title": "",
+        "title": "Fantastic, great location and even better staff",
         "positive": "It’s in a fantastic location and easy to get to loads of other places within a short amount of time. The staff were very helpful and they have a fantastic concierge that knew everything and I’m very sure if he didn’t know it, it wasn’t worth knowing.",
         "negative": "",
         "body": "It’s in a fantastic location and easy to get to loads of other places within a short amount of time. The staff were very helpful and they have a fantastic concierge that knew everything and I’m very sure if he didn’t know it, it wasn’t worth knowing."
       },
       {
         "reviewer": "Don",
-        "title": "",
+        "title": "Comfortable for a side sleeper",
         "positive": "My shoulders sometimes ache on hotel beds, so I was pleasantly surprised by this one. Sleeping on my side felt comfortable all three nights.",
         "negative": "",
         "body": "My shoulders sometimes ache on hotel beds, so I was pleasantly surprised by this one. Sleeping on my side felt comfortable all three nights."
       },
       {
         "reviewer": "Mikew49",
-        "title": "",
+        "title": "A break from other people’s TVs",
         "positive": "I’m easily distracted by other people’s TVs, and thankfully I heard none here. The quiet evenings were much appreciated.",
         "negative": "",
         "body": "I’m easily distracted by other people’s TVs, and thankfully I heard none here. The quiet evenings were much appreciated."
       },
       {
         "reviewer": "Casey",
-        "title": "",
+        "title": "Treadmill worked just as it should",
         "positive": "Got a decent run in before heading out. The treadmill belt moved smoothly, and changing the incline didn’t interrupt my stride.",
         "negative": "",
         "body": "Got a decent run in before heading out. The treadmill belt moved smoothly, and changing the incline didn’t interrupt my stride."
       },
       {
         "reviewer": "Jennifer",
-        "title": "",
+        "title": "Passed my bathroom check",
         "positive": "I’m quite fussy about bathrooms, so I checked the shower corners when I arrived. No grime or stray hairs anywhere, which was a reassuring start.",
         "negative": "",
         "body": "I’m quite fussy about bathrooms, so I checked the shower corners when I arrived. No grime or stray hairs anywhere, which was a reassuring start."
       },
       {
         "reviewer": "Silvi",
-        "title": "",
+        "title": "Exceptional",
         "positive": "Aside from the fact that the room and bed were extremely comfortable, the assistance from the concierge team was A+. It began well before our arrival to help us plan our stay..",
         "negative": "",
         "body": "Aside from the fact that the room and bed were extremely comfortable, the assistance from the concierge team was A+. It began well before our arrival to help us plan our stay.."
       },
       {
         "reviewer": "Jill",
-        "title": "",
+        "title": "Stayed connected on my phone",
         "positive": "My phone stayed on the Wi-Fi whenever I used it. No random disconnects.",
         "negative": "",
         "body": "My phone stayed on the Wi-Fi whenever I used it. No random disconnects."
       },
       {
         "reviewer": "Alan",
-        "title": "",
+        "title": "Kept clean throughout",
         "positive": "The room was cleaned properly each day, especially the bathroom. No complaints there.",
         "negative": "",
         "body": "The room was cleaned properly each day, especially the bathroom. No complaints there."
       },
       {
         "reviewer": "Nomita",
-        "title": "",
+        "title": "Would order those eggs and toast again",
         "positive": "Only had eggs and toast for breakfast, but both were done so well that I’d happily order them again.",
         "negative": "",
         "body": "Only had eggs and toast for breakfast, but both were done so well that I’d happily order them again."
       },
       {
         "reviewer": "Lopadchak",
-        "title": "",
+        "title": "The treadmill kept stopping",
         "positive": "",
         "negative": "Twice during a run, the treadmill stopped unexpectedly. I couldn’t get into a rhythm and gave up on using it.",
         "body": "Twice during a run, the treadmill stopped unexpectedly. I couldn’t get into a rhythm and gave up on using it."
       },
       {
         "reviewer": "Diego",
-        "title": "",
+        "title": "Finished every bite of breakfast",
         "positive": "The first mouthful of breakfast was enough to convince me to finish the plate. Proper flavor in the eggs and fresh bread made all the difference.",
         "negative": "",
         "body": "The first mouthful of breakfast was enough to convince me to finish the plate. Proper flavor in the eggs and fresh bread made all the difference."
       },
       {
         "reviewer": "Andrew",
-        "title": "",
+        "title": "Relaxing and luxurious",
         "positive": "Beautiful building, very distinctive. Rooms were spotless.",
         "negative": "Style, character. Probably the prettiest building in Chicago.",
         "body": "Beautiful building, very distinctive. Rooms were spotless.\nStyle, character. Probably the prettiest building in Chicago."
       },
       {
         "reviewer": "Julia",
-        "title": "",
+        "title": "Traffic was just a faint murmur",
         "positive": "Traffic was barely a murmur in my room, even during the busier part of the evening.",
         "negative": "",
         "body": "Traffic was barely a murmur in my room, even during the busier part of the evening."
       },
       {
         "reviewer": "Kenny",
-        "title": "",
+        "title": "Photo uploads were easy",
         "positive": "Uploading the day’s photos was straightforward each evening. The room Wi-Fi got through them without stopping halfway or making me start again.",
         "negative": "",
         "body": "Uploading the day’s photos was straightforward each evening. The room Wi-Fi got through them without stopping halfway or making me start again."
       },
       {
         "reviewer": "Vida",
-        "title": "",
+        "title": "Wonderful and Loved",
         "positive": "The Location was perfect for Us!",
         "negative": "",
         "body": "The Location was perfect for Us!"
       },
       {
         "reviewer": "Turkhia",
-        "title": "",
+        "title": "Several weights I needed were missing",
         "positive": "",
         "negative": "Gaps in the dumbbell rack made it awkward to progress between sets. The available weights just didn’t cover the range I needed.",
         "body": "Gaps in the dumbbell rack made it awkward to progress between sets. The available weights just didn’t cover the range I needed."
       },
       {
         "reviewer": "Justin",
-        "title": "",
+        "title": "Enjoyed the sweet and savory choices",
         "positive": "Tried a few different breakfast items over my stay and didn’t come across anything stale or bland. There was a nice balance of sweet and savory choices.",
         "negative": "",
         "body": "Tried a few different breakfast items over my stay and didn’t come across anything stale or bland. There was a nice balance of sweet and savory choices."
       },
       {
         "reviewer": "Mariella",
-        "title": "",
+        "title": "Didn’t miss my pillow from home",
         "positive": "For once, I didn’t miss my own pillow: this one was soft enough to settle into and still supported my head properly.",
         "negative": "",
         "body": "For once, I didn’t miss my own pillow: this one was soft enough to settle into and still supported my head properly."
       },
       {
         "reviewer": "John",
-        "title": "",
+        "title": "Exceptional",
         "positive": "Location",
         "negative": "",
         "body": "Location"
       },
       {
         "reviewer": "Kirill",
-        "title": "",
+        "title": "Dependable internet morning and night",
         "positive": "Checking messages in the morning and catching up online at night were equally straightforward. Whenever I used the Wi-Fi, the connection held up.",
         "negative": "",
         "body": "Checking messages in the morning and catching up online at night were equally straightforward. Whenever I used the Wi-Fi, the connection held up."
       },
       {
         "reviewer": "Darlyn",
-        "title": "",
+        "title": "celebrated my bachelorette here and it was great",
         "positive": "fabulous location!",
         "negative": "",
         "body": "fabulous location!"
       },
       {
         "reviewer": "Melissa",
-        "title": "",
+        "title": "The window kept street noise out",
         "positive": "Once the window was shut, street noise faded into the background. I was surprised by how little of it reached the room.",
         "negative": "",
         "body": "Once the window was shut, street noise faded into the background. I was surprised by how little of it reached the room."
       },
       {
         "reviewer": "Rachel",
-        "title": "",
+        "title": "Mattress yes, pillows no",
         "positive": "Loved the mattress.",
         "negative": "The pillows went flat as soon as I put my head down. A bit of a mismatch in how comfortable the bed felt overall.",
         "body": "Loved the mattress.\nThe pillows went flat as soon as I put my head down. A bit of a mismatch in how comfortable the bed felt overall."
       },
       {
         "reviewer": "Nikki",
-        "title": "",
+        "title": "Wi-Fi handled everyday browsing well",
         "positive": "Restaurant menus and directions opened quickly over Wi-Fi, even when I had several tabs going. It was dependable for all my everyday browsing.",
         "negative": "",
         "body": "Restaurant menus and directions opened quickly over Wi-Fi, even when I had several tabs going. It was dependable for all my everyday browsing."
       },
       {
         "reviewer": "Leonard",
-        "title": "",
+        "title": "Depends who’s at reception",
         "positive": "One person at reception patiently helped with my questions.",
         "negative": "The next person barely looked up. Whether I felt welcome really depended on who was there.",
         "body": "One person at reception patiently helped with my questions.\nThe next person barely looked up. Whether I felt welcome really depended on who was there."
       },
       {
         "reviewer": "Jamie",
-        "title": "",
+        "title": "A peaceful evening with a book",
         "positive": "Spent an evening reading with the TV off and wasn’t distracted by sounds from outside or the corridor. The room was peaceful enough to really switch off.",
         "negative": "",
         "body": "Spent an evening reading with the TV off and wasn’t distracted by sounds from outside or the corridor. The room was peaceful enough to really switch off."
       },
       {
         "reviewer": "Peter",
-        "title": "",
+        "title": "Easy to put a session together",
         "positive": "Didn’t need anything elaborate, just a treadmill and a decent selection of weights. The gym covered both nicely.",
         "negative": "",
         "body": "Didn’t need anything elaborate, just a treadmill and a decent selection of weights. The gym covered both nicely."
       },
       {
         "reviewer": "Guido",
-        "title": "",
+        "title": "Really liked the bedding",
         "positive": "The duvet felt light while still keeping me warm, and the sheets were soft against my skin. A really comfortable bed to come back to.",
         "negative": "",
         "body": "The duvet felt light while still keeping me warm, and the sheets were soft against my skin. A really comfortable bed to come back to."
       },
       {
         "reviewer": "Stephanie",
-        "title": "",
+        "title": "Better pastries than hot food",
         "positive": "Enjoyed the pastries at breakfast.",
         "negative": "The hot food was rather bland. I had some things I’d go back for and others I’d leave next time.",
         "body": "Enjoyed the pastries at breakfast.\nThe hot food was rather bland. I had some things I’d go back for and others I’d leave next time."
       },
       {
         "reviewer": "Black",
-        "title": "",
+        "title": "Wonderful experience at the Pendry",
         "positive": "Customer service",
         "negative": "",
         "body": "Customer service"
       },
       {
         "reviewer": "Ruth",
-        "title": "",
+        "title": "Went back for another pastry",
         "positive": "The pastries at breakfast had crisp edges and soft middles, just how I like them. I went back for another one before heading out.",
         "negative": "",
         "body": "The pastries at breakfast had crisp edges and soft middles, just how I like them. I went back for another one before heading out."
       },
       {
         "reviewer": "Jessica",
-        "title": "",
+        "title": "Steady connection with occasional drops",
         "positive": "For long stretches the internet was perfectly steady.",
         "negative": "Then it would drop for a few minutes. Some annoying interruptions between the trouble-free sessions.",
         "body": "For long stretches the internet was perfectly steady.\nThen it would drop for a few minutes. Some annoying interruptions between the trouble-free sessions."
       },
       {
         "reviewer": "Tracy",
-        "title": "",
+        "title": "No sticky surfaces",
         "positive": "No sticky tables or fingerprints on the mirror; everything felt properly cleaned.",
         "negative": "",
         "body": "No sticky tables or fingerprints on the mirror; everything felt properly cleaned."
       },
       {
         "reviewer": "Elena",
-        "title": "",
+        "title": "Too much equipment out of use",
         "positive": "",
         "negative": "A couple of machines had out-of-order signs, leaving very little to choose from. I couldn’t put together the workout I’d planned.",
         "body": "A couple of machines had out-of-order signs, leaving very little to choose from. I couldn’t put together the workout I’d planned."
       },
       {
         "reviewer": "Leonid",
-        "title": "",
+        "title": "Exceptional",
         "positive": "Great hotel",
         "negative": "",
         "body": "Great hotel"
       },
       {
         "reviewer": "Jani",
-        "title": "",
+        "title": "Could keep up my usual workout",
         "positive": "The gym had the weights I normally use and enough different equipment to put together a proper session. I didn’t have to abandon half my routine.",
         "negative": "",
         "body": "The gym had the weights I normally use and enough different equipment to put together a proper session. I didn’t have to abandon half my routine."
       },
       {
         "reviewer": "Charlie",
-        "title": "",
+        "title": "Very Good",
         "positive": "The people who worked there were great! Quick",
         "negative": "Quick service.",
         "body": "The people who worked there were great! Quick\nQuick service."
       },
       {
         "reviewer": "Susan",
-        "title": "",
+        "title": "Fine for email, less good for calls",
         "positive": "Email and web pages worked fine over Wi-Fi.",
         "negative": "My video call cut out twice. The connection was useful for some things and frustrating for others.",
         "body": "Email and web pages worked fine over Wi-Fi.\nMy video call cut out twice. The connection was useful for some things and frustrating for others."
       },
       {
         "reviewer": "David",
-        "title": "",
+        "title": "Beautiful hotel",
         "positive": "The hotel is in a great location and the rooms were exceptionally comfortable.",
         "negative": "Nothing from my perspective.",
         "body": "The hotel is in a great location and the rooms were exceptionally comfortable.\nNothing from my perspective."
       },
       {
         "reviewer": "Paola",
-        "title": "",
+        "title": "Coffee and pastries hit the spot",
         "positive": "Good coffee and wonderfully fresh pastries at breakfast. I could get used to mornings like that!",
         "negative": "",
         "body": "Good coffee and wonderfully fresh pastries at breakfast. I could get used to mornings like that!"
       },
       {
         "reviewer": "Cacey",
-        "title": "",
+        "title": "Easy to find a comfortable position",
         "positive": "I tend to turn over a lot, and every position felt comfortable on this bed. The mattress never seemed to push against my hips.",
         "negative": "",
         "body": "I tend to turn over a lot, and every position felt comfortable on this bed. The mattress never seemed to push against my hips."
       },
       {
         "reviewer": "Sanford",
-        "title": "",
+        "title": "Ended up on mobile data",
         "positive": "",
         "negative": "Spent the first evening trying to get the Wi-Fi to stay connected for more than a few minutes. Eventually I gave up and used my phone’s data.",
         "body": "Spent the first evening trying to get the Wi-Fi to stay connected for more than a few minutes. Eventually I gave up and used my phone’s data."
       },
       {
         "reviewer": "James",
-        "title": "",
+        "title": "Had an above and beyond experience. The service and cleanliness of the hotel made this hotel a new favorite.",
         "positive": "The staff was extremely accommodating. The room was cleaned to perfection every day we were there. Above and beyond.",
         "negative": "",
         "body": "The staff was extremely accommodating. The room was cleaned to perfection every day we were there. Above and beyond."
       },
       {
         "reviewer": "Francine",
-        "title": "",
+        "title": "Someone else’s TV kept me company",
         "positive": "",
         "negative": "Next door’s television came through the wall loud and clear until late.",
         "body": "Next door’s television came through the wall loud and clear until late."
       },
       {
         "reviewer": "Simon",
-        "title": "",
+        "title": "Enjoyed every minute",
         "positive": "Central Chicago, very walkable to all our destinations",
         "negative": "In-room information",
         "body": "Central Chicago, very walkable to all our destinations\nIn-room information"
       },
       {
         "reviewer": "Karie",
-        "title": "",
+        "title": "Good connection on both devices",
         "positive": "Both devices worked well on the wireless network, whether I was browsing on my phone or using my tablet.",
         "negative": "",
         "body": "Both devices worked well on the wireless network, whether I was browsing on my phone or using my tablet."
       },
       {
         "reviewer": "Marc",
-        "title": "",
+        "title": "A good breakfast selection",
         "positive": "Really enjoyed the hot breakfast options and fresh fruit, especially having so much to choose from in the morning.",
         "negative": "",
         "body": "Really enjoyed the hot breakfast options and fresh fruit, especially having so much to choose from in the morning."
       },
       {
         "reviewer": "Jorge",
-        "title": "",
+        "title": "Handy at first, more travel later",
         "positive": "It was handy for the places I visited first.",
         "negative": "Less convenient for the other side of my itinerary. I had a mix of easy outings and awkward trips back.",
         "body": "It was handy for the places I visited first.\nLess convenient for the other side of my itinerary. I had a mix of easy outings and awkward trips back."
       },
       {
         "reviewer": "Megan",
-        "title": "",
+        "title": "A lovely dreamy getaway with turndown service.",
         "positive": "Clean. Quiet. Nobody in the halls. Bar was amazing.",
         "negative": "",
         "body": "Clean. Quiet. Nobody in the halls. Bar was amazing."
       },
       {
         "reviewer": "Jeffery",
-        "title": "",
+        "title": "Glad I brought my gym kit",
         "positive": "The fitness room had enough working equipment for both cardio and a few strength exercises. My trainers got more use than I’d expected.",
         "negative": "",
         "body": "The fitness room had enough working equipment for both cardio and a few strength exercises. My trainers got more use than I’d expected."
       },
       {
         "reviewer": "Upton",
-        "title": "",
+        "title": "The pillows went completely flat",
         "positive": "",
         "negative": "Pillows that flattened into almost nothing, no matter how much I bunched them up to get some support.",
         "body": "Pillows that flattened into almost nothing, no matter how much I bunched them up to get some support."
       },
       {
         "reviewer": "Della",
-        "title": "",
+        "title": "Internet worked when I needed it",
         "positive": "Used the internet for maps and a few bookings, and everything loaded when I needed it. No frustrating pauses between pages.",
         "negative": "",
         "body": "Used the internet for maps and a few bookings, and everything loaded when I needed it. No frustrating pauses between pages."
       },
       {
         "reviewer": "Colum",
-        "title": "",
+        "title": "A dusty shelf in an otherwise clean room",
         "positive": "The bathroom was sparkling.",
         "negative": "A dusty shelf by the bed let the cleaning down a little.",
         "body": "The bathroom was sparkling.\nA dusty shelf by the bed let the cleaning down a little."
       },
       {
         "reviewer": "Tatiana",
-        "title": "",
+        "title": "Wonderful",
         "positive": "Location, staff",
         "negative": "",
         "body": "Location, staff"
       },
       {
         "reviewer": "Mark",
-        "title": "",
+        "title": "A breakfast I was glad not to skip",
         "positive": "I usually skip hotel breakfasts, but this one won me over with how fresh everything tasted.",
         "negative": "",
         "body": "I usually skip hotel breakfasts, but this one won me over with how fresh everything tasted."
       },
       {
         "reviewer": "Raimey",
-        "title": "",
+        "title": "The bench and weights suited me",
         "positive": "The bench stayed steady while I exercised, and there were enough weight options to increase the load between sets. Quite happy with the gym.",
         "negative": "",
         "body": "The bench stayed steady while I exercised, and there were enough weight options to increase the load between sets. Quite happy with the gym."
       },
       {
         "reviewer": "Kathleen",
-        "title": "",
+        "title": "Door slams sent me reaching for earplugs",
         "positive": "",
         "negative": "A door nearby slammed repeatedly during the evening, and the sound really travelled. I ended up using earplugs to take the edge off it.",
         "body": "A door nearby slammed repeatedly during the evening, and the sound really travelled. I ended up using earplugs to take the edge off it."
       },
       {
         "reviewer": "Brian",
-        "title": "",
+        "title": "Excellent location, near all the major attractions. Super clean and excellent amenities.",
         "positive": "Location, amenities, cleanliness.",
         "negative": "Long wait to check in.",
         "body": "Location, amenities, cleanliness.\nLong wait to check in."
       },
       {
         "reviewer": "Randi",
-        "title": "",
+        "title": "Tickets downloaded in seconds",
         "positive": "Downloaded my tickets using the room connection and had them ready in seconds. The internet worked just as smoothly the next morning.",
         "negative": "",
         "body": "Downloaded my tickets using the room connection and had them ready in seconds. The internet worked just as smoothly the next morning."
       },
       {
         "reviewer": "Lucy",
-        "title": "",
+        "title": "Excellent",
         "positive": "Excellent Excellent",
         "negative": "",
         "body": "Excellent Excellent"
       },
       {
         "reviewer": "Chris",
-        "title": "",
+        "title": "No buffering on my tablet",
         "positive": "Watched an episode on my tablet before bed and it played through without buffering. That was my main use of the Wi-Fi, and it handled it well.",
         "negative": "",
         "body": "Watched an episode on my tablet before bed and it played through without buffering. That was my main use of the Wi-Fi, and it handled it well."
       },
       {
         "reviewer": "Elizabeth",
-        "title": "",
+        "title": "5 star joy",
         "positive": "Fantastic hotel with great service and vibe.",
         "negative": "Nothing to not like about The Pendry it’s fab!",
         "body": "Fantastic hotel with great service and vibe.\nNothing to not like about The Pendry it’s fab!"
       },
       {
         "reviewer": "Samantha",
-        "title": "",
+        "title": "That mattress was a treat",
         "positive": "After a full day out, stretching out on this mattress felt wonderful. It had enough give without that sinking-in feeling.",
         "negative": "",
         "body": "After a full day out, stretching out on this mattress felt wonderful. It had enough give without that sinking-in feeling."
       },
       {
         "reviewer": "Julius",
-        "title": "",
+        "title": "The sheet needed changing",
         "positive": "",
         "negative": "A visible mark on the sheet should have been spotted before I arrived.",
         "body": "A visible mark on the sheet should have been spotted before I arrived."
       },
       {
         "reviewer": "Kathy",
-        "title": "",
+        "title": "Breakfast held up across all three days",
         "positive": "Breakfast was fresh and enjoyable on all three mornings, whatever I decided to try.",
         "negative": "",
         "body": "Breakfast was fresh and enjoyable on all three mornings, whatever I decided to try."
       },
       {
         "reviewer": "Syrpina",
-        "title": "",
+        "title": "Shouting outside reached the room",
         "positive": "",
         "negative": "Outside shouting kept disturbing me well after I’d gone to bed, despite having the window firmly closed.",
         "body": "Outside shouting kept disturbing me well after I’d gone to bed, despite having the window firmly closed."
       },
       {
         "reviewer": "Marita",
-        "title": "",
+        "title": "Lovely fresh linen",
         "positive": "Opened the bedding expecting the odd stray hair, as I’ve found elsewhere, but there wasn’t one. All the linen looked freshly washed.",
         "negative": "",
         "body": "Opened the bedding expecting the odd stray hair, as I’ve found elsewhere, but there wasn’t one. All the linen looked freshly washed."
       },
       {
         "reviewer": "Joshua",
-        "title": "",
+        "title": "Excellent 10th anniversary trip!",
         "positive": "Excellent location, very nice accommodations and friendly staff.",
         "negative": "The bar staff were a bit cold.",
         "body": "Excellent location, very nice accommodations and friendly staff.\nThe bar staff were a bit cold."
       },
       {
         "reviewer": "Kathryn",
-        "title": "",
+        "title": "More than a token set of dumbbells",
         "positive": "There was a useful range of dumbbells, rather than a few very light pairs. I could work through the strength exercises I’d planned.",
         "negative": "",
         "body": "There was a useful range of dumbbells, rather than a few very light pairs. I could work through the strength exercises I’d planned."
       },
       {
         "reviewer": "Cherie",
-        "title": "",
+        "title": "Pillows with some support at last",
         "positive": "Good pillows! They held their shape instead of flattening under my head.",
         "negative": "",
         "body": "Good pillows! They held their shape instead of flattening under my head."
       },
       {
         "reviewer": "Harriet",
-        "title": "",
+        "title": "Spotless from the moment I walked in",
         "positive": "You know that dusty feeling some hotel rooms have when you first walk in? None of that here; the furniture and window ledges were spotless.",
         "negative": "",
         "body": "You know that dusty feeling some hotel rooms have when you first walk in? None of that here; the furniture and window ledges were spotless."
       },
       {
         "reviewer": "Julie",
-        "title": "",
+        "title": "Made myself very comfortable in bed",
         "positive": "Stayed up reading in bed longer than I meant to because it was so comfortable, especially with those pillows behind me.",
         "negative": "",
         "body": "Stayed up reading in bed longer than I meant to because it was so comfortable, especially with those pillows behind me."
       },
       {
         "reviewer": "Gail",
-        "title": "",
+        "title": "Some nights quieter than others",
         "positive": "The first night was wonderfully quiet.",
         "negative": "Street noise carried into the room the following evening. My experience varied quite a bit from night to night.",
         "body": "The first night was wonderfully quiet.\nStreet noise carried into the room the following evening. My experience varied quite a bit from night to night."
       },
       {
         "reviewer": "Weam",
-        "title": "",
+        "title": "Very Good",
         "positive": "Location",
         "negative": "Bill surcharges",
         "body": "Location\nBill surcharges"
       },
       {
         "reviewer": "Ruedi",
-        "title": "",
+        "title": "Even checking directions was frustrating",
         "positive": "",
         "negative": "Looking up directions shouldn’t be difficult, but the room internet kept timing out. Basic browsing was unreliable throughout my visit.",
         "body": "Looking up directions shouldn’t be difficult, but the room internet kept timing out. Basic browsing was unreliable throughout my visit."
       },
       {
         "reviewer": "Iliana",
-        "title": "",
+        "title": "A properly scrubbed bathroom",
         "positive": "Spotless shower glass and a freshly scrubbed sink, with none of the soap residue I so often find in hotel bathrooms.",
         "negative": "",
         "body": "Spotless shower glass and a freshly scrubbed sink, with none of the soap residue I so often find in hotel bathrooms."
       },
       {
         "reviewer": "Matthew",
-        "title": "",
+        "title": "Wonderful",
         "positive": "Location",
         "negative": "",
         "body": "Location"
       },
       {
         "reviewer": "Donna",
-        "title": "",
+        "title": "The equipment felt well maintained",
         "positive": "Nothing I tried in the fitness room was loose or sticking. Even the adjustments on the bench worked properly.",
         "negative": "",
         "body": "Nothing I tried in the fitness room was loose or sticking. Even the adjustments on the bench worked properly."
       },
       {
         "reviewer": "Vanderléia",
-        "title": "",
+        "title": "Hot and full of flavor",
         "positive": "Hot, freshly cooked breakfast with plenty of flavor. I enjoyed every bite.",
         "negative": "",
         "body": "Hot, freshly cooked breakfast with plenty of flavor. I enjoyed every bite."
       },
       {
         "reviewer": "Luiz",
-        "title": "",
+        "title": "Too hard a bed for me",
         "positive": "",
         "negative": "Woke up with a stiff back each morning after struggling to get comfortable on the bed. The mattress was much too hard for my liking.",
         "body": "Woke up with a stiff back each morning after struggling to get comfortable on the bed. The mattress was much too hard for my liking."
       },
       {
         "reviewer": "Vyacheslav",
-        "title": "",
+        "title": "Mostly muffled, apart from louder voices",
         "positive": "Ordinary corridor activity was well muffled.",
         "negative": "A few loud voices came through clearly. It wasn’t consistently noisy, but it wasn’t completely peaceful either.",
         "body": "Ordinary corridor activity was well muffled.\nA few loud voices came through clearly. It wasn’t consistently noisy, but it wasn’t completely peaceful either."
       },
       {
         "reviewer": "Susana",
-        "title": "",
+        "title": "Cleaning slipped a little later on",
         "positive": "Cleaning was thorough on the first day, especially around the sink and shower.",
         "negative": "Later in the stay, I noticed the bathroom floor hadn’t been done as carefully.",
         "body": "Cleaning was thorough on the first day, especially around the sink and shower.\nLater in the stay, I noticed the bathroom floor hadn’t been done as carefully."
       },
       {
         "reviewer": "Sharon",
-        "title": "",
+        "title": "The Pendry is awesome",
         "positive": "Great location. Muriel at the front desk was great.",
         "negative": "",
         "body": "Great location. Muriel at the front desk was great."
       },
       {
         "reviewer": "Wojciech",
-        "title": "",
+        "title": "Firm without being too hard",
         "positive": "A firm mattress suits me, and this one got the balance right. Supportive, but with enough cushioning that I wasn’t waking up stiff.",
         "negative": "",
         "body": "A firm mattress suits me, and this one got the balance right. Supportive, but with enough cushioning that I wasn’t waking up stiff."
       },
       {
         "reviewer": "Philippe",
-        "title": "",
+        "title": "An evening online without reconnecting",
         "positive": "My laptop stayed online through an entire evening without the usual fiddling with the Wi-Fi to get it going again.",
         "negative": "",
         "body": "My laptop stayed online through an entire evening without the usual fiddling with the Wi-Fi to get it going again."
       },
       {
         "reviewer": "Lars",
-        "title": "",
+        "title": "Exceptional",
         "positive": "Everything. I’ve never enjoyed a hotel stay as much as I did at Pendry. The location, the so attentive and kind staff, the interiors, the luxury feel, their complementary refresher by the front desk.",
         "negative": "The room was a little tight, but very comfortable.",
         "body": "Everything. I’ve never enjoyed a hotel stay as much as I did at Pendry. The location, the so attentive and kind staff, the interiors, the luxury feel, their complementary refresher by the front desk.\nThe room was a little tight, but very comfortable."
       },
       {
         "reviewer": "Judy",
-        "title": "",
+        "title": "So much waiting for pages to load",
         "positive": "",
         "negative": "Even opening a basic web page involved waiting, refreshing and waiting again. The Wi-Fi showed a connection but rarely seemed to get anywhere.",
         "body": "Even opening a basic web page involved waiting, refreshing and waiting again. The Wi-Fi showed a connection but rarely seemed to get anywhere."
       },
       {
         "reviewer": "Margarida",
-        "title": "",
+        "title": "Quiet even when I turned in early",
         "positive": "Turned in fairly early and expected to hear other guests returning later. If they did, I certainly didn’t hear them.",
         "negative": "",
         "body": "Turned in fairly early and expected to hear other guests returning later. If they did, I certainly didn’t hear them."
       },
       {
         "reviewer": "Kate",
-        "title": "",
+        "title": "Weights were useful, bike needed attention",
         "positive": "The dumbbells and bench let me get through most of my workout.",
         "negative": "The exercise bike’s resistance kept slipping, which made that part of the session frustrating.",
         "body": "The dumbbells and bench let me get through most of my workout.\nThe exercise bike’s resistance kept slipping, which made that part of the session frustrating."
       },
       {
         "reviewer": "Anthony",
-        "title": "",
+        "title": "Plenty I wanted to eat",
         "positive": "Tasty breakfast and plenty I wanted to eat. I looked forward to it.",
         "negative": "",
         "body": "Tasty breakfast and plenty I wanted to eat. I looked forward to it."
       },
       {
         "reviewer": "Wendy",
-        "title": "",
+        "title": "Very Good",
         "positive": "Best hotel gym I’ve ever seen and such friendly welcoming staff",
         "negative": "",
         "body": "Best hotel gym I’ve ever seen and such friendly welcoming staff"
       },
       {
         "reviewer": "Oyassia",
-        "title": "",
+        "title": "Woken by closing doors",
         "positive": "",
         "negative": "Every closing door along the corridor seemed to land with a thud in my room. I was woken more than once by it.",
         "body": "Every closing door along the corridor seemed to land with a thud in my room. I was woken more than once by it."
       },
       {
         "reviewer": "Robert",
-        "title": "",
+        "title": "A lovely bed to come back to",
         "positive": "Getting into that cushioned bed with its smooth sheets was exactly what I needed at the end of each day.",
         "negative": "",
         "body": "Getting into that cushioned bed with its smooth sheets was exactly what I needed at the end of each day."
       },
       {
         "reviewer": "Michal",
-        "title": "",
+        "title": "Even my socks stayed clean",
         "positive": "Walked around in white socks after unpacking and they stayed white, so the floors had clearly had a proper clean.",
         "negative": "",
         "body": "Walked around in white socks after unpacking and they stayed white, so the floors had clearly had a proper clean."
       },
       {
         "reviewer": "Talia",
-        "title": "",
+        "title": "Good options for different appetites",
         "positive": "There was enough variety for me to have a lighter breakfast one day and something more filling the next. Both were tasty and freshly prepared.",
         "negative": "",
         "body": "There was enough variety for me to have a lighter breakfast one day and something more filling the next. Both were tasty and freshly prepared."
       },
       {
         "reviewer": "Alyssa",
-        "title": "",
+        "title": "Exceptional",
         "positive": "We were speechless walking into our room. Staff and room exceeded our expectations and we cannot wait to book again.",
         "negative": "",
         "body": "We were speechless walking into our room. Staff and room exceeded our expectations and we cannot wait to book again."
       },
       {
         "reviewer": "Raul",
-        "title": "",
+        "title": "Hardly heard the room next door",
         "positive": "Barely heard a thing through the wall, even though I knew the room next door was occupied.",
         "negative": "",
         "body": "Barely heard a thing through the wall, even though I knew the room next door was occupied."
       },
       {
         "reviewer": "Adriana",
-        "title": "",
+        "title": "Our stay at Pendry was perfect.",
         "positive": "We loved everything!",
         "negative": "N/A",
         "body": "We loved everything!\nN/A"
       },
       {
         "reviewer": "Brad",
-        "title": "",
+        "title": "Wi-Fi kept dropping in the same spot",
         "positive": "",
         "negative": "The Wi-Fi signal kept dropping while I sat in the same spot. Very frustrating.",
         "body": "The Wi-Fi signal kept dropping while I sat in the same spot. Very frustrating."
       },
       {
         "reviewer": "Fischer",
-        "title": "",
+        "title": "Enough room to stretch properly",
         "positive": "I could roll out a mat and do my floor exercises without getting in the way of the machines. The fitness area worked well for that.",
         "negative": "",
         "body": "I could roll out a mat and do my floor exercises without getting in the way of the machines. The fitness area worked well for that."
       },
       {
         "reviewer": "Cristian",
-        "title": "",
+        "title": "Fruit was fresher on the first morning",
         "positive": "Lovely breakfast fruit on day one.",
         "negative": "Disappointing fruit on day two; freshness was a bit hit and miss.",
         "body": "Lovely breakfast fruit on day one.\nDisappointing fruit on day two; freshness was a bit hit and miss."
       },
       {
         "reviewer": "Ellen",
-        "title": "",
+        "title": "Tired of reconnecting",
         "positive": "",
         "negative": "Had to keep reconnecting the Wi-Fi, sometimes before I’d even finished opening the page I wanted.",
         "body": "Had to keep reconnecting the Wi-Fi, sometimes before I’d even finished opening the page I wanted."
       },
       {
         "reviewer": "Samuel",
-        "title": "",
+        "title": "A beautiful hotel",
         "positive": "A very beautiful hotel, a large light filled room with tasteful styling",
         "negative": "",
         "body": "A very beautiful hotel, a large light filled room with tasteful styling"
       },
       {
         "reviewer": "Elba",
-        "title": "",
+        "title": "Good cardio, fewer choices for strength",
         "positive": "I enjoyed using the treadmills; they were in good working order.",
         "negative": "The weights selection was limited, so I couldn’t do quite the strength session I’d planned.",
         "body": "I enjoyed using the treadmills; they were in good working order.\nThe weights selection was limited, so I couldn’t do quite the strength session I’d planned."
       },
       {
         "reviewer": "Mary",
-        "title": "",
+        "title": "Hallway activity barely reached me",
         "positive": "People were coming and going along the corridor, but I only noticed when I opened my door. Inside the room, things were nicely hushed.",
         "negative": "",
         "body": "People were coming and going along the corridor, but I only noticed when I opened my door. Inside the room, things were nicely hushed."
       },
       {
         "reviewer": "Rajat",
-        "title": "",
+        "title": "Never got that promised follow-up",
         "positive": "",
         "negative": "Still waiting for the follow-up I was promised after raising a request at reception; nobody ever got back to me.",
         "body": "Still waiting for the follow-up I was promised after raising a request at reception; nobody ever got back to me."
       },
       {
         "reviewer": "Jonathan",
-        "title": "",
+        "title": "Next door’s conversation carried through",
         "positive": "",
         "negative": "Could follow bits of the conversation in the next room without trying. The sound carried through the wall enough to be distracting late in the evening.",
         "body": "Could follow bits of the conversation in the next room without trying. The sound carried through the wall enough to be distracting late in the evening."
       },
       {
         "reviewer": "Michelina",
-        "title": "",
+        "title": "Exceptional",
         "positive": "Really clean room!",
         "negative": "",
         "body": "Really clean room!"
       },
       {
         "reviewer": "Eduardo",
-        "title": "",
+        "title": "Pillows that suited my neck",
         "positive": "Usually I spend the first night folding hotel pillows into shape, but these supported my neck just right. I settled straight in.",
         "negative": "",
         "body": "Usually I spend the first night folding hotel pillows into shape, but these supported my neck just right. I settled straight in."
       },
       {
         "reviewer": "Oleksandr",
-        "title": "",
+        "title": "Two visits to the fitness room",
         "positive": "Used the gym twice during my stay. I don’t use gyms often enough to say much about how the facilities compare.",
         "negative": "",
         "body": "Used the gym twice during my stay. I don’t use gyms often enough to say much about how the facilities compare."
       },
       {
         "reviewer": "Michael",
-        "title": "",
+        "title": "We love the Pendry- we stay in the Pendry every time we visit.",
         "positive": "Great vibe",
         "negative": "Everything was excellent",
         "body": "Great vibe\nEverything was excellent"
       },
       {
         "reviewer": "Sergio",
-        "title": "",
+        "title": "The little corners were clean too",
         "positive": "Even the shelf behind the bathroom mirror was free of dust. Little things like that made the room feel properly looked after.",
         "negative": "",
         "body": "Even the shelf behind the bathroom mirror was free of dust. Little things like that made the room feel properly looked after."
       },
       {
         "reviewer": "Sarah",
-        "title": "",
+        "title": "Never needed my earplugs",
         "positive": "The earplugs I packed stayed in my bag. Outside activity was muted enough that I didn’t feel I needed them.",
         "negative": "",
         "body": "The earplugs I packed stayed in my bag. Outside activity was muted enough that I didn’t feel I needed them."
       },
       {
         "reviewer": "Abdullah",
-        "title": "",
+        "title": "Really enjoyed the fruit and bread",
         "positive": "Ripe fruit that actually tasted sweet and some lovely fresh bread made breakfast very enjoyable.",
         "negative": "",
         "body": "Ripe fruit that actually tasted sweet and some lovely fresh bread made breakfast very enjoyable."
       },
       {
         "reviewer": "Derek",
-        "title": "",
+        "title": "Nice hotel. Beautiful reception and bar areas. Extremely slow service in the bar.",
         "positive": "The public areas on the ground floor were gorgeous.",
         "negative": "Very little attention or money had been spent on the other floors above ground level. The decor of the rooms has definitely been upsold in the photos, in reality they are rather drab.",
         "body": "The public areas on the ground floor were gorgeous.\nVery little attention or money had been spent on the other floors above ground level. The decor of the rooms has definitely been upsold in the photos, in reality they are rather drab."
       },
       {
         "reviewer": "Jon",
-        "title": "",
+        "title": "Wonderful",
         "positive": "Staff was the best!! The VALET ROCKS!!!!",
         "negative": "",
         "body": "Staff was the best!! The VALET ROCKS!!!!"
       },
       {
         "reviewer": "Michel",
-        "title": "",
+        "title": "Night traffic was hard to ignore",
         "positive": "",
         "negative": "Engines and horns were surprisingly loud from the room at night. I found myself waiting for gaps in the traffic noise before I could drift off.",
         "body": "Engines and horns were surprisingly loud from the room at night. I found myself waiting for gaps in the traffic noise before I could drift off."
       },
       {
         "reviewer": "Bookstaver",
-        "title": "",
+        "title": "Good mattress, stiff bedding",
         "positive": "My back was happy with the mattress.",
         "negative": "The stiff bedding wasn’t nearly as comfortable against my skin.",
         "body": "My back was happy with the mattress.\nThe stiff bedding wasn’t nearly as comfortable against my skin."
       },
       {
         "reviewer": "Alison",
-        "title": "",
+        "title": "The breakfast fruit was a highlight",
         "positive": "The fruit selection was a pleasant surprise: sweet, ripe and worth finishing. Breakfast ended up being one of the meals I enjoyed most on the trip.",
         "negative": "",
         "body": "The fruit selection was a pleasant surprise: sweet, ripe and worth finishing. Breakfast ended up being one of the meals I enjoyed most on the trip."
       },
       {
         "reviewer": "John-paul",
-        "title": "",
+        "title": "Useful setup for a short weights session",
         "positive": "Found the dumbbells and an adjustable bench I needed without having to improvise. That was enough for a satisfying workout.",
         "negative": "",
         "body": "Found the dumbbells and an adjustable bench I needed without having to improvise. That was enough for a satisfying workout."
       },
       {
         "reviewer": "Isagarciaa",
-        "title": "",
+        "title": "The place I love the stay when in Chicago.",
         "positive": "Great property in a great location.",
         "negative": "Nothing",
         "body": "Great property in a great location.\nNothing"
       },
       {
         "reviewer": "Blair",
-        "title": "",
+        "title": "Fresh towels every day",
         "positive": "Fresh towels and a spotless bathroom every day. Very happy with the cleaning.",
         "negative": "",
         "body": "Fresh towels and a spotless bathroom every day. Very happy with the cleaning."
       },
       {
         "reviewer": "Dellann",
-        "title": "",
+        "title": "They got the scrambled eggs right",
         "positive": "Scrambled eggs can be disappointing in hotels, but these were soft and properly seasoned. A much better breakfast than I’d expected.",
         "negative": "",
         "body": "Scrambled eggs can be disappointing in hotels, but these were soft and properly seasoned. A much better breakfast than I’d expected."
       },
       {
         "reviewer": "Kayla",
-        "title": "",
+        "title": "Plenty to work with in the gym",
         "positive": "A bike, treadmills and weights gave me enough choice to vary things over my stay. I was pleased with what was available.",
         "negative": "",
         "body": "A bike, treadmills and weights gave me enough choice to vary things over my stay. I was pleased with what was available."
       },
       {
         "reviewer": "Cécile",
-        "title": "",
+        "title": "Wonderful",
         "positive": "needs elevators that work quicker",
         "negative": "",
         "body": "needs elevators that work quicker"
       },
       {
         "reviewer": "Claudia",
-        "title": "",
+        "title": "Couldn’t finish uploading my photos",
         "positive": "",
         "negative": "Couldn’t get a photo upload to finish on the hotel network. After several failed attempts, I switched to mobile data and left the Wi-Fi alone.",
         "body": "Couldn’t get a photo upload to finish on the hotel network. After several failed attempts, I switched to mobile data and left the Wi-Fi alone."
       },
       {
         "reviewer": "Geoffery",
-        "title": "",
+        "title": "A bike I actually wanted to use",
         "positive": "The exercise bike’s resistance changed smoothly and the pedals felt steady. Managed the whole session I’d planned on it.",
         "negative": "",
         "body": "The exercise bike’s resistance changed smoothly and the pedals felt steady. Managed the whole session I’d planned on it."
       },
       {
         "reviewer": "Amanda",
-        "title": "",
+        "title": "Couldn’t get comfortable in that dip",
         "positive": "",
         "negative": "There was a noticeable dip on one side of the mattress that kept pulling me into it. I never found a comfortable spot.",
         "body": "There was a noticeable dip on one side of the mattress that kept pulling me into it. I never found a comfortable spot."
       },
       {
         "reviewer": "Pranav",
-        "title": "",
+        "title": "Stunning stay in a Chicago icon",
         "positive": "Gorgeously appointed hotel in a fantastic location. The building is iconic and the staff were so helpful and delightful. They could not have done enough to assist.",
         "negative": "Nothing. It was perfect!",
         "body": "Gorgeously appointed hotel in a fantastic location. The building is iconic and the staff were so helpful and delightful. They could not have done enough to assist.\nNothing. It was perfect!"
       },
       {
         "reviewer": "Jomarra",
-        "title": "",
+        "title": "Fresh bread made the morning",
         "positive": "Really enjoyed the bread in the morning, especially toasted with a little butter. It tasted fresh each day, which made a simple breakfast very satisfying.",
         "negative": "",
         "body": "Really enjoyed the bread in the morning, especially toasted with a little butter. It tasted fresh each day, which made a simple breakfast very satisfying."
       },
       {
         "reviewer": "Emel",
-        "title": "",
+        "title": "Couldn’t fault the housekeeping",
         "positive": "Fresh sheets, spotless towels and no dusty surfaces when I put my things down. Couldn’t fault the cleaning during my three nights.",
         "negative": "",
         "body": "Fresh sheets, spotless towels and no dusty surfaces when I put my things down. Couldn’t fault the cleaning during my three nights."
       },
       {
         "reviewer": "Hanan",
-        "title": "",
+        "title": "Limited options for cardio",
         "positive": "",
         "negative": "I’d hoped to switch between a bike and a treadmill, but the gym didn’t offer both. The lack of choice made it hard to follow my usual cardio routine.",
         "body": "I’d hoped to switch between a bike and a treadmill, but the gym didn’t offer both. The lack of choice made it hard to follow my usual cardio routine."
       },
       {
         "reviewer": "Brittany",
-        "title": "",
+        "title": "Exceptional",
         "positive": "Wonderful building, great location",
         "negative": "No attention to sustainability, towels are changed daily even when barely used",
         "body": "Wonderful building, great location\nNo attention to sustainability, towels are changed daily even when barely used"
       },
       {
         "reviewer": "Victoria",
-        "title": "",
+        "title": "Looked forward to breakfast",
         "positive": "Breakfast was something I looked forward to each morning. The eggs were nicely cooked and the toast arrived with a proper crunch.",
         "negative": "",
         "body": "Breakfast was something I looked forward to each morning. The eggs were nicely cooked and the toast arrived with a proper crunch."
       },
       {
         "reviewer": "Joseph",
-        "title": "",
+        "title": "Could hear everyone passing my door",
         "positive": "",
         "negative": "Footsteps and conversations in the corridor sounded much closer than they should have. Each time someone passed, it pulled my attention away from what I was doing.",
         "body": "Footsteps and conversations in the corridor sounded much closer than they should have. Each time someone passed, it pulled my attention away from what I was doing."
@@ -5720,1050 +5720,1050 @@
     "nobu-hotel-chicago": [
       {
         "reviewer": "Anne",
-        "title": "",
+        "title": "Eggs and toast just how I like them",
         "positive": "Eggs were cooked just as I like them, with toast that wasn’t leathery or cold. Breakfast made a very good start to the day.",
         "negative": "",
         "body": "Eggs were cooked just as I like them, with toast that wasn’t leathery or cold. Breakfast made a very good start to the day."
       },
       {
         "reviewer": "Daniel",
-        "title": "",
+        "title": "Housekeeping made a good impression",
         "positive": "Crisp, freshly washed linen and a properly scrubbed bathroom made a good first impression. That level of cleanliness continued during the visit.",
         "negative": "",
         "body": "Crisp, freshly washed linen and a properly scrubbed bathroom made a good first impression. That level of cleanliness continued during the visit."
       },
       {
         "reviewer": "Cristie",
-        "title": "",
+        "title": "The connection wouldn’t hold",
         "positive": "",
         "negative": "The internet dropped whenever I tried to do more than open a page or two. Rejoining the network only bought me another few minutes.",
         "body": "The internet dropped whenever I tried to do more than open a page or two. Rejoining the network only bought me another few minutes."
       },
       {
         "reviewer": "Lauren",
-        "title": "",
+        "title": "Even support across the bed",
         "positive": "No lumps, dips or hard edges in the mattress, just even support wherever I settled.",
         "negative": "",
         "body": "No lumps, dips or hard edges in the mattress, just even support wherever I settled."
       },
       {
         "reviewer": "Bashaer",
-        "title": "",
+        "title": "Relaxing stay in a busy part of town. Tranquil vibes and delicious food.",
         "positive": "Walking distance to restaurants and shops.",
         "negative": "View of the room is of a pickle ball court",
         "body": "Walking distance to restaurants and shops.\nView of the room is of a pickle ball court"
       },
       {
         "reviewer": "Rjtonya",
-        "title": "",
+        "title": "Toothpaste from the previous guest",
         "positive": "",
         "negative": "The bathroom counter had dried toothpaste on it from before I arrived. It made me question how thoroughly the room had been cleaned.",
         "body": "The bathroom counter had dried toothpaste on it from before I arrived. It made me question how thoroughly the room had been cleaned."
       },
       {
         "reviewer": "Неофидов",
-        "title": "",
+        "title": "Great for relax and vacation.",
         "positive": "High level of comfort and incredibly responsive staff.",
         "negative": "I cannot live there permanently.",
         "body": "High level of comfort and incredibly responsive staff.\nI cannot live there permanently."
       },
       {
         "reviewer": "Debra",
-        "title": "",
+        "title": "So little sound from the corridor",
         "positive": "Closed the door and could barely tell there were other guests on the floor. The lack of corridor noise was a real plus.",
         "negative": "",
         "body": "Closed the door and could barely tell there were other guests on the floor. The lack of corridor noise was a real plus."
       },
       {
         "reviewer": "Angela",
-        "title": "",
+        "title": "More than sweet things for breakfast",
         "positive": "Breakfast had enough savory options to suit me, and the ones I tried tasted good. It was nice having more to choose from than sweet pastries.",
         "negative": "",
         "body": "Breakfast had enough savory options to suit me, and the ones I tried tasted good. It was nice having more to choose from than sweet pastries."
       },
       {
         "reviewer": "Francis",
-        "title": "",
+        "title": "More travelling than sightseeing",
         "positive": "",
         "negative": "Ended up spending a lot of the day getting to and from the places I wanted to see. The location wasn’t convenient for my sightseeing plans.",
         "body": "Ended up spending a lot of the day getting to and from the places I wanted to see. The location wasn’t convenient for my sightseeing plans."
       },
       {
         "reviewer": "Aileen",
-        "title": "",
+        "title": "Struggled to find an appealing breakfast",
         "positive": "",
         "negative": "Limited choices and unappealing food made breakfast a disappointment, particularly by the third morning.",
         "body": "Limited choices and unappealing food made breakfast a disappointment, particularly by the third morning."
       },
       {
         "reviewer": "Eran",
-        "title": "",
+        "title": "Not a speck on the desk",
         "positive": "Ran my hand over the desk before unpacking and didn’t pick up any dust; the rest of the room looked equally clean.",
         "negative": "",
         "body": "Ran my hand over the desk before unpacking and didn’t pick up any dust; the rest of the room looked equally clean."
       },
       {
         "reviewer": "Abhishek",
-        "title": "",
+        "title": "Perfect location, excellent staff and a beautiful view from the room.",
         "positive": "Best possible location, amazing staff, superb room & view",
         "negative": "",
         "body": "Best possible location, amazing staff, superb room & view"
       },
       {
         "reviewer": "Paul",
-        "title": "",
+        "title": "The door blocked out passing guests",
         "positive": "The door seemed to block most of the noise from people passing outside. I only realized how busy the corridor was when I stepped out.",
         "negative": "",
         "body": "The door seemed to block most of the noise from people passing outside. I only realized how busy the corridor was when I stepped out."
       },
       {
         "reviewer": "William",
-        "title": "",
+        "title": "Tickets booked without a connection problem",
         "positive": "Booked my next day’s tickets from the room without a single connection hiccup. The Wi-Fi worked just as reliably for messages and browsing afterwards.",
         "negative": "",
         "body": "Booked my next day’s tickets from the room without a single connection hiccup. The Wi-Fi worked just as reliably for messages and browsing afterwards."
       },
       {
         "reviewer": "Monique",
-        "title": "",
+        "title": "Equipment was ready to use",
         "positive": "All the machines I tried were functioning properly, with no broken controls to work around. I was happy with the fitness facilities.",
         "negative": "",
         "body": "All the machines I tried were functioning properly, with no broken controls to work around. I was happy with the fitness facilities."
       },
       {
         "reviewer": "Christen",
-        "title": "",
+        "title": "Bathroom was clean right to the edges",
         "positive": "Noticed how clean the bathroom tiles were while unpacking my toiletries. No soap residue around the basin or grubby edges in the shower either.",
         "negative": "",
         "body": "Noticed how clean the bathroom tiles were while unpacking my toiletries. No soap residue around the basin or grubby edges in the shower either."
       },
       {
         "reviewer": "Rita",
-        "title": "",
+        "title": "Exceptional",
         "positive": "Nice facilities, cool roof top bar, very friendly and attentive staff.",
         "negative": "",
         "body": "Nice facilities, cool roof top bar, very friendly and attentive staff."
       },
       {
         "reviewer": "Daiva",
-        "title": "",
+        "title": "Luxury comfort and design",
         "positive": "Everything! Beautiful design and very comfortable stay.",
         "negative": "",
         "body": "Everything! Beautiful design and very comfortable stay."
       },
       {
         "reviewer": "Takeena",
-        "title": "",
+        "title": "Easy to plan the day online",
         "positive": "I used a tablet to plan most of my trip, so reliable internet mattered. Pages opened promptly and the Wi-Fi never lost the connection mid-search.",
         "negative": "",
         "body": "I used a tablet to plan most of my trip, so reliable internet mattered. Pages opened promptly and the Wi-Fi never lost the connection mid-search."
       },
       {
         "reviewer": "Javier",
-        "title": "",
+        "title": "Enjoyed a peaceful evening in",
         "positive": "Stayed in one evening with nothing playing and found it very peaceful. No street sounds or neighboring conversations competing for attention.",
         "negative": "",
         "body": "Stayed in one evening with nothing playing and found it very peaceful. No street sounds or neighboring conversations competing for attention."
       },
       {
         "reviewer": "Ann",
-        "title": "",
+        "title": "Cardio options were disappointing",
         "positive": "",
         "negative": "One treadmill wouldn’t start and the other kept pausing during use. I left the gym without getting the run I’d hoped for.",
         "body": "One treadmill wouldn’t start and the other kept pausing during use. I left the gym without getting the run I’d hoped for."
       },
       {
         "reviewer": "Deanna",
-        "title": "",
+        "title": "My phone connected without any fuss",
         "positive": "My phone picked up the Wi-Fi automatically each evening and stayed connected as long as I needed it.",
         "negative": "",
         "body": "My phone picked up the Wi-Fi automatically each evening and stayed connected as long as I needed it."
       },
       {
         "reviewer": "Alicia",
-        "title": "",
+        "title": "A mattress my hips could get on with",
         "positive": "I slept on my side without my hip feeling pressed into the mattress. That’s a small thing, but it made the bed especially comfortable for me.",
         "negative": "",
         "body": "I slept on my side without my hip feeling pressed into the mattress. That’s a small thing, but it made the bed especially comfortable for me."
       },
       {
         "reviewer": "Michelle",
-        "title": "",
+        "title": "Dust hiding behind the bedside table",
         "positive": "",
         "negative": "Dust had built up behind the bedside table, and it was obvious once I plugged in my charger. That area looked as though it hadn’t been cleaned for a while.",
         "body": "Dust had built up behind the bedside table, and it was obvious once I plugged in my charger. That area looked as though it hadn’t been cleaned for a while."
       },
       {
         "reviewer": "Mokhtar",
-        "title": "",
+        "title": "Had to work around broken equipment",
         "positive": "",
         "negative": "More than one machine in the fitness room was out of use. With so few alternatives, there wasn’t much of a workout left for me to do.",
         "body": "More than one machine in the fitness room was out of use. With so few alternatives, there wasn’t much of a workout left for me to do."
       },
       {
         "reviewer": "Dmitry",
-        "title": "",
+        "title": "Quieter once the evening settled down",
         "positive": "Once the evening settled down, it was very quiet.",
         "negative": "Earlier I could hear guests talking in the hallway. The noise level wasn’t the same throughout the night.",
         "body": "Once the evening settled down, it was very quiet.\nEarlier I could hear guests talking in the hallway. The noise level wasn’t the same throughout the night."
       },
       {
         "reviewer": "Faith",
-        "title": "",
+        "title": "excellent, I give it a 20/10. if I travel to Chicago again, I’ll most definitely book Nobu again",
         "positive": "staff super friendly, kind and always willing to help. property is modern and classy.",
         "negative": "",
         "body": "staff super friendly, kind and always willing to help. property is modern and classy."
       },
       {
         "reviewer": "Jason",
-        "title": "",
+        "title": "Location worked for some outings",
         "positive": "The location suited a couple of my outings perfectly.",
         "negative": "Getting to the other places on my list was a trek. It really depended on the day’s plans.",
         "body": "The location suited a couple of my outings perfectly.\nGetting to the other places on my list was a trek. It really depended on the day’s plans."
       },
       {
         "reviewer": "Amy",
-        "title": "",
+        "title": "Didn’t feel like moving off that bed",
         "positive": "Stretched out for a short rest after unpacking and didn’t feel like moving. The bed was that comfortable.",
         "negative": "",
         "body": "Stretched out for a short rest after unpacking and didn’t feel like moving. The bed was that comfortable."
       },
       {
         "reviewer": "Camila",
-        "title": "",
+        "title": "Nothing awkward about the machines",
         "positive": "The gym equipment adjusted easily, and everything I used felt secure. I could concentrate on exercising instead of fiddling with it.",
         "negative": "",
         "body": "The gym equipment adjusted easily, and everything I used felt secure. I could concentrate on exercising instead of fiddling with it."
       },
       {
         "reviewer": "Amanda",
-        "title": "",
+        "title": "Lovely",
         "positive": "Great ambience",
         "negative": "Nothing",
         "body": "Great ambience\nNothing"
       },
       {
         "reviewer": "Richard",
-        "title": "",
+        "title": "Two quiet nights out of three",
         "positive": "Two peaceful nights, with long quiet stretches.",
         "negative": "One night was interrupted by outside noise. Those distracting moments left me with a mixed impression overall.",
         "body": "Two peaceful nights, with long quiet stretches.\nOne night was interrupted by outside noise. Those distracting moments left me with a mixed impression overall."
       },
       {
         "reviewer": "Jade",
-        "title": "",
+        "title": "Fresh linen, sticky desk",
         "positive": "Sheets and towels were spotless.",
         "negative": "The desk had a sticky patch I had to wipe. The cleaning was good in some places and careless in others.",
         "body": "Sheets and towels were spotless.\nThe desk had a sticky patch I had to wipe. The cleaning was good in some places and careless in others."
       },
       {
         "reviewer": "Ron",
-        "title": "",
+        "title": "Simple breakfast, fresh ingredients",
         "positive": "A simple breakfast done well: ripe fruit, fresh bread and good coffee. Everything tasted as though it belonged on the plate that morning.",
         "negative": "",
         "body": "A simple breakfast done well: ripe fruit, fresh bread and good coffee. Everything tasted as though it belonged on the plate that morning."
       },
       {
         "reviewer": "Pavielle",
-        "title": "",
+        "title": "Barely noticed late arrivals",
         "positive": "Expected to hear other guests coming back late, but almost no hallway noise reached me inside.",
         "negative": "",
         "body": "Expected to hear other guests coming back late, but almost no hallway noise reached me inside."
       },
       {
         "reviewer": "Bridgette",
-        "title": "",
+        "title": "Exceptional",
         "positive": "This property is absolutely amazing from the staff, cleanliness, location, convenience, absolutely everything was amazing! The staff was so accommodating and made us feel so welcomed! I will always be staying with Nobu going forward.",
         "negative": "",
         "body": "This property is absolutely amazing from the staff, cleanliness, location, convenience, absolutely everything was amazing! The staff was so accommodating and made us feel so welcomed! I will always be staying with Nobu going forward."
       },
       {
         "reviewer": "Jacquelyn",
-        "title": "",
+        "title": "Maps and bookings all went smoothly",
         "positive": "Scrolled through maps, checked train times and made a reservation on the same Wi-Fi session. Nothing stalled or asked me to reconnect.",
         "negative": "",
         "body": "Scrolled through maps, checked train times and made a reservation on the same Wi-Fi session. Nothing stalled or asked me to reconnect."
       },
       {
         "reviewer": "Gordon",
-        "title": "",
+        "title": "Dried-out eggs and limp toast",
         "positive": "",
         "negative": "The eggs at breakfast had dried out around the edges. Alongside some limp toast, they made for a pretty unappealing start to the day.",
         "body": "The eggs at breakfast had dried out around the edges. Alongside some limp toast, they made for a pretty unappealing start to the day."
       },
       {
         "reviewer": "Randall",
-        "title": "",
+        "title": "Soft bedding without the weight",
         "positive": "Soft bedding that didn’t weigh me down or make turning over feel like a struggle.",
         "negative": "",
         "body": "Soft bedding that didn’t weigh me down or make turning over feel like a struggle."
       },
       {
         "reviewer": "Stuart",
-        "title": "",
+        "title": "Radio played without cutting out",
         "positive": "Online radio kept playing over Wi-Fi while I got ready, with no sound cutting out mid-song.",
         "negative": "",
         "body": "Online radio kept playing over Wi-Fi while I got ready, with no sound cutting out mid-song."
       },
       {
         "reviewer": "Karen",
-        "title": "",
+        "title": "Quiet enough for an afternoon of reading",
         "positive": "Spent an afternoon reading in the room and wasn’t distracted by noise from neighboring guests. The quiet carried on into the evening too.",
         "negative": "",
         "body": "Spent an afternoon reading in the room and wasn’t distracted by noise from neighboring guests. The quiet carried on into the evening too."
       },
       {
         "reviewer": "Dennis",
-        "title": "",
+        "title": "Nice pillows, overly firm mattress",
         "positive": "I liked the pillows and soft sheets.",
         "negative": "The mattress was firmer than I could really settle into. Not a bad bed, but not entirely right for me either.",
         "body": "I liked the pillows and soft sheets.\nThe mattress was firmer than I could really settle into. Not a bad bed, but not entirely right for me either."
       },
       {
         "reviewer": "Ayanna",
-        "title": "",
+        "title": "Superb. Would love to return or stay at another location.",
         "positive": "Everything: location, decor, scent, staff, amenities.",
         "negative": "Found a hair in bathroom sink",
         "body": "Everything: location, decor, scent, staff, amenities.\nFound a hair in bathroom sink"
       },
       {
         "reviewer": "Bilal",
-        "title": "",
+        "title": "Too little equipment for my plans",
         "positive": "",
         "negative": "I expected to be able to do a fairly ordinary strength routine, but several exercises weren’t possible with the equipment there. The gym felt very limited.",
         "body": "I expected to be able to do a fairly ordinary strength routine, but several exercises weren’t possible with the equipment there. The gym felt very limited."
       },
       {
         "reviewer": "Aasiyah",
-        "title": "",
+        "title": "No hallway noise waking me early",
         "positive": "No clattering or loud conversations from the corridor to wake me earlier than I wanted.",
         "negative": "",
         "body": "No clattering or loud conversations from the corridor to wake me earlier than I wanted."
       },
       {
         "reviewer": "Melony",
-        "title": "",
+        "title": "Breakfast didn’t taste fresh",
         "positive": "",
         "negative": "Took a bite of the morning pastry and found it disappointingly stale. The rest of breakfast wasn’t much better, with very little that tasted fresh.",
         "body": "Took a bite of the morning pastry and found it disappointingly stale. The rest of breakfast wasn’t much better, with very little that tasted fresh."
       },
       {
         "reviewer": "Murray",
-        "title": "",
+        "title": "Excellent location, amenities, and service",
         "positive": "Great location in the West Loop, you’re in the middle of everything.",
         "negative": "None",
         "body": "Great location in the West Loop, you’re in the middle of everything.\nNone"
       },
       {
         "reviewer": "Arif",
-        "title": "",
+        "title": "As comfortable as my bed at home",
         "positive": "My usual test is whether I miss my bed at home, and here I didn’t. The mattress and pillows suited me straight away.",
         "negative": "",
         "body": "My usual test is whether I miss my bed at home, and here I didn’t. The mattress and pillows suited me straight away."
       },
       {
         "reviewer": "Thilo",
-        "title": "",
+        "title": "Kept my exercise plans on track",
         "positive": "Packed workout clothes hoping I’d find a usable gym. The equipment here covered my routine, and I was glad to get a session in.",
         "negative": "",
         "body": "Packed workout clothes hoping I’d find a usable gym. The equipment here covered my routine, and I was glad to get a session in."
       },
       {
         "reviewer": "Christopher",
-        "title": "",
+        "title": "All my photos backed up first time",
         "positive": "Left my photos backing up on the hotel Wi-Fi and found the whole batch uploaded without a single failed attempt.",
         "negative": "",
         "body": "Left my photos backing up on the hotel Wi-Fi and found the whole batch uploaded without a single failed attempt."
       },
       {
         "reviewer": "Gibson",
-        "title": "",
+        "title": "Even the lamps were dust-free",
         "positive": "Clean right down to the bedside lamps, where I usually find dust, and the bathroom floor was spotless too.",
         "negative": "",
         "body": "Clean right down to the bedside lamps, where I usually find dust, and the bathroom floor was spotless too."
       },
       {
         "reviewer": "Deepak",
-        "title": "",
+        "title": "A comfortable and pleasant place to stay",
         "positive": "A now dish i had tried continental breakfast where toast and yogurt combination by fabulous.",
         "negative": "",
         "body": "A now dish i had tried continental breakfast where toast and yogurt combination by fabulous."
       },
       {
         "reviewer": "Welsh",
-        "title": "",
+        "title": "Couldn’t get the bike resistance to work",
         "positive": "",
         "negative": "Turning up the resistance made almost no difference on the exercise bike. It wasn’t much use for the workout I’d intended.",
         "body": "Turning up the resistance made almost no difference on the exercise bike. It wasn’t much use for the workout I’d intended."
       },
       {
         "reviewer": "Stefano",
-        "title": "",
+        "title": "The duvet was heavier than I’d like",
         "positive": "Loved the cushioned mattress.",
         "negative": "Found the duvet uncomfortably heavy, so the bed setup wasn’t entirely for me.",
         "body": "Loved the cushioned mattress.\nFound the duvet uncomfortably heavy, so the bed setup wasn’t entirely for me."
       },
       {
         "reviewer": "Dngerousbeauty",
-        "title": "",
+        "title": "Tough bread and tired pastries",
         "positive": "",
         "negative": "Nothing I sampled at breakfast tasted particularly fresh. The bread was tough, and the pastries had that day-old texture.",
         "body": "Nothing I sampled at breakfast tasted particularly fresh. The bread was tough, and the pastries had that day-old texture."
       },
       {
         "reviewer": "Naishad",
-        "title": "",
+        "title": "Clean drawers ready for unpacking",
         "positive": "Unpacking felt easy because the drawers and shelves were already clean. No crumbs, hair or dust left over from whoever had the room before me.",
         "negative": "",
         "body": "Unpacking felt easy because the drawers and shelves were already clean. No crumbs, hair or dust left over from whoever had the room before me."
       },
       {
         "reviewer": "Kendrick",
-        "title": "",
+        "title": "Too far to come back between outings",
         "positive": "",
         "negative": "Most places I’d planned to visit were farther away than I’d realized. Getting back between outings took enough time that I usually stayed out instead.",
         "body": "Most places I’d planned to visit were farther away than I’d realized. Getting back between outings took enough time that I usually stayed out instead."
       },
       {
         "reviewer": "Daisy",
-        "title": "",
+        "title": "More choice than I expected in the gym",
         "positive": "I could switch between a couple of cardio machines and then do some strength work. It was a useful selection for a hotel workout.",
         "negative": "",
         "body": "I could switch between a couple of cardio machines and then do some strength work. It was a useful selection for a hotel workout."
       },
       {
         "reviewer": "Margaret",
-        "title": "",
+        "title": "A favorite place to stay when visiting Chicago",
         "positive": "Always best service provided.",
         "negative": "",
         "body": "Always best service provided."
       },
       {
         "reviewer": "Sav",
-        "title": "",
+        "title": "The bike held up for a longer session",
         "positive": "Spent a while on the exercise bike and found it worked well throughout. The resistance settings gave me a useful range to work through.",
         "negative": "",
         "body": "Spent a while on the exercise bike and found it worked well throughout. The resistance settings gave me a useful range to work through."
       },
       {
         "reviewer": "Tori",
-        "title": "",
+        "title": "Fresh fruit and a lovely crusty loaf",
         "positive": "The breakfast fruit tasted freshly cut and the bread had a nice crust. I enjoyed what I ate enough to come back the next morning.",
         "negative": "",
         "body": "The breakfast fruit tasted freshly cut and the bread had a nice crust. I enjoyed what I ate enough to come back the next morning."
       },
       {
         "reviewer": "Quiyanna",
-        "title": "",
+        "title": "Very Good",
         "positive": "The staff was amazing..",
         "negative": "",
         "body": "The staff was amazing.."
       },
       {
         "reviewer": "Jada",
-        "title": "",
+        "title": "Nothing missed in the bathroom",
         "positive": "Gleaming taps, a spotless mirror and no overlooked grime in the bathroom, even after a closer look.",
         "negative": "",
         "body": "Gleaming taps, a spotless mirror and no overlooked grime in the bathroom, even after a closer look."
       },
       {
         "reviewer": "Chadwick",
-        "title": "",
+        "title": "Wi-Fi call was clear throughout",
         "positive": "Had a clear voice call using Wi-Fi, with none of the awkward silences when the connection drops. It worked well for the whole conversation.",
         "negative": "",
         "body": "Had a clear voice call using Wi-Fi, with none of the awkward silences when the connection drops. It worked well for the whole conversation."
       },
       {
         "reviewer": "Cifuentes",
-        "title": "",
+        "title": "Liked the range of free weights",
         "positive": "There were enough different dumbbells to make a strength workout worthwhile. I could move up gradually instead of making a big jump between weights.",
         "negative": "",
         "body": "There were enough different dumbbells to make a strength workout worthwhile. I could move up gradually instead of making a big jump between weights."
       },
       {
         "reviewer": "Francisca",
-        "title": "",
+        "title": "Hallway chatter wasn’t a problem",
         "positive": "Hallway chatter barely reached me at bedtime, even though I’m usually very aware of it.",
         "negative": "",
         "body": "Hallway chatter barely reached me at bedtime, even though I’m usually very aware of it."
       },
       {
         "reviewer": "Glenn",
-        "title": "",
+        "title": "The perfect base when you visit Chicago.",
         "positive": "It’s an experience. A sophisticated hotel for sophisticated people. Location is perfect, surrounding neighbourhood has a great range of food, shops and access to the entire city.",
         "negative": "",
         "body": "It’s an experience. A sophisticated hotel for sophisticated people. Location is perfect, surrounding neighbourhood has a great range of food, shops and access to the entire city."
       },
       {
         "reviewer": "Julianeal21",
-        "title": "",
+        "title": "A pillow that didn’t collapse",
         "positive": "The pillow didn’t collapse when I rolled onto my side, which I loved. I could settle into a comfortable position without constantly adjusting it.",
         "negative": "",
         "body": "The pillow didn’t collapse when I rolled onto my side, which I loved. I could settle into a comfortable position without constantly adjusting it."
       },
       {
         "reviewer": "Bryan",
-        "title": "",
+        "title": "Hotel Wi-Fi handled the lot",
         "positive": "No need for a hotspot here; the hotel network handled everything I tried. Even sending a batch of large photos was straightforward.",
         "negative": "",
         "body": "No need for a hotspot here; the hotel network handled everything I tried. Even sending a batch of large photos was straightforward."
       },
       {
         "reviewer": "Diane",
-        "title": "",
+        "title": "The shower needed a closer clean",
         "positive": "Sink and toilet were very clean.",
         "negative": "The shower edges needed attention, so the bathroom cleaning was a little uneven.",
         "body": "Sink and toilet were very clean.\nThe shower edges needed attention, so the bathroom cleaning was a little uneven."
       },
       {
         "reviewer": "Henry",
-        "title": "",
+        "title": "Lovely and quiet with the TV off",
         "positive": "With the television off, the room was still remarkably quiet. I didn’t need background sound to cover up anything from outside.",
         "negative": "",
         "body": "With the television off, the room was still remarkably quiet. I didn’t need background sound to cover up anything from outside."
       },
       {
         "reviewer": "Holly",
-        "title": "",
+        "title": "Exceptional",
         "positive": "The staff were great, friendly and helpful. We had a lovely welcome letter and champagne in the room As we had just been married",
         "negative": "Nothing everything was great!",
         "body": "The staff were great, friendly and helpful. We had a lovely welcome letter and champagne in the room As we had just been married\nNothing everything was great!"
       },
       {
         "reviewer": "Mohammad",
-        "title": "",
+        "title": "Not enough space for floor work",
         "positive": "",
         "negative": "Once I put a mat down, there was barely room to move between it and the machines. The gym layout made stretching and bodyweight exercises awkward.",
         "body": "Once I put a mat down, there was barely room to move between it and the machines. The gym layout made stretching and bodyweight exercises awkward."
       },
       {
         "reviewer": "Konstantinos",
-        "title": "",
+        "title": "Weekend Trip to the City",
         "positive": "Great aesthetic, spacious room, luxurious amenities!",
         "negative": "Everything was great!",
         "body": "Great aesthetic, spacious room, luxurious amenities!\nEverything was great!"
       },
       {
         "reviewer": "Stephen",
-        "title": "",
+        "title": "More buffering than watching",
         "positive": "",
         "negative": "Tried to stream something before bed and spent more time watching it buffer than play. The Wi-Fi connection kept failing, so I stopped trying.",
         "body": "Tried to stream something before bed and spent more time watching it buffer than play. The Wi-Fi connection kept failing, so I stopped trying."
       },
       {
         "reviewer": "Marco",
-        "title": "",
+        "title": "Exceptional",
         "positive": "I love this luxury hotel. The style, the people, it just felt all great!",
         "negative": "",
         "body": "I love this luxury hotel. The style, the people, it just felt all great!"
       },
       {
         "reviewer": "Caitlin",
-        "title": "",
+        "title": "Coming back for a break meant a detour",
         "positive": "",
         "negative": "Popping back for a break would have meant a long detour from the places I wanted to see.",
         "body": "Popping back for a break would have meant a long detour from the places I wanted to see."
       },
       {
         "reviewer": "Misty",
-        "title": "",
+        "title": "Could fit in cardio and some lifting",
         "positive": "The gym setup let me do a bit of both without leaving out exercises for lack of equipment. That was all I needed during the trip.",
         "negative": "",
         "body": "The gym setup let me do a bit of both without leaving out exercises for lack of equipment. That was all I needed during the trip."
       },
       {
         "reviewer": "Kristi",
-        "title": "",
+        "title": "Sheets and towels passed inspection",
         "positive": "I always check the sheets before getting into a hotel bed, and these were spotless. The towels were equally fresh, with no marks or odd smells.",
         "negative": "",
         "body": "I always check the sheets before getting into a hotel bed, and these were spotless. The towels were equally fresh, with no marks or odd smells."
       },
       {
         "reviewer": "Brodey",
-        "title": "",
+        "title": "Most stylish hotel I’ve ever stayed with a wonderful and professional service staff. Bravo all around.",
         "positive": "Design elements were incredible!",
         "negative": "I have no complaints about it.",
         "body": "Design elements were incredible!\nI have no complaints about it."
       },
       {
         "reviewer": "Sara",
-        "title": "",
+        "title": "Had to send photos over mobile data",
         "positive": "",
         "negative": "Couldn’t send a few photos without the hotel network disconnecting, so I gave up and used mobile data.",
         "body": "Couldn’t send a few photos without the hotel network disconnecting, so I gave up and used mobile data."
       },
       {
         "reviewer": "Kimberly",
-        "title": "",
+        "title": "Hot breakfast varied from day to day",
         "positive": "The hot breakfast was tasty one morning.",
         "negative": "Only lukewarm the next. Some good food, but the quality varied during my stay.",
         "body": "The hot breakfast was tasty one morning.\nOnly lukewarm the next. Some good food, but the quality varied during my stay."
       },
       {
         "reviewer": "Martha",
-        "title": "",
+        "title": "Exceptional",
         "positive": "Location and restaurants, rooms comfortable",
         "negative": "",
         "body": "Location and restaurants, rooms comfortable"
       },
       {
         "reviewer": "Continue readingMegan",
-        "title": "",
+        "title": "A workable space for floor exercises",
         "positive": "There was enough usable space beside the equipment for a mat and a few stretches. I could finish my routine there without squeezing into a corner.",
         "negative": "",
         "body": "There was enough usable space beside the equipment for a mat and a few stretches. I could finish my routine there without squeezing into a corner."
       },
       {
         "reviewer": "Tiia",
-        "title": "",
+        "title": "Street activity stayed outside",
         "positive": "The street was active outside, but very little sound made it through the closed window. Inside, I could relax without traffic intruding.",
         "negative": "",
         "body": "The street was active outside, but very little sound made it through the closed window. Inside, I could relax without traffic intruding."
       },
       {
         "reviewer": "Mike",
-        "title": "",
+        "title": "Simply amazing",
         "positive": "Everything",
         "negative": "N/A",
         "body": "Everything\nN/A"
       },
       {
         "reviewer": "Steven",
-        "title": "",
+        "title": "Messages went through straight away",
         "positive": "Messages sent straight away on the room internet instead of sitting there waiting for a connection.",
         "negative": "",
         "body": "Messages sent straight away on the room internet instead of sitting there waiting for a connection."
       },
       {
         "reviewer": "Vivian",
-        "title": "",
+        "title": "Comfortable from the first night",
         "positive": "The mattress had a gentle give that felt comfortable immediately and stayed that way every night.",
         "negative": "",
         "body": "The mattress had a gentle give that felt comfortable immediately and stayed that way every night."
       },
       {
         "reviewer": "Donald",
-        "title": "",
+        "title": "Nice facility,\"\"\"",
         "positive": "Great location, clean, nice staff.",
         "negative": "",
         "body": "Great location, clean, nice staff."
       },
       {
         "reviewer": "Lena",
-        "title": "",
+        "title": "Clear picture on a long family call",
         "positive": "A video chat with family went on much longer than intended, and the picture stayed clear throughout. The internet didn’t let me down.",
         "negative": "",
         "body": "A video chat with family went on much longer than intended, and the picture stayed clear throughout. The internet didn’t let me down."
       },
       {
         "reviewer": "Ambar",
-        "title": "",
+        "title": "Good choices for a light or hot breakfast",
         "positive": "Really liked being able to choose between a light breakfast and a proper hot meal, with enough variety to keep both interesting.",
         "negative": "",
         "body": "Really liked being able to choose between a light breakfast and a proper hot meal, with enough variety to keep both interesting."
       },
       {
         "reviewer": "Nikhil",
-        "title": "",
+        "title": "Love the space, bathrooms are great, and location is perfect",
         "positive": "Very clean and design forward rooms.",
         "negative": "Rooms could have a little more lighting options to help in evenings if working! But it’s ok",
         "body": "Very clean and design forward rooms.\nRooms could have a little more lighting options to help in evenings if working! But it’s ok"
       },
       {
         "reviewer": "Patricia",
-        "title": "",
+        "title": "We will be back",
         "positive": "Food was delicious",
         "negative": "",
         "body": "Food was delicious"
       },
       {
         "reviewer": "B",
-        "title": "",
+        "title": "A relief for someone who wakes easily",
         "positive": "As someone who usually wakes at every door closing, I was grateful for how little corridor noise reached my room.",
         "negative": "",
         "body": "As someone who usually wakes at every door closing, I was grateful for how little corridor noise reached my room."
       },
       {
         "reviewer": "Trussoni",
-        "title": "",
+        "title": "Very easy to settle into bed",
         "positive": "Plump pillows and a well-cushioned mattress made reading in bed wonderfully comfortable.",
         "negative": "",
         "body": "Plump pillows and a well-cushioned mattress made reading in bed wonderfully comfortable."
       },
       {
         "reviewer": "Lee",
-        "title": "",
+        "title": "Warm welcome, disappointing follow-through",
         "positive": "Reception was warm and attentive at arrival.",
         "negative": "Later I struggled to get anyone to follow up on a request. The service depended on the moment.",
         "body": "Reception was warm and attentive at arrival.\nLater I struggled to get anyone to follow up on a request. The service depended on the moment."
       },
       {
         "reviewer": "Jonathan",
-        "title": "",
+        "title": "Proper foot massage with a view n dat",
         "positive": "One of the best breakfast I have ever had.",
         "negative": "Have more wine and food in the room",
         "body": "One of the best breakfast I have ever had.\nHave more wine and food in the room"
       },
       {
         "reviewer": "Madison",
-        "title": "",
+        "title": "Fewer easy walks than I’d expected",
         "positive": "",
         "negative": "I underestimated how much travelling I’d be doing from here each morning. Very few of my planned stops were an easy walk away.",
         "body": "I underestimated how much travelling I’d be doing from here each morning. Very few of my planned stops were an easy walk away."
       },
       {
         "reviewer": "Vigil",
-        "title": "",
+        "title": "Calm evenings without sudden bangs",
         "positive": "My evenings here were calm, with no sudden bangs interrupting them. Whatever noise there was elsewhere in the building didn’t carry into the room.",
         "negative": "",
         "body": "My evenings here were calm, with no sudden bangs interrupting them. Whatever noise there was elsewhere in the building didn’t carry into the room."
       },
       {
         "reviewer": "Nicole",
-        "title": "",
+        "title": "Barely warm and short on flavor",
         "positive": "",
         "negative": "I was hungry enough to finish breakfast, but I can’t say I enjoyed it. The hot food was barely warm and lacked much flavor.",
         "body": "I was hungry enough to finish breakfast, but I can’t say I enjoyed it. The hot food was barely warm and lacked much flavor."
       },
       {
         "reviewer": "Janet",
-        "title": "",
+        "title": "Enough equipment for my routine",
         "positive": "I found the weights and cardio machines I needed and got through my usual workout. The gym did the job well for me.",
         "negative": "",
         "body": "I found the weights and cardio machines I needed and got through my usual workout. The gym did the job well for me."
       },
       {
         "reviewer": "Thomas",
-        "title": "",
+        "title": "Couldn’t hear the neighboring rooms",
         "positive": "Even late in the evening, I couldn’t hear televisions or conversations from the rooms beside mine. It felt pleasantly calm once I settled in.",
         "negative": "",
         "body": "Even late in the evening, I couldn’t hear televisions or conversations from the rooms beside mine. It felt pleasantly calm once I settled in."
       },
       {
         "reviewer": "Lorrie",
-        "title": "",
+        "title": "An awkward base for my route",
         "positive": "",
         "negative": "For the route I’d put together, this turned out to be an awkward base. Even short visits elsewhere needed more travel time than I had allowed.",
         "body": "For the route I’d put together, this turned out to be an awkward base. Even short visits elsewhere needed more travel time than I had allowed."
       },
       {
         "reviewer": "Heather",
-        "title": "",
+        "title": "Exceptional",
         "positive": "Great view of the Chicago skyline. Comfortable bed and amazing bathroom.",
         "negative": "",
         "body": "Great view of the Chicago skyline. Comfortable bed and amazing bathroom."
       },
       {
         "reviewer": "Becky",
-        "title": "",
+        "title": "A steady treadmill for my morning run",
         "positive": "The treadmill ran evenly, and the speed controls responded properly throughout. I had no trouble doing the session I wanted.",
         "negative": "",
         "body": "The treadmill ran evenly, and the speed controls responded properly throughout. I had no trouble doing the session I wanted."
       },
       {
         "reviewer": "Noah",
-        "title": "",
+        "title": "Exceptional",
         "positive": "The location was perfect in the west loop of Chicago, surrounded by endless restaurants and bars.",
         "negative": "",
         "body": "The location was perfect in the west loop of Chicago, surrounded by endless restaurants and bars."
       },
       {
         "reviewer": "Christine",
-        "title": "",
+        "title": "Hair left in the shower",
         "positive": "",
         "negative": "A few hairs left in the shower before I’d even used it really put me off.",
         "body": "A few hairs left in the shower before I’d even used it really put me off."
       },
       {
         "reviewer": "Alexander",
-        "title": "",
+        "title": "Finally, a pillow I didn’t have to fold",
         "positive": "Finally found a hotel pillow that didn’t need folding in half. It held my neck at a comfortable angle right through the night.",
         "negative": "",
         "body": "Finally found a hotel pillow that didn’t need folding in half. It held my neck at a comfortable angle right through the night."
       },
       {
         "reviewer": "Willliam",
-        "title": "",
+        "title": "Left most of the underripe fruit",
         "positive": "",
         "negative": "The breakfast fruit looked promising but tasted watery and underripe, so I left most of it.",
         "body": "The breakfast fruit looked promising but tasted watery and underripe, so I left most of it."
       },
       {
         "reviewer": "Erin",
-        "title": "",
+        "title": "Not every call went as smoothly",
         "positive": "One video call was flawless, and basic browsing generally worked.",
         "negative": "Another call kept freezing on the same device. The Wi-Fi had its off moments.",
         "body": "One video call was flawless, and basic browsing generally worked.\nAnother call kept freezing on the same device. The Wi-Fi had its off moments."
       },
       {
         "reviewer": "Yong",
-        "title": "",
+        "title": "Didn’t even open the earplug packet",
         "positive": "Brought earplugs as usual and didn’t even open the packet; the room was that quiet.",
         "negative": "",
         "body": "Brought earplugs as usual and didn’t even open the packet; the room was that quiet."
       },
       {
         "reviewer": "Apollonia",
-        "title": "",
+        "title": "We loved our stay!",
         "positive": "Its stunning inside rooms very spacious staff lovely.",
         "negative": "Nothing",
         "body": "Its stunning inside rooms very spacious staff lovely.\nNothing"
       },
       {
         "reviewer": "Evan",
-        "title": "",
+        "title": "Treadmill was good, weights less useful",
         "positive": "Had a good run on a treadmill that worked smoothly.",
         "negative": "There weren’t enough heavier dumbbells for the lifting I wanted to do afterwards.",
         "body": "Had a good run on a treadmill that worked smoothly.\nThere weren’t enough heavier dumbbells for the lifting I wanted to do afterwards."
       },
       {
         "reviewer": "Mohamed",
-        "title": "",
+        "title": "Enjoyed the scrambled eggs especially",
         "positive": "The morning meal was more enjoyable than I’d expected, particularly the soft scrambled eggs. I finished the plate instead of picking around the edges.",
         "negative": "",
         "body": "The morning meal was more enjoyable than I’d expected, particularly the soft scrambled eggs. I finished the plate instead of picking around the edges."
       },
       {
         "reviewer": "Sandra",
-        "title": "",
+        "title": "Not well placed for my plans",
         "positive": "",
         "negative": "The places I wanted to explore were spread a long way from the hotel. For this trip, the location made getting around more of an effort than I’d hoped.",
         "body": "The places I wanted to explore were spread a long way from the hotel. For this trip, the location made getting around more of an effort than I’d hoped."
       },
       {
         "reviewer": "Ashley",
-        "title": "",
+        "title": "A nice way to bring in the new year!",
         "positive": "The manager was kind and accommodating",
         "negative": "Tv was broke in my first room. In the second room the bench was dirty. Just doesn’t seem like they are keeping up the property for the cost per night.",
         "body": "The manager was kind and accommodating\nTv was broke in my first room. In the second room the bench was dirty. Just doesn’t seem like they are keeping up the property for the cost per night."
       },
       {
         "reviewer": "Marcus",
-        "title": "",
+        "title": "Better Wi-Fi during the day",
         "positive": "Browsing was quick during the day.",
         "negative": "The connection became patchy in the evening. I wouldn’t describe it as either consistently good or consistently bad.",
         "body": "Browsing was quick during the day.\nThe connection became patchy in the evening. I wouldn’t describe it as either consistently good or consistently bad."
       },
       {
         "reviewer": "Aimee",
-        "title": "",
+        "title": "Not a peep through the wall",
         "positive": "Didn’t hear a peep from next door. Lovely to have quiet evenings without someone else’s television in the background.",
         "negative": "",
         "body": "Didn’t hear a peep from next door. Lovely to have quiet evenings without someone else’s television in the background."
       },
       {
         "reviewer": "Heath",
-        "title": "",
+        "title": "Already planning the next morning’s breakfast",
         "positive": "Enjoyed the hot breakfast so much on the first day that I was already thinking about what to try the next morning.",
         "negative": "",
         "body": "Enjoyed the hot breakfast so much on the first day that I was already thinking about what to try the next morning."
       },
       {
         "reviewer": "Pamela",
-        "title": "",
+        "title": "No adjustment needed for this mattress",
         "positive": "Normally I need a night to adjust to hotel beds, but this one felt comfortable straight away.",
         "negative": "",
         "body": "Normally I need a night to adjust to hotel beds, but this one felt comfortable straight away."
       },
       {
         "reviewer": "Lisa",
-        "title": "",
+        "title": "Lovely",
         "positive": "Loved the staff here! So friendly and willing to go above and beyond. Location is perfect. Room is spacious and clean. Would definitely stay again.",
         "negative": "Traffic noise outside, but it’s Chicago. Nothing you can really do about that.",
         "body": "Loved the staff here! So friendly and willing to go above and beyond. Location is perfect. Room is spacious and clean. Would definitely stay again.\nTraffic noise outside, but it’s Chicago. Nothing you can really do about that."
       },
       {
         "reviewer": "Kevin",
-        "title": "",
+        "title": "Fruit was good, bread was dry",
         "positive": "Fresh, tasty fruit at breakfast.",
         "negative": "Rather dry bread; some parts of the meal were much better than others.",
         "body": "Fresh, tasty fruit at breakfast.\nRather dry bread; some parts of the meal were much better than others."
       },
       {
         "reviewer": "Emma",
-        "title": "",
+        "title": "Browsing and uploads both worked well",
         "positive": "Whether I was browsing or uploading pictures, everything went smoothly over the room Wi-Fi.",
         "negative": "",
         "body": "Whether I was browsing or uploading pictures, everything went smoothly over the room Wi-Fi."
       },
       {
         "reviewer": "Karin",
-        "title": "",
+        "title": "I will continue to seek out Nobu hotels in my future travel. Five stars isn’t enough.",
         "positive": "The food and cocktails at the Nobu restaurant and rooftop was exceptional.",
         "negative": "Everything smacked of perfection.",
         "body": "The food and cocktails at the Nobu restaurant and rooftop was exceptional.\nEverything smacked of perfection."
       },
       {
         "reviewer": "Katrina",
-        "title": "",
+        "title": "Weight selection needed filling out",
         "positive": "",
         "negative": "There were big gaps between the available dumbbell sizes. I couldn’t find a sensible weight for several of my usual exercises.",
         "body": "There were big gaps between the available dumbbell sizes. I couldn’t find a sensible weight for several of my usual exercises."
       },
       {
         "reviewer": "Terrence",
-        "title": "",
+        "title": "Wonderful",
         "positive": "Great location",
         "negative": "",
         "body": "Great location"
       },
       {
         "reviewer": "Luann",
-        "title": "",
+        "title": "A long download with no interruptions",
         "positive": "My tablet finished a long download without the Wi-Fi cutting out once.",
         "negative": "",
         "body": "My tablet finished a long download without the Wi-Fi cutting out once."
       },
       {
         "reviewer": "Kristina",
-        "title": "",
+        "title": "Rubbery eggs put me off",
         "positive": "",
         "negative": "Rubbery eggs and dry toast put me right off breakfast.",
         "body": "Rubbery eggs and dry toast put me right off breakfast."
       },
       {
         "reviewer": "Brystal",
-        "title": "",
+        "title": "Exceptional",
         "positive": "Loved the design and aesthetic. Gorgeous room, great spa facilities, and amazing on site restaurant.",
         "negative": "Cancellation policy was a bit outrageous. Limited to no support from staff which was surprising.",
         "body": "Loved the design and aesthetic. Gorgeous room, great spa facilities, and amazing on site restaurant.\nCancellation policy was a bit outrageous. Limited to no support from staff which was surprising."
       },
       {
         "reviewer": "Darnell",
-        "title": "",
+        "title": "This network got along with my phone",
         "positive": "My phone has been awkward with hotel networks before, but this one worked first time. The connection remained reliable whenever I picked it up again.",
         "negative": "",
         "body": "My phone has been awkward with hotel networks before, but this one worked first time. The connection remained reliable whenever I picked it up again."
       },
       {
         "reviewer": "Shauneen",
-        "title": "",
+        "title": "Lovely modern industrial style hotel I would recommend",
         "positive": "The design was beautiful",
         "negative": "Some areas not so clean",
         "body": "The design was beautiful\nSome areas not so clean"
       },
       {
         "reviewer": "Van",
-        "title": "",
+        "title": "Helpful one moment, abrupt the next",
         "positive": "Had a lovely interaction with one staff member who took time to help.",
         "negative": "Another was quite abrupt with a simple question, so my overall impression was mixed.",
         "body": "Had a lovely interaction with one staff member who took time to help.\nAnother was quite abrupt with a simple question, so my overall impression was mixed."
       },
       {
         "reviewer": "Willow",
-        "title": "",
+        "title": "Three quiet nights",
         "positive": "All three nights were quiet, without the doors slamming and voices through walls I’ve had elsewhere.",
         "negative": "",
         "body": "All three nights were quiet, without the doors slamming and voices through walls I’ve had elsewhere."
       },
       {
         "reviewer": "Braun",
-        "title": "",
+        "title": "The right sort of firmness",
         "positive": "Firm enough to support my back without feeling hard, which is exactly how I like a mattress.",
         "negative": "",
         "body": "Firm enough to support my back without feeling hard, which is exactly how I like a mattress."
       },
       {
         "reviewer": "Sheila",
-        "title": "",
+        "title": "Walkable for some stops, a trek for others",
         "positive": "Some stops were easy to walk to.",
         "negative": "Others took ages to reach, so the location was a mixed blessing for my itinerary.",
         "body": "Some stops were easy to walk to.\nOthers took ages to reach, so the location was a mixed blessing for my itinerary."
       },
       {
         "reviewer": "Laura",
-        "title": "",
+        "title": "The weights area worked for me",
         "positive": "Used the bench and dumbbells on two visits. Both times I had what I needed for a proper set of exercises.",
         "negative": "",
         "body": "Used the bench and dumbbells on two visits. Both times I had what I needed for a proper set of exercises."
       },
       {
         "reviewer": "Noura",
-        "title": "",
+        "title": "A great experience and will come here again soon",
         "positive": "Everything specially the staff",
         "negative": "Nothing.",
         "body": "Everything specially the staff\nNothing."
       },
       {
         "reviewer": "Dawn",
-        "title": "",
+        "title": "That pastry was worth another visit",
         "positive": "That flaky breakfast pastry was worth going back for: lots of flavor and none of the usual dryness.",
         "negative": "",
         "body": "That flaky breakfast pastry was worth going back for: lots of flavor and none of the usual dryness."
       },
       {
         "reviewer": "Maria",
-        "title": "",
+        "title": "Loved the feel of the sheets",
         "positive": "The sheets felt lovely against my skin, with none of that scratchy stiffness. Combined with the mattress, they made the bed really comfortable.",
         "negative": "",
         "body": "The sheets felt lovely against my skin, with none of that scratchy stiffness. Combined with the mattress, they made the bed really comfortable."
       },
       {
         "reviewer": "Caouette",
-        "title": "",
+        "title": "Decent selection, one machine unusable",
         "positive": "The fitness room offered a reasonable mix of cardio equipment and weights.",
         "negative": "The bike I wanted to use wasn’t working, so part of that choice was only on paper.",
         "body": "The fitness room offered a reasonable mix of cardio equipment and weights.\nThe bike I wanted to use wasn’t working, so part of that choice was only on paper."
       },
       {
         "reviewer": "Kelly",
-        "title": "",
+        "title": "A whole film without the loading circle",
         "positive": "Streamed a full film in the room without seeing the loading circle once!",
         "negative": "",
         "body": "Streamed a full film in the room without seeing the loading circle once!"
       },
       {
         "reviewer": "Ellen",
-        "title": "",
+        "title": "Amazing hotel!! Best in west loop!! Will be back!",
         "positive": "Love it",
         "negative": "",
         "body": "Love it"
       },
       {
         "reviewer": "Vick",
-        "title": "",
+        "title": "Hard to leave that duvet behind",
         "positive": "Could easily have spent another hour under that soft duvet each morning; the whole bed felt wonderfully comfortable.",
         "negative": "",
         "body": "Could easily have spent another hour under that soft duvet each morning; the whole bed felt wonderfully comfortable."
       },
       {
         "reviewer": "Mazen",
-        "title": "",
+        "title": "Hassan from the front desk and his staff were fast and of great help to sort out my booking issue",
         "positive": "Clean, quiet, super friendly staff, great location for my work.",
         "negative": "Concrete ceilings for the room was different, but I get it’s part of the design.",
         "body": "Clean, quiet, super friendly staff, great location for my work.\nConcrete ceilings for the room was different, but I get it’s part of the design."
       },
       {
         "reviewer": "Helen",
-        "title": "",
+        "title": "The bench wouldn’t stay adjusted",
         "positive": "",
         "negative": "The adjustable bench kept slipping back from the position I set. I stopped using it because I couldn’t rely on it staying in place.",
         "body": "The adjustable bench kept slipping back from the position I set. I stopped using it because I couldn’t rely on it staying in place."
       },
       {
         "reviewer": "Suzanne",
-        "title": "",
+        "title": "Surprisingly little traffic noise",
         "positive": "A city hotel can be loud, so I was pleased by how subdued everything sounded from my room. Traffic never rose above a faint background murmur.",
         "negative": "",
         "body": "A city hotel can be loud, so I was pleased by how subdued everything sounded from my room. Traffic never rose above a faint background murmur."
       },
       {
         "reviewer": "Brooke",
-        "title": "",
+        "title": "Clean, comfortable, chic & great staff!",
         "positive": "Staff was so great & friendly! Luxe and comfortable hotel. Would definitely come back :)",
         "negative": "N/A",
         "body": "Staff was so great & friendly! Luxe and comfortable hotel. Would definitely come back :)\nN/A"
       },
       {
         "reviewer": "Kristin",
-        "title": "",
+        "title": "Steady internet whenever I tried it",
         "positive": "Used the Wi-Fi at different times of day and got the same steady connection. I could browse without wondering whether the next page would load.",
         "negative": "",
         "body": "Used the Wi-Fi at different times of day and got the same steady connection. I could browse without wondering whether the next page would load."
       },
       {
         "reviewer": "Rafe",
-        "title": "",
+        "title": "Breakfast choices soon became repetitive",
         "positive": "",
         "negative": "Breakfast choices felt repetitive by the second morning. I struggled to put together a plate I really wanted, and what I did try was bland.",
         "body": "Breakfast choices felt repetitive by the second morning. I struggled to put together a plate I really wanted, and what I did try was bland."
@@ -6772,1056 +6772,1062 @@
     "arlo-chicago": [
       {
         "reviewer": "Mathew",
-        "title": "",
+        "title": "Stayed on that bed longer than planned",
         "positive": "I planned on resting for a few minutes and ended up staying on the bed much longer. It was comfortably cushioned without swallowing me up.",
         "negative": "",
         "body": "I planned on resting for a few minutes and ended up staying on the bed much longer. It was comfortably cushioned without swallowing me up."
       },
       {
         "reviewer": "Nita",
-        "title": "",
+        "title": "Reliable on the laptop as well as the phone",
         "positive": "Even when I switched from my phone to my laptop, the network worked without a fuss. Both devices had a dependable connection.",
         "negative": "",
         "body": "Even when I switched from my phone to my laptop, the network worked without a fuss. Both devices had a dependable connection."
       },
       {
         "reviewer": "Kelly",
-        "title": "",
+        "title": "Great for Chicago newbies",
         "positive": "A beautiful cute hotel! Staff made this such a great stay!",
         "negative": "I can’t think of a single thing I disliked.",
         "body": "A beautiful cute hotel! Staff made this such a great stay!\nI can’t think of a single thing I disliked."
       },
       {
         "reviewer": "Sandrine",
-        "title": "",
+        "title": "Could make the bike session as hard as I wanted",
         "positive": "The resistance settings gave me a proper range, and the bike kept working smoothly as I changed them. Enjoyed using it.",
         "negative": "",
         "body": "The resistance settings gave me a proper range, and the bike kept working smoothly as I changed them. Enjoyed using it."
       },
       {
         "reviewer": "Dvorak",
-        "title": "",
+        "title": "Street sounds were barely audible",
         "positive": "I usually notice traffic as soon as I switch off the television. Here, the sound from the street was barely audible even then.",
         "negative": "",
         "body": "I usually notice traffic as soon as I switch off the television. Here, the sound from the street was barely audible even then."
       },
       {
         "reviewer": "Bindi",
-        "title": "",
+        "title": "A gym I could do a full session in",
         "positive": "Cardio machines, a useful spread of weights and a bench covered the routine I’d brought with me. I didn’t have to skip anything for lack of equipment.",
         "negative": "",
         "body": "Cardio machines, a useful spread of weights and a bench covered the routine I’d brought with me. I didn’t have to skip anything for lack of equipment."
       },
       {
         "reviewer": "Francisco",
-        "title": "",
+        "title": "Great",
         "positive": "Friendly staff , big rooms and nice ambience",
         "negative": "The check out time is too soon and the check in too late",
         "body": "Friendly staff , big rooms and nice ambience\nThe check out time is too soon and the check in too late"
       },
       {
         "reviewer": "Robin",
-        "title": "",
+        "title": "Conversations outside came straight through",
         "positive": "",
         "negative": "Voices carried straight in from the corridor, even with the door firmly closed. It was especially annoying when a group stopped outside to chat.",
         "body": "Voices carried straight in from the corridor, even with the door firmly closed. It was especially annoying when a group stopped outside to chat."
       },
       {
         "reviewer": "Denise",
-        "title": "",
+        "title": "My hotspot got a rest",
         "positive": "Never reached for my mobile hotspot during this stay. The Wi-Fi was reliable enough for every call, message and bit of browsing I did.",
         "negative": "",
         "body": "Never reached for my mobile hotspot during this stay. The Wi-Fi was reliable enough for every call, message and bit of browsing I did."
       },
       {
         "reviewer": "Pat",
-        "title": "",
+        "title": "Fresh bread made a simple meal better",
         "positive": "Fresh bread made my simple breakfast much better than expected. Toasted or as it came, it tasted good on each morning I tried it.",
         "negative": "",
         "body": "Fresh bread made my simple breakfast much better than expected. Toasted or as it came, it tasted good on each morning I tried it."
       },
       {
         "reviewer": "Mustafa",
-        "title": "",
+        "title": "A good choice at a perfect location",
         "positive": "I was informed during check-in that my room type had be changed due to a prior damage. It was handled professionally.",
         "negative": "",
         "body": "I was informed during check-in that my room type had be changed due to a prior damage. It was handled professionally."
       },
       {
         "reviewer": "Mcbarry",
-        "title": "",
+        "title": "Wouldn’t look forward to that breakfast again",
         "positive": "",
         "negative": "Disappointing fruit and stale-tasting pastries put me off the morning meal. Breakfast was the part of the visit I wouldn’t look forward to repeating.",
         "body": "Disappointing fruit and stale-tasting pastries put me off the morning meal. Breakfast was the part of the visit I wouldn’t look forward to repeating."
       },
       {
         "reviewer": "Jaime",
-        "title": "",
+        "title": "Spotless counter for my toiletries",
         "positive": "No need to wipe the bathroom counter before setting out my toiletries; it was already spotless, along with the sink and shower.",
         "negative": "",
         "body": "No need to wipe the bathroom counter before setting out my toiletries; it was already spotless, along with the sink and shower."
       },
       {
         "reviewer": "Zulema",
-        "title": "",
+        "title": "Got my run in without any trouble",
         "positive": "The treadmill kept a steady pace, and the incline settings worked well. I was able to do my usual running session in the fitness room.",
         "negative": "",
         "body": "The treadmill kept a steady pace, and the incline settings worked well. I was able to do my usual running session in the fitness room."
       },
       {
         "reviewer": "Charlotte",
-        "title": "",
+        "title": "Could tell what next door was watching",
         "positive": "",
         "negative": "Could hear the television next door clearly enough to recognize when the program changed. That was distracting when I was trying to wind down.",
         "body": "Could hear the television next door clearly enough to recognize when the program changed. That was distracting when I was trying to wind down."
       },
       {
         "reviewer": "Ingrid",
-        "title": "",
+        "title": "Light duvet and soft sheets",
         "positive": "Soft sheets and a duvet that didn’t weigh me down made it easy to get comfortable.",
         "negative": "",
         "body": "Soft sheets and a duvet that didn’t weigh me down made it easy to get comfortable."
       },
       {
         "reviewer": "Emily",
-        "title": "",
+        "title": "Quiet enough to hear the pages turn",
         "positive": "Quiet enough to hear myself turning the pages of my book, with barely any sound from neighboring rooms.",
         "negative": "",
         "body": "Quiet enough to hear myself turning the pages of my book, with barely any sound from neighboring rooms."
       },
       {
         "reviewer": "Mia",
-        "title": "",
+        "title": "My stay was simply perfect, I will return again.",
         "positive": "Clean Welcoming Great price",
         "negative": "N/a",
         "body": "Clean Welcoming Great price\nN/a"
       },
       {
         "reviewer": "Janice",
-        "title": "",
+        "title": "Wi-Fi I didn’t have to keep checking",
         "positive": "Refreshing to use hotel Wi-Fi without constantly having to check whether the connection has disappeared.",
         "negative": "",
         "body": "Refreshing to use hotel Wi-Fi without constantly having to check whether the connection has disappeared."
       },
       {
         "reviewer": "Bard",
-        "title": "",
+        "title": "Just as good the second morning",
         "positive": "Went back for breakfast after a good first morning and found it just as fresh and flavorful.",
         "negative": "",
         "body": "Went back for breakfast after a good first morning and found it just as fresh and flavorful."
       },
       {
         "reviewer": "Antony",
-        "title": "",
+        "title": "Perfect location, very clean and comfortable",
         "positive": "Comfortable bed and pillows, spotlessly clean, nice modern decor, fantastic location,",
         "negative": "Nothing",
         "body": "Comfortable bed and pillows, spotlessly clean, nice modern decor, fantastic location,\nNothing"
       },
       {
         "reviewer": "Victor",
-        "title": "",
+        "title": "The staff was amazing",
         "positive": "Great atmosphere",
         "negative": "",
         "body": "Great atmosphere"
       },
       {
         "reviewer": "Shani",
-        "title": "",
+        "title": "Good bread let down by rubbery eggs",
         "positive": "Fresh, tasty bread at breakfast.",
         "negative": "Rather rubbery eggs left me with mixed feelings about the meal.",
         "body": "Fresh, tasty bread at breakfast.\nRather rubbery eggs left me with mixed feelings about the meal."
       },
       {
         "reviewer": "Kylie",
-        "title": "",
+        "title": "Had to ask all over again",
         "positive": "",
         "negative": "Nobody followed up after assuring me they would look into my question. I had to explain the whole thing again when I checked back.",
         "body": "Nobody followed up after assuring me they would look into my question. I had to explain the whole thing again when I checked back."
       },
       {
         "reviewer": "Sylvia",
-        "title": "",
+        "title": "Street noise didn’t intrude on the evening",
         "positive": "Once inside for the evening, I could relax without the street sounds intruding.",
         "negative": "",
         "body": "Once inside for the evening, I could relax without the street sounds intruding."
       },
       {
         "reviewer": "Dr",
-        "title": "",
+        "title": "No trouble switching between travel pages",
         "positive": "Planning each day online was painless, with the Wi-Fi staying connected as I switched between maps and booking pages.",
         "negative": "",
         "body": "Planning each day online was painless, with the Wi-Fi staying connected as I switched between maps and booking pages."
       },
       {
         "reviewer": "Leslie",
-        "title": "",
+        "title": "I would stay there again!",
         "positive": "Hotel was clean. Service was amazing.",
         "negative": "I had no complaints",
         "body": "Hotel was clean. Service was amazing.\nI had no complaints"
       },
       {
         "reviewer": "Tajc",
-        "title": "",
+        "title": "Soft pillows with proper support",
         "positive": "Soft pillows that still kept some shape made a big difference for me. My neck felt supported rather than propped up at an odd angle.",
         "negative": "",
         "body": "Soft pillows that still kept some shape made a big difference for me. My neck felt supported rather than propped up at an odd angle."
       },
       {
         "reviewer": "Djunnaymed",
-        "title": "",
+        "title": "Didn’t hear anyone getting back late",
         "positive": "Went to bed before most people seemed to be back, but never heard them arrive. The room kept the hallway noise out well.",
         "negative": "",
         "body": "Went to bed before most people seemed to be back, but never heard them arrive. The room kept the hallway noise out well."
       },
       {
         "reviewer": "Babak",
-        "title": "",
+        "title": "A practical layout for exercising",
         "positive": "I could move between the weights, machines and mat area without constantly shifting things out of the way. The fitness space was easy to use.",
         "negative": "",
         "body": "I could move between the weights, machines and mat area without constantly shifting things out of the way. The fitness space was easy to use."
       },
       {
         "reviewer": "Ann",
-        "title": "",
+        "title": "Exceptional",
         "positive": "Location",
         "negative": "",
         "body": "Location"
       },
       {
         "reviewer": "Kelley",
-        "title": "",
+        "title": "Great location, nice staff.",
         "positive": "Weird coffee maker",
         "negative": "",
         "body": "Weird coffee maker"
       },
       {
         "reviewer": "Friederike",
-        "title": "",
+        "title": "Gym equipment was in good shape",
         "positive": "Everything I used moved smoothly and felt secure, including the bench adjustments. No frustrating maintenance problems during my workouts.",
         "negative": "",
         "body": "Everything I used moved smoothly and felt secure, including the bench adjustments. No frustrating maintenance problems during my workouts."
       },
       {
         "reviewer": "Jeanne",
-        "title": "",
+        "title": "Comfortable mattress let down by rough sheets",
         "positive": "I could relax on the mattress quite happily.",
         "negative": "The sheets felt rougher than I’d like. The bed setup had good and bad points for comfort.",
         "body": "I could relax on the mattress quite happily.\nThe sheets felt rougher than I’d like. The bed setup had good and bad points for comfort."
       },
       {
         "reviewer": "Taylor",
-        "title": "",
+        "title": "Exactly how a room should look on arrival",
         "positive": "Clean floors, no bits in the corners and nothing left behind by the previous guest. Exactly how a room should be on arrival.",
         "negative": "",
         "body": "Clean floors, no bits in the corners and nothing left behind by the previous guest. Exactly how a room should be on arrival."
       },
       {
         "reviewer": "Xochitl",
-        "title": "",
+        "title": "Location location location",
         "positive": "Location",
         "negative": "The scent they have in the lobby is overwhelming",
         "body": "Location\nThe scent they have in the lobby is overwhelming"
       },
       {
         "reviewer": "Ugo",
-        "title": "",
+        "title": "Online reservations went through first time",
         "positive": "Reservations went through online first time, and confirmation pages loaded straight away. I never worried that the connection had dropped in the middle of a booking.",
         "negative": "",
         "body": "Reservations went through online first time, and confirmation pages loaded straight away. I never worried that the connection had dropped in the middle of a booking."
       },
       {
         "reviewer": "Nikhil",
-        "title": "",
+        "title": "My shoulder didn’t like this mattress",
         "positive": "",
         "negative": "Much too firm a mattress for a side sleeper like me; my shoulder was sore in the morning.",
         "body": "Much too firm a mattress for a side sleeper like me; my shoulder was sore in the morning."
       },
       {
         "reviewer": "Leandro",
-        "title": "",
+        "title": "Late-night horns were hard to tune out",
         "positive": "",
         "negative": "Traffic noise kept cutting through late at night, with horns much louder than I’d expected. I had trouble tuning it out.",
         "body": "Traffic noise kept cutting through late at night, with horns much louder than I’d expected. I had trouble tuning it out."
       },
       {
         "reviewer": "Aubrey",
-        "title": "",
+        "title": "Easy to vary workouts over the stay",
         "positive": "Used the bike one day and a treadmill the next, then added some lifting. The available equipment made both visits worthwhile.",
         "negative": "",
         "body": "Used the bike one day and a treadmill the next, then added some lifting. The available equipment made both visits worthwhile."
       },
       {
         "reviewer": "Ela",
-        "title": "",
+        "title": "Reliable one evening, patchy the next",
         "positive": "The Wi-Fi was dependable on my first evening.",
         "negative": "It dropped several times the next night. There were useful stretches, but I couldn’t always count on it.",
         "body": "The Wi-Fi was dependable on my first evening.\nIt dropped several times the next night. There were useful stretches, but I couldn’t always count on it."
       },
       {
         "reviewer": "John",
-        "title": "",
+        "title": "Solid choice for a few nights in the city",
         "positive": "Great location and facilities.",
         "negative": "Key cards were very sensitive and would de-activate",
         "body": "Great location and facilities.\nKey cards were very sensitive and would de-activate"
       },
       {
         "reviewer": "Vernon",
-        "title": "",
+        "title": "More than one good breakfast option",
         "positive": "Enough breakfast variety to avoid having the same plate every morning. I found several things I enjoyed rather than one safe option.",
         "negative": "",
         "body": "Enough breakfast variety to avoid having the same plate every morning. I found several things I enjoyed rather than one safe option."
       },
       {
         "reviewer": "Ian",
-        "title": "",
+        "title": "Would have appreciated a little courtesy",
         "positive": "",
         "negative": "A couple of curt responses from staff left a poor impression; I was only looking for ordinary, polite assistance.",
         "body": "A couple of curt responses from staff left a poor impression; I was only looking for ordinary, polite assistance."
       },
       {
         "reviewer": "Heather",
-        "title": "",
+        "title": "Didn’t have to improvise my strength session",
         "positive": "The gym had the different weights I needed and a bench that adjusted properly. I could follow my usual set of exercises.",
         "negative": "",
         "body": "The gym had the different weights I needed and a bench that adjusted properly. I could follow my usual set of exercises."
       },
       {
         "reviewer": "Неофидов",
-        "title": "",
+        "title": "Heard every word on my Wi-Fi call",
         "positive": "Called a friend over Wi-Fi and could hear every word clearly. The connection held for the full call without either of us having to repeat ourselves.",
         "negative": "",
         "body": "Called a friend over Wi-Fi and could hear every word clearly. The connection held for the full call without either of us having to repeat ourselves."
       },
       {
         "reviewer": "Tulba",
-        "title": "",
+        "title": "The welcome was better than the later help",
         "positive": "Friendly welcome when I arrived.",
         "negative": "A rather dismissive response when I needed help later. The service didn’t feel consistent across the visit.",
         "body": "Friendly welcome when I arrived.\nA rather dismissive response when I needed help later. The service didn’t feel consistent across the visit."
       },
       {
         "reviewer": "Raine",
-        "title": "",
+        "title": "Would definitely stay at Arlo again if in Chicago.",
         "positive": "Clean, comfortable and right next to Millenium park.",
         "negative": "No complaints",
         "body": "Clean, comfortable and right next to Millenium park.\nNo complaints"
       },
       {
         "reviewer": "Brooke",
-        "title": "",
+        "title": "Breakfast tasted freshly cooked",
         "positive": "Enjoyed a breakfast that tasted freshly made instead of just warmed through. The eggs were a particular highlight.",
         "negative": "",
         "body": "Enjoyed a breakfast that tasted freshly made instead of just warmed through. The eggs were a particular highlight."
       },
       {
         "reviewer": "Marco",
-        "title": "",
+        "title": "Earplugs stayed unused for three nights",
         "positive": "Packed earplugs expecting the usual city noise, but the room was quiet enough to manage without them. They stayed unused all three nights.",
         "negative": "",
         "body": "Packed earplugs expecting the usual city noise, but the room was quiet enough to manage without them. They stayed unused all three nights."
       },
       {
         "reviewer": "Jomela",
-        "title": "",
+        "title": "Good for browsing, shaky for a longer call",
         "positive": "Simple web browsing worked smoothly.",
         "negative": "A longer call over the same connection kept breaking up. A mixture of reliable basics and frustrating interruptions.",
         "body": "Simple web browsing worked smoothly.\nA longer call over the same connection kept breaking up. A mixture of reliable basics and frustrating interruptions."
       },
       {
         "reviewer": "Xongitiko",
-        "title": "",
+        "title": "Most of breakfast stayed on the plate",
         "positive": "",
         "negative": "Lukewarm food and dry eggs meant I left most of my breakfast on the plate.",
         "body": "Lukewarm food and dry eggs meant I left most of my breakfast on the plate."
       },
       {
         "reviewer": "Ephantus",
-        "title": "",
+        "title": "Exceptional",
         "positive": "Nice clean rooms with awesome views.",
         "negative": "",
         "body": "Nice clean rooms with awesome views."
       },
       {
         "reviewer": "Noura",
-        "title": "",
+        "title": "The bedding felt scratchy and stiff",
         "positive": "",
         "negative": "Scratchy sheets and a stiff duvet made the bedding unpleasant to settle into. I found it hard to feel comfortable even after rearranging everything.",
         "body": "Scratchy sheets and a stiff duvet made the bedding unpleasant to settle into. I found it hard to feel comfortable even after rearranging everything."
       },
       {
         "reviewer": "Craig",
-        "title": "",
+        "title": "More than enough for a holiday workout",
         "positive": "Found a good balance of cardio equipment and free weights. I had plenty to use without having to invent a completely different routine.",
         "negative": "",
         "body": "Found a good balance of cardio equipment and free weights. I had plenty to use without having to invent a completely different routine."
       },
       {
         "reviewer": "Creighton",
-        "title": "",
+        "title": "Clear sound and picture while catching up",
         "positive": "Spent a while sharing pictures over a video call, and the connection kept up nicely. Both the picture and sound stayed clear.",
         "negative": "",
         "body": "Spent a while sharing pictures over a video call, and the connection kept up nicely. Both the picture and sound stayed clear."
       },
       {
         "reviewer": "Sophia",
-        "title": "",
+        "title": "They are sweet and very caring",
         "positive": "Everyone is very friendly and welcoming !",
         "negative": "Nothing it was super good",
         "body": "Everyone is very friendly and welcoming !\nNothing it was super good"
       },
       {
         "reviewer": "Bashaer",
-        "title": "",
+        "title": "My glasses case picked up the dust",
         "positive": "",
         "negative": "Dust on the bedside shelf came away on my glasses case, so that surface clearly hadn’t been wiped.",
         "body": "Dust on the bedside shelf came away on my glasses case, so that surface clearly hadn’t been wiped."
       },
       {
         "reviewer": "Donald",
-        "title": "",
+        "title": "Handier for daytime than evening plans",
         "positive": "Getting to my daytime stops was straightforward.",
         "negative": "The evening plans involved more travelling back and forth. The convenience really depended on where I was going.",
         "body": "Getting to my daytime stops was straightforward.\nThe evening plans involved more travelling back and forth. The convenience really depended on where I was going."
       },
       {
         "reviewer": "Karin",
-        "title": "",
+        "title": "A useful mix of exercise equipment",
         "positive": "I could alternate cardio with weights without running out of things to use. The gym had enough variety to keep me interested.",
         "negative": "",
         "body": "I could alternate cardio with weights without running out of things to use. The gym had enough variety to keep me interested."
       },
       {
         "reviewer": "Noah",
-        "title": "",
+        "title": "Fruit and pastries to look forward to",
         "positive": "Found myself looking forward to the morning meal by the second day. The fresh fruit and pastries were especially good together.",
         "negative": "",
         "body": "Found myself looking forward to the morning meal by the second day. The fresh fruit and pastries were especially good together."
       },
       {
         "reviewer": "Anastasiia",
-        "title": "",
+        "title": "Pages loaded properly on my tablet",
         "positive": "My tablet stayed online while I looked through quite a few travel pages. Nothing hung halfway through loading or needed a second attempt.",
         "negative": "",
         "body": "My tablet stayed online while I looked through quite a few travel pages. Nothing hung halfway through loading or needed a second attempt."
       },
       {
         "reviewer": "Ernesto",
-        "title": "",
+        "title": "Excellent professional people",
         "positive": "Clean. Elegant vibe.",
         "negative": "Leaving",
         "body": "Clean. Elegant vibe.\nLeaving"
       },
       {
         "reviewer": "Mamduh",
-        "title": "",
+        "title": "A comfortable bed after all that walking",
         "positive": "Coming back after a day of walking, I really appreciated how well the bed cushioned me without any uncomfortable pressure points.",
         "negative": "",
         "body": "Coming back after a day of walking, I really appreciated how well the bed cushioned me without any uncomfortable pressure points."
       },
       {
         "reviewer": "Jacqueline",
-        "title": "",
+        "title": "Exceptional",
         "positive": "Location was fantastic! Close to everything and if you wanted to visit different neighborhoods the public transportation was easily accessible.",
         "negative": "",
         "body": "Location was fantastic! Close to everything and if you wanted to visit different neighborhoods the public transportation was easily accessible."
       },
       {
         "reviewer": "Plamedie",
-        "title": "",
+        "title": "Watched a film with no pauses",
         "positive": "Watched a film all the way through online with no pauses for buffering or lost connections.",
         "negative": "",
         "body": "Watched a film all the way through online with no pauses for buffering or lost connections."
       },
       {
         "reviewer": "Faith",
-        "title": "",
+        "title": "Much quieter with the door shut",
         "positive": "The corridor sounded lively when I stepped into it, so I was surprised how little I could hear with my door closed. Inside was pleasantly quiet.",
         "negative": "",
         "body": "The corridor sounded lively when I stepped into it, so I was surprised how little I could hear with my door closed. Inside was pleasantly quiet."
       },
       {
         "reviewer": "nothing at allLanise",
-        "title": "",
+        "title": "Everything I tried worked properly",
         "positive": "Put a few different machines through their paces over the stay. All of them responded as expected, with nothing broken or sticking.",
         "negative": "",
         "body": "Put a few different machines through their paces over the stay. All of them responded as expected, with nothing broken or sticking."
       },
       {
         "reviewer": "Apollonia",
-        "title": "",
+        "title": "The mattress felt better than it looked",
         "positive": "The mattress was more comfortable than it first looked. Once I lay down, it gave enough at the shoulders and stayed supportive underneath.",
         "negative": "",
         "body": "The mattress was more comfortable than it first looked. Once I lay down, it gave enough at the shoulders and stayed supportive underneath."
       },
       {
         "reviewer": "Bulelwa",
-        "title": "",
+        "title": "Home away from home",
         "positive": "Everything! The staff, the people and the city itself.",
         "negative": "Nothing",
         "body": "Everything! The staff, the people and the city itself.\nNothing"
       },
       {
         "reviewer": "Francesco",
-        "title": "",
+        "title": "Peaceful without any humming or rattling",
         "positive": "With everything switched off, there was no hum or rattling to spoil the quiet of the room.",
         "negative": "",
         "body": "With everything switched off, there was no hum or rattling to spoil the quiet of the room."
       },
       {
         "reviewer": "Jadechi",
-        "title": "",
+        "title": "Enjoyed both light and cooked breakfasts",
         "positive": "I tried both the lighter and the cooked breakfast options during my stay. Everything I chose tasted fresh, so I’d be happy having either again.",
         "negative": "",
         "body": "I tried both the lighter and the cooked breakfast options during my stay. Everything I chose tasted fresh, so I’d be happy having either again."
       },
       {
         "reviewer": "Christine",
-        "title": "",
+        "title": "Exceptional",
         "positive": "Everything! Warm and friendly service. Very helpful.",
         "negative": "",
         "body": "Everything! Warm and friendly service. Very helpful."
       },
       {
         "reviewer": "Ashley",
-        "title": "",
+        "title": "The bathroom needed another clean",
         "positive": "",
         "negative": "The sink still had residue around the tap, and the bathroom floor hadn’t been cleaned thoroughly. It didn’t give me much confidence in the housekeeping.",
         "body": "The sink still had residue around the tap, and the bathroom floor hadn’t been cleaned thoroughly. It didn’t give me much confidence in the housekeeping."
       },
       {
         "reviewer": "Deanna",
-        "title": "",
+        "title": "Everything was wonderful. The staff was absolutely exceptional and their communications before during an after were amaz",
         "positive": "The room was spacious and updated. The lobby was very nice with a nice back entrance for Easy drop off and pick up. It was very nice to have a very nice bar and restaurant right on site as well!",
         "negative": "",
         "body": "The room was spacious and updated. The lobby was very nice with a nice back entrance for Easy drop off and pick up. It was very nice to have a very nice bar and restaurant right on site as well!"
       },
       {
         "reviewer": "Holly",
-        "title": "",
+        "title": "Appreciated the savory breakfast choices",
         "positive": "A few savory choices made breakfast easy for me, since I don’t want something sweet first thing. What I tried was well cooked and tasty.",
         "negative": "",
         "body": "A few savory choices made breakfast easy for me, since I don’t want something sweet first thing. What I tried was well cooked and tasty."
       },
       {
         "reviewer": "Karen",
-        "title": "",
+        "title": "We had a great stay. Friendly staff and on premises restaurant go far!Great shower and comfy bed. And location, location",
         "positive": "The location was perfect.",
         "negative": "Could have used a regular coffee maker. Like a big cup in bed.the velvet settee looked a little dirty and there were a couple of drip spots on the floor but the bathroom was very clean so not a big worry.",
         "body": "The location was perfect.\nCould have used a regular coffee maker. Like a big cup in bed.the velvet settee looked a little dirty and there were a couple of drip spots on the floor but the bathroom was very clean so not a big worry."
       },
       {
         "reviewer": "Perdomo",
-        "title": "",
+        "title": "Good options for lighter exercises too",
         "positive": "There were smaller weights as well as heavier ones, which suited the way I train. I could build up gradually rather than starting with too much.",
         "negative": "",
         "body": "There were smaller weights as well as heavier ones, which suited the way I train. I could build up gradually rather than starting with too much."
       },
       {
         "reviewer": "Rodney",
-        "title": "",
+        "title": "Didn’t need to drown out other noise",
         "positive": "Peaceful enough that I never needed the television on to cover up noise from elsewhere.",
         "negative": "",
         "body": "Peaceful enough that I never needed the television on to cover up noise from elsewhere."
       },
       {
         "reviewer": "Glenn",
-        "title": "",
+        "title": "Large downloads finished reliably",
         "positive": "I left some files downloading and found them all finished when I checked. Nice to have room Wi-Fi that could get through a larger download reliably.",
         "negative": "",
         "body": "I left some files downloading and found them all finished when I checked. Nice to have room Wi-Fi that could get through a larger download reliably."
       },
       {
         "reviewer": "Mara",
-        "title": "",
+        "title": "Wonderful stays to celebrate the Christmas season!",
         "positive": "All of The staff was exceptional! The hotel is clean and very nice. The rooms are newly remodeled and very spacious. The beds were very comfortable The bar was very nice and the staff there was awesome as well!",
         "negative": "",
         "body": "All of The staff was exceptional! The hotel is clean and very nice. The rooms are newly remodeled and very spacious. The beds were very comfortable The bar was very nice and the staff there was awesome as well!"
       },
       {
         "reviewer": "Kristine",
-        "title": "",
+        "title": "Could get through the whole workout",
         "positive": "There was enough working equipment to do both the cardio and strength exercises I’d planned. I left the fitness room feeling I’d made good use of it.",
         "negative": "",
         "body": "There was enough working equipment to do both the cardio and strength exercises I’d planned. I left the fitness room feeling I’d made good use of it."
       },
       {
         "reviewer": "July",
-        "title": "",
+        "title": "A flavorful plate to start the day",
         "positive": "I liked that the hot breakfast items still tasted good when eaten together, rather than everything being bland. A satisfying plate before heading out.",
         "negative": "",
         "body": "I liked that the hot breakfast items still tasted good when eaten together, rather than everything being bland. A satisfying plate before heading out."
       },
       {
         "reviewer": "Brodey",
-        "title": "",
+        "title": "No alarms or TVs through the wall",
         "positive": "No neighboring alarms or muffled TVs reaching me in the morning. A wonderfully quiet room.",
         "negative": "",
         "body": "No neighboring alarms or muffled TVs reaching me in the morning. A wonderfully quiet room."
       },
       {
         "reviewer": "Wendy",
-        "title": "",
+        "title": "Perfect location and clean",
         "positive": "Location",
         "negative": "Parking was bit far",
         "body": "Location\nParking was bit far"
       },
       {
         "reviewer": "Kim",
-        "title": "",
+        "title": "Enough breakfast variety for three mornings",
         "positive": "Enough variety at breakfast to keep three mornings interesting, with plenty of flavor in everything I tried.",
         "negative": "",
         "body": "Enough variety at breakfast to keep three mornings interesting, with plenty of flavor in everything I tried."
       },
       {
         "reviewer": "Bretag",
-        "title": "",
+        "title": "Quick access to email and attachments",
         "positive": "Email and attachments opened quickly, and I never had the Wi-Fi drop while I was using them.",
         "negative": "",
         "body": "Email and attachments opened quickly, and I never had the Wi-Fi drop while I was using them."
       },
       {
         "reviewer": "Murray",
-        "title": "",
+        "title": "Fresh linen was the first thing I noticed",
         "positive": "First thing I noticed was how fresh the linen smelled when I pulled back the duvet. No stains or stray hairs, and the bathroom was equally clean.",
         "negative": "",
         "body": "First thing I noticed was how fresh the linen smelled when I pulled back the duvet. No stains or stray hairs, and the bathroom was equally clean."
       },
       {
         "reviewer": "Elyssia",
-        "title": "",
+        "title": "Not enough heavier weights for me",
         "positive": "",
         "negative": "The available dumbbells stopped short of the weights I normally train with. I couldn’t get the strength session I wanted out of the gym.",
         "body": "The available dumbbells stopped short of the weights I normally train with. I couldn’t get the strength session I wanted out of the gym."
       },
       {
         "reviewer": "Ayanna",
-        "title": "",
+        "title": "Peaceful apart from a few door slams",
         "positive": "Mostly peaceful evenings.",
         "negative": "A few sudden door slams broke up the quiet rather sharply.",
         "body": "Mostly peaceful evenings.\nA few sudden door slams broke up the quiet rather sharply."
       },
       {
         "reviewer": "Rita",
-        "title": "",
+        "title": "The fitness room earned a second visit",
         "positive": "My first workout went well, so I went back another morning. The equipment I needed was working on both visits.",
         "negative": "",
         "body": "My first workout went well, so I went back another morning. The equipment I needed was working on both visits."
       },
       {
         "reviewer": "Patricia",
-        "title": "",
+        "title": "Couldn’t find a position that worked",
         "positive": "",
         "negative": "Spent most of the night shifting around because I couldn’t find a position that felt comfortable against my back.",
         "body": "Spent most of the night shifting around because I couldn’t find a position that felt comfortable against my back."
       },
       {
         "reviewer": "Vangie",
-        "title": "",
+        "title": "Great!",
         "positive": "Perfect location!",
         "negative": "",
         "body": "Perfect location!"
       },
       {
         "reviewer": "Terrence",
-        "title": "",
+        "title": "Almost no sound from next door",
         "positive": "I saw guests entering the adjoining room and still heard virtually nothing afterwards. Sound from next door wasn’t a problem for me.",
         "negative": "",
         "body": "I saw guests entering the adjoining room and still heard virtually nothing afterwards. Sound from next door wasn’t a problem for me."
       },
       {
         "reviewer": "Xavier",
-        "title": "",
+        "title": "A big photo upload went through first try",
         "positive": "Sent a big batch of photos home from my phone and they all went through first try. The wireless connection handled the upload without stopping.",
         "negative": "",
         "body": "Sent a big batch of photos home from my phone and they all went through first try. The wireless connection handled the upload without stopping."
       },
       {
         "reviewer": "Sepi",
-        "title": "",
+        "title": "Smooth bedding made settling in easy",
         "positive": "Smooth sheets, soft pillowcases, and no problem getting comfortable when I finally climbed into bed.",
         "negative": "",
         "body": "Smooth sheets, soft pillowcases, and no problem getting comfortable when I finally climbed into bed."
       },
       {
         "reviewer": "Alan",
-        "title": "",
+        "title": "Thank you for a lovely stay.",
         "positive": "Not a thing.",
         "negative": "",
         "body": "Not a thing."
       },
       {
         "reviewer": "Declan",
-        "title": "",
+        "title": "Great hotel in great location",
         "positive": "Breakfast was good„, location was great",
         "negative": "The porter that arranged the taxi was very \"out of his head\" on weed , was really the only thing that didn’t \"fit\"",
         "body": "Breakfast was good„, location was great\nThe porter that arranged the taxi was very \"out of his head\" on weed , was really the only thing that didn’t \"fit\""
       },
       {
         "reviewer": "Aysegul",
-        "title": "",
+        "title": "Someone else’s drink rings on the desk",
         "positive": "",
         "negative": "There were sticky rings on the desk from someone else’s drinks. That should have been cleaned before the room was given to the next guest.",
         "body": "There were sticky rings on the desk from someone else’s drinks. That should have been cleaned before the room was given to the next guest."
       },
       {
         "reviewer": "Anna",
-        "title": "",
+        "title": "An undisturbed early night",
         "positive": "An early night passed undisturbed, with no voices through the wall or traffic loud enough to wake me.",
         "negative": "",
         "body": "An early night passed undisturbed, with no voices through the wall or traffic loud enough to wake me."
       },
       {
         "reviewer": "Kenneth",
-        "title": "",
+        "title": "Exceptional",
         "positive": "What else can be said when everything was just right? They Goldiloxed me!",
         "negative": "Could they have done a little something about the minus 8 degree F temperature outside?",
         "body": "What else can be said when everything was just right? They Goldiloxed me!\nCould they have done a little something about the minus 8 degree F temperature outside?"
       },
       {
         "reviewer": "Abhishek",
-        "title": "",
+        "title": "Streaming worked all evening",
         "positive": "A whole evening of streaming, with no buffering or sudden dropouts. The hotel internet did exactly what I needed.",
         "negative": "",
         "body": "A whole evening of streaming, with no buffering or sudden dropouts. The hotel internet did exactly what I needed."
       },
       {
         "reviewer": "Alastair",
-        "title": "",
+        "title": "The linen gave me confidence in the cleaning",
         "positive": "Fresh towels without a mark on them and equally spotless sheets gave me confidence in the cleaning.",
         "negative": "",
         "body": "Fresh towels without a mark on them and equally spotless sheets gave me confidence in the cleaning."
       },
       {
         "reviewer": "Romero",
-        "title": "",
+        "title": "An unnecessarily abrupt response",
         "positive": "",
         "negative": "Asked a simple question at reception and got such an abrupt response that I didn’t feel like asking anything further.",
         "body": "Asked a simple question at reception and got such an abrupt response that I didn’t feel like asking anything further."
       },
       {
         "reviewer": "Tanesha",
-        "title": "",
+        "title": "Kept rolling into the hollow",
         "positive": "",
         "negative": "Kept rolling into a hollow in the bed instead of staying where I’d settled. That uneven support made it difficult to get comfortable.",
         "body": "Kept rolling into a hollow in the bed instead of staying where I’d settled. That uneven support made it difficult to get comfortable."
       },
       {
         "reviewer": "Jane",
-        "title": "",
+        "title": "Space to do the floor part of my routine",
         "positive": "There was a sensible area for mat exercises alongside the machines. I could stretch out fully without blocking the route through the gym.",
         "negative": "",
         "body": "There was a sensible area for mat exercises alongside the machines. I could stretch out fully without blocking the route through the gym."
       },
       {
         "reviewer": "Niru",
-        "title": "",
+        "title": "Passed from person to person",
         "positive": "",
         "negative": "Getting an answer involved repeating my request to several people. Each one seemed ready to pass it on, but nobody actually took care of it.",
         "body": "Getting an answer involved repeating my request to several people. Each one seemed ready to pass it on, but nobody actually took care of it."
       },
       {
         "reviewer": "Jodie",
-        "title": "",
+        "title": "Awesome staff and ease of getting to everything on Michigan Ave",
         "positive": "Central to everything on Michigan Ave",
         "negative": "A little bit loud at night with the sirens but no biggy",
         "body": "Central to everything on Michigan Ave\nA little bit loud at night with the sirens but no biggy"
       },
       {
         "reviewer": "Adam",
-        "title": "",
+        "title": "Two flat pillows weren’t much better than one",
         "positive": "",
         "negative": "The pillows looked full but flattened the moment I lay on them. Doubling them up didn’t help much with the lack of support.",
         "body": "The pillows looked full but flattened the moment I lay on them. Doubling them up didn’t help much with the lack of support."
       },
       {
         "reviewer": "Heleanna",
-        "title": "",
+        "title": "Nothing left around the shower drain",
         "positive": "The shower tray was spotless, with no hair around the drain or residue on the sides. That mattered more to me than the room looking tidy at a glance.",
         "negative": "",
         "body": "The shower tray was spotless, with no hair around the drain or residue on the sides. That mattered more to me than the room looking tidy at a glance."
       },
       {
         "reviewer": "Konstantinos",
-        "title": "",
+        "title": "Ripe fruit for a lovely light breakfast",
         "positive": "Sweet, ripe fruit made my lighter breakfast feel like something to look forward to.",
         "negative": "",
         "body": "Sweet, ripe fruit made my lighter breakfast feel like something to look forward to."
       },
       {
         "reviewer": "George",
-        "title": "",
+        "title": "Helpfulness varied between staff",
         "positive": "One staff member went out of their way to help.",
         "negative": "A later request was brushed aside by someone else.",
         "body": "One staff member went out of their way to help.\nA later request was brushed aside by someone else."
       },
       {
         "reviewer": "L",
-        "title": "",
+        "title": "Podcasts downloaded without a hitch",
         "positive": "Downloaded a few podcasts without a hitch, and the Wi-Fi was just as dependable for everyday browsing.",
         "negative": "",
         "body": "Downloaded a few podcasts without a hitch, and the Wi-Fi was just as dependable for everyday browsing."
       },
       {
         "reviewer": "Priti",
-        "title": "",
+        "title": "The dumbbell range was a pleasant surprise",
         "positive": "Found both lighter pairs for smaller exercises and heavier ones for the rest. Much more useful than the tiny selection I sometimes see in hotels.",
         "negative": "",
         "body": "Found both lighter pairs for smaller exercises and heavier ones for the rest. Much more useful than the tiny selection I sometimes see in hotels."
       },
       {
         "reviewer": "Ronda",
-        "title": "",
+        "title": "Staff were amazing. Clean and great location. Beer selection at restaurant and bar was lacking.",
         "positive": "Great location",
         "negative": "Bar stool’s uncomfortable",
         "body": "Great location\nBar stool’s uncomfortable"
       },
       {
         "reviewer": "Sunipa",
-        "title": "",
+        "title": "Eggs, toast and coffee done well",
         "positive": "The eggs were soft, the toast had a little crunch, and the coffee rounded it off nicely. That was a breakfast I enjoyed finishing.",
         "negative": "",
         "body": "The eggs were soft, the toast had a little crunch, and the coffee rounded it off nicely. That was a breakfast I enjoyed finishing."
       },
       {
         "reviewer": "Mehmet",
-        "title": "",
+        "title": "Very Good",
         "positive": "Check in time is too late",
         "negative": "",
         "body": "Check in time is too late"
       },
       {
         "reviewer": "Andrea",
-        "title": "",
+        "title": "We loved the location",
         "positive": "Great location",
         "negative": "I liked everything, no complaints",
         "body": "Great location\nI liked everything, no complaints"
       },
       {
         "reviewer": "Margaret",
-        "title": "",
+        "title": "Clean beyond the obvious surfaces",
         "positive": "I checked a couple of the less obvious places, including the shelf inside the wardrobe. Everything was dust-free, not just the surfaces you see first.",
         "negative": "",
         "body": "I checked a couple of the less obvious places, including the shelf inside the wardrobe. Everything was dust-free, not just the surfaces you see first."
       },
       {
         "reviewer": "Joachim",
-        "title": "",
+        "title": "Browsing felt as easy as at home",
         "positive": "Could open directions and update my plans as quickly as I could at home. The connection stayed steady whenever I needed another page.",
         "negative": "",
         "body": "Could open directions and update my plans as quickly as I could at home. The connection stayed steady whenever I needed another page."
       },
       {
         "reviewer": "Jeffrey",
-        "title": "",
+        "title": "Not enough appealing breakfast options",
         "positive": "",
         "negative": "I wanted a breakfast with a bit of variety, but the options soon felt limited. What I did pick wasn’t especially appetizing either.",
         "body": "I wanted a breakfast with a bit of variety, but the options soon felt limited. What I did pick wasn’t especially appetizing either."
       },
       {
         "reviewer": "Brystal",
-        "title": "",
+        "title": "An inconvenient base for my outings",
         "positive": "",
         "negative": "It wasn’t easy to pop back during the day from the areas I was exploring. The extra journey each way made the hotel an inconvenient base for me.",
         "body": "It wasn’t easy to pop back during the day from the areas I was exploring. The extra journey each way made the hotel an inconvenient base for me."
       },
       {
         "reviewer": "Oleg",
-        "title": "",
+        "title": "A few crumbs spoilt the clean impression",
         "positive": "Most surfaces were properly wiped. A clean room in many respects.",
         "negative": "There were crumbs near the bedside table, one of a couple of obvious misses.",
         "body": "Most surfaces were properly wiped. A clean room in many respects.\nThere were crumbs near the bedside table, one of a couple of obvious misses."
       },
       {
         "reviewer": "Farrah",
-        "title": "",
+        "title": "The weights setup met my needs",
         "positive": "A stable bench and enough dumbbells to choose from made strength work straightforward. I was pleased with the fitness room.",
         "negative": "",
         "body": "A stable bench and enough dumbbells to choose from made strength work straightforward. I was pleased with the fitness room."
       },
       {
         "reviewer": "Deepak",
-        "title": "",
+        "title": "Wonderful",
         "positive": "Staff",
         "negative": "",
         "body": "Staff"
       },
       {
         "reviewer": "Mike",
-        "title": "",
+        "title": "Gave up on the tough toast",
         "positive": "",
         "negative": "Morning toast was tough enough that I gave up halfway through. The rest of breakfast tasted flat too, so it wasn’t a great start.",
         "body": "Morning toast was tough enough that I gave up halfway through. The rest of breakfast tasted flat too, so it wasn’t a great start."
       },
       {
         "reviewer": "Carmel",
-        "title": "",
+        "title": "Machines felt solid and usable",
         "positive": "No wobbling bench or awkward controls to distract me during the workout. The equipment seemed to be kept in good working condition.",
         "negative": "",
         "body": "No wobbling bench or awkward controls to distract me during the workout. The equipment seemed to be kept in good working condition."
       },
       {
         "reviewer": "Daron",
-        "title": "",
+        "title": "I had a wonderful time.",
         "positive": "Clean",
         "negative": "Noisy!! Look like someone was doing some construction work. Also, took housekeeping so long to bring one roll a tissue up to my room. Almost a hour to get tissue.",
         "body": "Clean\nNoisy!! Look like someone was doing some construction work. Also, took housekeeping so long to bring one roll a tissue up to my room. Almost a hour to get tissue."
       },
       {
         "reviewer": "Martha",
-        "title": "",
+        "title": "An easy walk to only some of my stops",
         "positive": "Some of the sights on my list were an easy walk.",
         "negative": "Others took longer to reach than I’d allowed. The location was useful for only part of my itinerary.",
         "body": "Some of the sights on my list were an easy walk.\nOthers took longer to reach than I’d allowed. The location was useful for only part of my itinerary."
       },
       {
         "reviewer": "Shauneen",
-        "title": "",
+        "title": "Just the firmness my back needed",
         "positive": "For someone who usually prefers their own bed, I got on very well with this one. The firmness was just right for my back.",
         "negative": "",
         "body": "For someone who usually prefers their own bed, I got on very well with this one. The firmness was just right for my back."
       },
       {
         "reviewer": "Valerie",
-        "title": "",
+        "title": "Exceptional",
         "positive": "Great location close to the train station.",
         "negative": "",
         "body": "Great location close to the train station."
       },
       {
         "reviewer": "Mazen",
-        "title": "",
+        "title": "Connected quickly and stayed online",
         "positive": "Joined the network quickly on arrival and had a steady connection every time I used it afterwards.",
         "negative": "",
         "body": "Joined the network quickly on arrival and had a steady connection every time I used it afterwards."
       },
       {
         "reviewer": "Lucinda",
-        "title": "",
+        "title": "Cardio equipment better than the floor space",
         "positive": "The treadmills worked well, and I enjoyed that part of my session.",
         "negative": "The area left for stretching was rather cramped once I put a mat down.",
         "body": "The treadmills worked well, and I enjoyed that part of my session.\nThe area left for stretching was rather cramped once I put a mat down."
       },
       {
         "reviewer": "Maxine",
-        "title": "",
+        "title": "Great pillows, mattress too soft",
         "positive": "The pillows felt great.",
         "negative": "The mattress was too soft under my lower back for the bed to be fully comfortable.",
         "body": "The pillows felt great.\nThe mattress was too soft under my lower back for the bed to be fully comfortable."
       },
       {
         "reviewer": "Liam",
-        "title": "",
+        "title": "Hallway noise stayed in the hallway",
         "positive": "Even the busier part of the evening passed without much sound reaching my room. I appreciated how well the corridor noise was kept outside.",
         "negative": "",
         "body": "Even the busier part of the evening passed without much sound reaching my room. I appreciated how well the corridor noise was kept outside."
       },
       {
         "reviewer": "Louay",
-        "title": "",
+        "title": "Care had gone into the cooking",
         "positive": "Simple food, but it tasted as though someone had paid attention to the cooking. I particularly enjoyed the hot breakfast rather than just filling up on bread.",
         "negative": "",
         "body": "Simple food, but it tasted as though someone had paid attention to the cooking. I particularly enjoyed the hot breakfast rather than just filling up on bread."
       },
       {
         "reviewer": "Louise",
-        "title": "",
+        "title": "The pillow kept its shape",
         "positive": "Loved having a pillow that actually kept its shape when I turned onto my side.",
         "negative": "",
         "body": "Loved having a pillow that actually kept its shape when I turned onto my side."
       },
       {
         "reviewer": "Waldo",
-        "title": "",
+        "title": "Street noise muffled, hallway voices audible",
         "positive": "Street sounds were well muted.",
         "negative": "I could hear people talking outside my door. The room handled one kind of noise better than the other.",
         "body": "Street sounds were well muted.\nI could hear people talking outside my door. The room handled one kind of noise better than the other."
       },
       {
         "reviewer": "Haley",
-        "title": "",
+        "title": "The staff was incredibly helpful and so kind. It felt so nice to walk in and be remembered and warmly greeted!",
         "positive": "It was walking distance from everything",
         "negative": "Little expensive for the room size",
         "body": "It was walking distance from everything\nLittle expensive for the room size"
       },
       {
         "reviewer": "Hayes",
-        "title": "",
+        "title": "Didn’t feel acknowledged at reception",
         "positive": "",
         "negative": "The person at reception barely acknowledged me while I was asking for assistance. I left the conversation feeling ignored rather than helped.",
         "body": "The person at reception barely acknowledged me while I was asking for assistance. I left the conversation feeling ignored rather than helped."
       },
       {
         "reviewer": "Carroll",
-        "title": "",
+        "title": "Too much time spent getting back and forth",
         "positive": "",
         "negative": "For my itinerary, getting to and from the hotel took far too much of the day.",
         "body": "For my itinerary, getting to and from the hotel took far too much of the day."
       },
       {
         "reviewer": "Steve",
-        "title": "",
+        "title": "All over great hospitality and clean property",
         "positive": "Customer service",
         "negative": "Pillows",
         "body": "Customer service\nPillows"
       },
       {
         "reviewer": "Cedric",
-        "title": "",
+        "title": "Easy to stay in touch over Wi-Fi",
         "positive": "Messages and photos went straight through on the hotel Wi-Fi, making it easy to keep in touch.",
         "negative": "",
         "body": "Messages and photos went straight through on the hotel Wi-Fi, making it easy to keep in touch."
       },
       {
         "reviewer": "Constanza",
-        "title": "",
+        "title": "Plenty of choice, uneven freshness",
         "positive": "Plenty of appealing breakfast choices, and I loved the fruit.",
         "negative": "Found the pastries rather dry. The quality didn’t quite match across the different choices.",
         "body": "Plenty of appealing breakfast choices, and I loved the fruit.\nFound the pastries rather dry. The quality didn’t quite match across the different choices."
       },
       {
         "reviewer": "Pablo",
-        "title": "",
+        "title": "No sudden noises for this light sleeper",
         "positive": "A light sleeper here, and I wasn’t jolted awake by doors or voices during my stay. That made a welcome change from some recent hotel visits.",
         "negative": "",
         "body": "A light sleeper here, and I wasn’t jolted awake by doors or voices during my stay. That made a welcome change from some recent hotel visits."
       },
       {
         "reviewer": "Anastasija",
-        "title": "",
+        "title": "Those flaky pastries were tempting",
         "positive": "Light, flaky pastries made breakfast a treat. I was very tempted to have another!",
         "negative": "",
         "body": "Light, flaky pastries made breakfast a treat. I was very tempted to have another!"
       },
       {
         "reviewer": "Josh",
-        "title": "",
+        "title": "No hunting around the room for a signal",
         "positive": "The room network worked from whichever spot I happened to be sitting in. I didn’t have to move around looking for a signal that would hold.",
         "negative": "",
         "body": "The room network worked from whichever spot I happened to be sitting in. I didn’t have to move around looking for a signal that would hold."
       },
       {
         "reviewer": "Freeman",
-        "title": "",
+        "title": "Good weights, one cardio machine let it down",
         "positive": "The free weights gave me plenty of options for strength exercises.",
         "negative": "The bike display kept cutting out, which made that part of my workout harder to follow.",
         "body": "The free weights gave me plenty of options for strength exercises.\nThe bike display kept cutting out, which made that part of my workout harder to follow."
       },
       {
         "reviewer": "Megan",
-        "title": "",
+        "title": "Clean and convenient.",
         "positive": "Super clean. Shower was extra hot with good water pressure. Close to everything I wanted to see. And great burgers at the restaurant!",
         "negative": "",
         "body": "Super clean. Shower was extra hot with good water pressure. Close to everything I wanted to see. And great burgers at the restaurant!"
       },
       {
         "reviewer": "Ryan",
-        "title": "",
+        "title": "No dips or awkward hard patches",
         "positive": "Good support across the mattress, including the side I tend to sleep on. I wasn’t rolling toward a dip or trying to avoid a hard patch.",
         "negative": "",
         "body": "Good support across the mattress, including the side I tend to sleep on. I wasn’t rolling toward a dip or trying to avoid a hard patch."
       }
     ]
   };
+  Object.entries(EMBEDDED_EXACT_HOTEL_REVIEWS).forEach(([hotelId, reviews]) => {
+    reviews.forEach((review, index) => {
+      const neutralHotelId = hotelId.replace(/[^a-z0-9]+/gi, "_");
+      review.stimulusId = neutralHotelId + "_review_" + String(index + 1).padStart(3, "0");
+    });
+  });
   window.EXACT_HOTEL_REVIEWS = EMBEDDED_EXACT_HOTEL_REVIEWS;
 
   function exactReviewsFor(hotelId) {
@@ -7855,6 +7861,30 @@
     const copy = items.slice();
     for (let i = copy.length - 1; i > 0; i -= 1) {
       const j = randomInteger(i + 1);
+      const temp = copy[i];
+      copy[i] = copy[j];
+      copy[j] = temp;
+    }
+    return copy;
+  }
+
+  function stableShuffled(items, seedText) {
+    let seed = 2166136261;
+    const normalized = String(seedText || "");
+    for (let i = 0; i < normalized.length; i += 1) {
+      seed ^= normalized.charCodeAt(i);
+      seed = Math.imul(seed, 16777619);
+    }
+    const random = () => {
+      seed += 0x6D2B79F5;
+      let value = seed;
+      value = Math.imul(value ^ (value >>> 15), value | 1);
+      value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+      return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+    };
+    const copy = items.slice();
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(random() * (i + 1));
       const temp = copy[i];
       copy[i] = copy[j];
       copy[j] = temp;
@@ -7909,7 +7939,10 @@
       return validStored;
     }
 
-    const nextOrder = shuffled(required);
+    const participant = participantStorageSuffix();
+    const nextOrder = participant === "anonymous"
+      ? shuffled(required)
+      : stableShuffled(required, `hotel-order-v1:${participant.toUpperCase()}`);
     localStorage.setItem(hotelOrderStorageKey(), JSON.stringify(nextOrder));
     logEvent("hotel_order_randomized", { hotelIds: nextOrder });
     return nextOrder;
@@ -8170,8 +8203,8 @@
           "locationScoreText": "",
           "areaMapText": "Excellent location",
           "guestLovedNote": "Guests loved walking around the neighborhood.",
-          "guestRating": 3.9,
-          "guestReviewCount": 798,
+          "guestRating": null,
+          "guestReviewCount": 150,
           "ratingBreakdown": {
               "Cleanliness": 4.5,
               "Service quality": 4.25,
@@ -8776,8 +8809,8 @@
           ],
           "locationScoreText": "",
           "guestLovedNote": "Guests loved walking around the neighborhood.",
-          "guestRating": 3.7,
-          "guestReviewCount": 373,
+          "guestRating": null,
+          "guestReviewCount": 150,
           "ratingBreakdown": {
               "Cleanliness": 3.25,
               "Service quality": 4.5,
@@ -8930,8 +8963,8 @@
           "locationScoreText": "",
           "areaMapText": "Excellent location",
           "guestLovedNote": "Guests loved walking around the neighborhood.",
-          "guestRating": 4.0,
-          "guestReviewCount": 1955,
+          "guestRating": null,
+          "guestReviewCount": 150,
           "ratingBreakdown": {
               "Cleanliness": 4.0,
               "Service quality": 3.0,
@@ -9026,42 +9059,42 @@
 
   const AI_REVIEW_SUMMARIES = {
     "pendry-chicago": {
-      overview: "Across the current review set, guests describe Pendry Hotel as a polished historic hotel with attentive service, clean and comfortable rooms, and convenient access to central Chicago.",
+      overview: "Across the current 150-review set, guests most consistently praise Pendry Hotel's location, cleanliness, breakfast, service, and room comfort. Noise and Wi-Fi reliability are the clearest recurring concerns.",
       strengths: [
-        "Staff, concierge, front desk, and valet service are frequently described as friendly, proactive, and helpful with celebrations or special requests.",
-        "Guests often praise room cleanliness, comfortable beds, spacious layouts in many room types, and the building's Art Deco character.",
-        "The central setting, breakfast or dining options, fitness center, lobby, bar, and rooftop spaces receive positive mentions when available."
+        "The central location is repeatedly described as convenient for reaching attractions, restaurants, and transportation.",
+        "Guests frequently report clean rooms and bathrooms, helpful service, and comfortable beds or room layouts.",
+        "Breakfast receives strong comments for freshness, variety, and overall quality."
       ],
       considerations: [
-        "Traffic, sirens, and Michigan Avenue street noise are recurring concerns, including in some higher-floor rooms.",
-        "Elevator waits can be slow, and rooftop access may be limited by opening hours or private events.",
-        "Parking, incidental holds, in-room dining, and other charges can weaken perceived value; some reviews also mention limited views, Wi-Fi inconsistency, or maintenance details."
+        "Corridor, street, and neighboring-room noise disrupt some stays and can make sleep difficult.",
+        "Several guests report Wi-Fi drops, buffering, or unstable connections during ordinary use.",
+        "Fitness facilities receive mixed feedback, especially about equipment variety, availability, and maintenance."
       ]
     },
     "nobu-hotel-chicago": {
-      overview: "Across the current review set, guests describe Nobu Hotel as a clean, design-forward luxury stay with spacious comfortable rooms, attentive service, and memorable dining.",
+      overview: "Across the current 150-review set, guests most consistently praise Nobu Hotel's service, room comfort, quiet rooms, and Wi-Fi. Cleanliness, location convenience, fitness facilities, and breakfast are more mixed.",
       strengths: [
-        "The minimalist Japanese-inspired interiors, comfortable beds, large bathrooms, soaking tubs in selected rooms, and thoughtful in-room amenities receive frequent praise.",
-        "Staff are commonly described as warm, attentive, accommodating, and helpful with celebrations or special requests, while the surrounding restaurant area is considered convenient.",
-        "Guests regularly highlight the Nobu restaurant, breakfast or dining experiences, rooftop, pool, steam facilities, and generally well-equipped rooms."
+        "Staff are often described as responsive, attentive, and helpful with requests.",
+        "Beds, room layouts, and bathrooms receive frequent praise for comfort.",
+        "Many guests report quiet rooms and reliable Wi-Fi for browsing, streaming, or work."
       ],
       considerations: [
-        "Parking, room service, bottled water, breakfast, and other extras can add substantial cost and reduce perceived value.",
-        "Several guests find the room or bathroom lighting too dim, particularly for working or applying makeup.",
-        "Street or rooftop noise appears in several reviews, alongside limited hours, size, or availability for the rooftop, pool, gym, or sauna."
+        "Some reviews mention missed cleaning details, including hair, dust, residue, or incomplete housekeeping.",
+        "The location works well for some dining plans but feels less convenient for several sightseeing itineraries.",
+        "Fitness equipment and breakfast freshness or variety receive recurring criticism."
       ]
     },
     "arlo-chicago": {
-      overview: "Across the current review set, guests highlight Arlo Hotel's central setting, friendly staff, clean modern rooms, comfortable beds, and convenient on-site dining.",
+      overview: "Across the current 150-review set, guests most consistently praise Arlo Hotel's Wi-Fi, fitness facilities, location, and cleanliness. Service and room comfort receive the most uneven feedback.",
       strengths: [
-        "The hotel is repeatedly described as convenient for walking to central Chicago attractions and public transportation.",
-        "Front desk and restaurant staff are frequently praised as welcoming, responsive, and helpful.",
-        "Many reviews mention clean rooms, comfortable beds, strong showers, and enjoyable breakfast, coffee, or restaurant options."
+        "Wi-Fi is frequently described as stable and dependable throughout the room.",
+        "Guests often value the fitness equipment and the hotel's convenient location for exploring the city.",
+        "Rooms and bathrooms are generally described as clean, while breakfast receives several positive comments."
       ],
       considerations: [
-        "Street noise, sirens, thin walls, and noise from neighboring rooms affect some stays; higher rooms facing away from the main street are often described as quieter.",
-        "A smaller group of guests report inconsistent housekeeping, including floors, towels, or bathroom details, and several mention unreliable or spotty Wi-Fi.",
-        "Parking and in-room extras can feel expensive, while some rooms have limited views and the coffee setup receives mixed feedback."
+        "Service responsiveness varies, with some guests reporting delays or unresolved requests.",
+        "Mattress, pillow, and room-comfort experiences are mixed rather than consistently positive.",
+        "Some guests mention corridor or street noise, and breakfast quality is not equally strong across all stays."
       ]
     }
   };
@@ -9466,7 +9499,7 @@
       card.setAttribute("data-hotel-id", h.id);
 
       const displayedReviewCount = state.showReviews ? balancedReviews(h).length : h.guestReviewCount;
-      const displayedReviewCountLabel = reviewCountLabel(displayedReviewCount, state.showReviews);
+      const displayedReviewCountLabel = reviewCountLabel(displayedReviewCount, false);
       const scoreBox = state.showReviews ? `
         <div class="booking-reviewcount booking-reviewcount--standalone">${escapeXml(displayedReviewCountLabel)}</div>
       ` : "";
@@ -9657,7 +9690,13 @@
   function reviewCardHtml(review, index, initialVisible) {
     const r = reviewDisplay(review);
     return `
-      <article class="review" data-review="1" data-review-index="${index}"${index >= initialVisible ? " hidden" : ""}>
+      <article
+        class="review"
+        data-review="1"
+        data-review-index="${index}"
+        data-review-position="${index + 1}"
+        data-review-id="${escapeXml(review.stimulusId || "")}"
+        ${index >= initialVisible ? "hidden" : ""}>
         <aside class="review__guest">
           <div class="review__name">${escapeXml(r.reviewer)}</div>
         </aside>
@@ -9667,6 +9706,7 @@
               <div class="review__date">Reviewed: ${escapeXml(r.reviewed)}</div>
             </div>
           ` : ""}
+          ${r.title ? `<h3 class="review__title">${escapeXml(r.title)}</h3>` : ""}
           <div class="review__copy">
             ${reviewTextBlockHtml("positive", r.positive)}
             ${reviewTextBlockHtml("negative", r.negative)}
@@ -9861,25 +9901,6 @@
               ${!state.showReviews && ["pendry-chicago", "nobu-hotel-chicago", "arlo-chicago"].includes(hotel.id) ? categoryBarsHtml(hotel) : ""}
             </div>
 
-            ${state.showReviews ? `
-              <div class="modal__right">
-                <div class="section section--ratings">
-                  <h3>Guest ratings</h3>
-                  <div data-track-section="guest_ratings">
-                      <div class="scorecard">
-                      <div class="scorecard__big" aria-label="Overall guest score">${escapeXml(bookingScore(hotel.guestRating))}</div>
-                      <div class="scorecard__meta">
-                        <div class="scorecard__denom">/ 10</div>
-                        <div class="scorecard__count">${formatCount(hotel.guestReviewCount)} guest reviews</div>
-                      </div>
-                    </div>
-                    <div class="breakdown" aria-label="Rating by category">
-                      ${ratingBreakdownRows(hotel)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ` : ``}
           </div>
           ${amenityDetailsHtml(hotel)}
           ${state.showReviews ? reviewsHtml(hotel) : ""}

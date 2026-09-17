@@ -10,15 +10,15 @@
  * Deploy as a Web App (Execute as: Me, Who has access: Anyone).
  */
 
-const SCHEMA_VERSION = "13";
+const SCHEMA_VERSION = "18";
 const WITHOUT_AI_SHEET = "Without_AI_Survey";
 const AI_SUMMARY_SHEET = "AI_Summary_Survey";
 const BROWSING_SHEET = "Browsing_Information";
 
 const HOTELS = [
-  { id: "pendry-chicago", slug: "pendry_chicago", name: "Pendry Hotel" },
-  { id: "nobu-hotel-chicago", slug: "nobu_hotel_chicago", name: "Nobu Hotel" },
-  { id: "arlo-chicago", slug: "arlo_chicago", name: "Arlo Hotel" }
+  { id: "pendry-chicago", slug: "pendry_chicago" },
+  { id: "nobu-hotel-chicago", slug: "nobu_hotel_chicago" },
+  { id: "arlo-chicago", slug: "arlo_chicago" }
 ];
 
 const ATTRIBUTES = [
@@ -32,19 +32,6 @@ const ATTRIBUTES = [
   { id: "breakfast_quality", likelihoodKey: "high_quality_breakfast", label: "Breakfast quality" }
 ];
 
-// Preserve the existing surprise columns in their original positions. The
-// current fitness columns are appended so deployed Sheets upgrade in place.
-const LEGACY_SURPRISE_ATTRIBUTE_IDS = [
-  "cleanliness",
-  "service_quality",
-  "room_comfort",
-  "wifi_reliability",
-  "noise_level",
-  "location_convenience",
-  "value_for_money",
-  "breakfast_quality"
-];
-
 const SURVEY_HEADERS = buildSurveyHeaders_();
 
 const BROWSING_HEADERS = [
@@ -53,7 +40,7 @@ const BROWSING_HEADERS = [
   "condition",
   "browsing_stage",
   "hotel_id",
-  "hotel_name",
+  "hotel_display_position",
   "first_opened_at",
   "last_opened_at",
   "last_closed_at",
@@ -67,8 +54,19 @@ const BROWSING_HEADERS = [
   "mean_scroll_speed_px_ms",
   "last_exit_reason",
   "time_limit_reached",
-  "five_minute_warning_shown",
-  "processed_visit_ids_json"
+  "processed_visit_ids_json",
+  "summary_viewing_seconds",
+  "individual_reviews_viewing_seconds",
+  "reviews_seen_count",
+  "reviews_read_count",
+  "review_seen_positions_json",
+  "review_read_positions_json",
+  "review_read_ids_json",
+  "review_stopping_position",
+  "review_reading_pattern",
+  "review_visibility_seconds_json",
+  "review_reading_sessions_json",
+  "review_furthest_position_seen"
 ];
 
 function buildSurveyHeaders_() {
@@ -79,20 +77,9 @@ function buildSurveyHeaders_() {
     "last_recorded_at",
     "completion_status",
     "completed_at",
-    "frequent_booking_scenario_ids",
-    "frequent_booking_scenario_labels",
-    "frequent_booking_scenario_other",
-    "prior_hotel_attributes",
-    "assigned_trip_scenario_id",
-    "assigned_trip_scenario_title",
     "assigned_attribute_1_id",
-    "assigned_attribute_1_label",
     "assigned_attribute_2_id",
-    "assigned_attribute_2_label",
-    "assigned_attribute_3_id",
-    "assigned_attribute_3_label",
-    "scenario_profile_acknowledged",
-    "hotels_asked"
+    "assigned_attribute_3_id"
   ];
 
   const stages = ["pre_review", "post_review"];
@@ -100,37 +87,22 @@ function buildSurveyHeaders_() {
     for (let s = 0; s < stages.length; s++) {
       for (let slot = 1; slot <= 3; slot++) {
         headers.push(matrixColumn_(stages[s], HOTELS[h].slug, slot, "likelihood"));
-        // Retained as empty legacy columns so existing deployed Sheets remain schema-compatible.
-        headers.push(matrixColumn_(stages[s], HOTELS[h].slug, slot, "confidence"));
       }
     }
   }
 
   headers.push(
     "chosen_hotel_id",
-    "chosen_hotel_name",
-    "revealed_attributes_acknowledged",
-    "revealed_attributes_json",
     "satisfaction_1_to_7",
     "would_switch_hotel",
-    "switch_confidence_0_to_100"
+    "switch_likelihood_1_to_5"
   );
 
-  for (let i = 0; i < LEGACY_SURPRISE_ATTRIBUTE_IDS.length; i++) {
-    headers.push("surprise_" + LEGACY_SURPRISE_ATTRIBUTE_IDS[i] + "_0_to_10");
+  for (let i = 0; i < ATTRIBUTES.length; i++) {
+    headers.push("surprise_" + ATTRIBUTES[i].id + "_1_to_5");
   }
 
-  headers.push("bot_detection_flag", "bot_detection_details", "all_answers_json");
-  // Legacy continuous-scale columns remain above so existing survey tabs keep
-  // their current column order. Current five-point answers are appended here.
-  headers.push("switch_likelihood_0_to_100");
-  headers.push("switch_likelihood_1_to_5", "switch_likelihood_label");
-  for (let i = 0; i < LEGACY_SURPRISE_ATTRIBUTE_IDS.length; i++) {
-    headers.push("surprise_" + LEGACY_SURPRISE_ATTRIBUTE_IDS[i] + "_1_to_5");
-    headers.push("surprise_" + LEGACY_SURPRISE_ATTRIBUTE_IDS[i] + "_label");
-  }
-  headers.push("surprise_fitness_facilities_1_to_5", "surprise_fitness_facilities_label");
-  headers.push("ai_use_frequency_1_to_7", "ai_use_frequency_label");
+  headers.push("ai_use_frequency_1_to_7", "bot_detection_flag", "bot_detection_details");
   return headers;
 }
 
@@ -186,6 +158,41 @@ function doGet() {
   return ContentService.createTextOutput("ok").setMimeType(ContentService.MimeType.TEXT);
 }
 
+/**
+ * Run this manually once when replacing the old analysis schema. It clears
+ * only the three named study tabs and recreates their current headers.
+ */
+function resetHotelSurveySheets() {
+  const ss = getSpreadsheet_();
+  const definitions = [
+    [WITHOUT_AI_SHEET, SURVEY_HEADERS],
+    [AI_SUMMARY_SHEET, SURVEY_HEADERS],
+    [BROWSING_SHEET, BROWSING_HEADERS]
+  ];
+
+  for (let i = 0; i < definitions.length; i++) {
+    const name = definitions[i][0];
+    const headers = definitions[i][1];
+    let sheet = ss.getSheetByName(name);
+    if (!sheet) sheet = ss.insertSheet(name);
+    const filter = sheet.getFilter();
+    if (filter) filter.remove();
+    sheet.clear();
+    if (sheet.getMaxColumns() > headers.length) {
+      sheet.deleteColumns(headers.length + 1, sheet.getMaxColumns() - headers.length);
+    }
+    ensureColumnCapacity_(sheet, headers.length);
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    sheet.setFrozenRows(1);
+    applySheetLayout_(sheet, name, headers);
+    sheet.getRange(1, 1, 1, headers.length)
+      .setBackground("#174ea6")
+      .setFontColor("#ffffff")
+      .setFontWeight("bold")
+      .setVerticalAlignment("middle");
+  }
+}
+
 function jsonResponse_(value) {
   return ContentService.createTextOutput(JSON.stringify(value)).setMimeType(ContentService.MimeType.JSON);
 }
@@ -216,10 +223,6 @@ function updateSurveyRow_(sheet, events, payload, receivedAt) {
   record.first_recorded_at = record.first_recorded_at || receivedAt;
   record.last_recorded_at = receivedAt;
   record.completion_status = record.completion_status || "in_progress";
-  record.hotels_asked = HOTELS.map(hotel => hotel.name).join(" | ");
-
-  const allAnswers = parseJsonObject_(record.all_answers_json);
-
   for (let i = 0; i < surveyEvents.length; i++) {
     const event = surveyEvents[i] || {};
     const value = objectValue_(event.value);
@@ -231,7 +234,6 @@ function updateSurveyRow_(sheet, events, payload, receivedAt) {
       for (let q = 0; q < questionIds.length; q++) {
         const questionId = questionIds[q];
         const answer = objectValue_(snapshotAnswers[questionId]);
-        allAnswers[questionId] = answer;
         applyAnswer_(record, questionId, answer, objectValue_(value.assignment));
       }
       record.completion_status = value.completion_status || "complete";
@@ -250,11 +252,9 @@ function updateSurveyRow_(sheet, events, payload, receivedAt) {
     }
 
     if (value.survey_page === "transition") continue;
-    allAnswers[event.element_id || "unknown_question"] = answer;
     applyAnswer_(record, event.element_id || "", answer, assignment);
   }
 
-  record.all_answers_json = jsonCell_(allAnswers);
   const values = SURVEY_HEADERS.map(header => record[header] === undefined ? "" : record[header]);
   const targetRow = rowNumber || sheet.getLastRow() + 1;
   ensureRowCapacity_(sheet, targetRow);
@@ -266,15 +266,10 @@ function updateSurveyRow_(sheet, events, payload, receivedAt) {
 }
 
 function mergeSurveyRecord_(target, source) {
-  const targetAnswers = parseJsonObject_(target.all_answers_json);
-  const sourceAnswers = parseJsonObject_(source.all_answers_json);
-  const answerIds = Object.keys(sourceAnswers);
-  for (let i = 0; i < answerIds.length; i++) targetAnswers[answerIds[i]] = sourceAnswers[answerIds[i]];
-
   for (let i = 0; i < SURVEY_HEADERS.length; i++) {
     const header = SURVEY_HEADERS[i];
     if (header === "first_recorded_at" || header === "last_recorded_at" || header === "completed_at" ||
-        header === "completion_status" || header === "all_answers_json") continue;
+        header === "completion_status") continue;
     if (!isBlank_(source[header])) target[header] = source[header];
   }
 
@@ -284,58 +279,36 @@ function mergeSurveyRecord_(target, source) {
   if (source.completion_status === "complete" || target.completion_status !== "complete") {
     target.completion_status = source.completion_status || target.completion_status;
   }
-  target.all_answers_json = jsonCell_(targetAnswers);
 }
 
 function applyAssignment_(record, assignment) {
-  if (!assignment || !assignment.scenario_id) return;
-  record.assigned_trip_scenario_id = textCell_(assignment.scenario_id || "");
-  record.assigned_trip_scenario_title = textCell_(assignment.scenario_title || "");
+  if (!assignment) return;
   const ids = Array.isArray(assignment.attribute_ids) ? assignment.attribute_ids : [];
-  const labels = Array.isArray(assignment.attribute_labels) ? assignment.attribute_labels : [];
   for (let i = 0; i < 3; i++) {
     record["assigned_attribute_" + (i + 1) + "_id"] = textCell_(ids[i] || "");
-    record["assigned_attribute_" + (i + 1) + "_label"] = textCell_(labels[i] || attributeLabel_(ids[i]));
   }
 }
 
 function applyAnswer_(record, questionId, answer, assignment) {
   if (questionId === "prolific_id") {
     record.prolific_id = textCell_(answer.value || record.prolific_id || "");
-  } else if (questionId === "hotel_scenarios_prior") {
-    record.frequent_booking_scenario_ids = joinCell_(answer.selected_ids || []);
-    record.frequent_booking_scenario_labels = joinCell_(answer.selected_labels || []);
-    record.frequent_booking_scenario_other = textCell_(answer.other_text || "");
-  } else if (questionId === "hotel_attributes_prior") {
-    record.prior_hotel_attributes = textCell_(answer.value || "");
-  } else if (answer.scenario_id && answer.value === true) {
-    record.scenario_profile_acknowledged = 1;
-    record.assigned_trip_scenario_id = textCell_(answer.scenario_id);
-    record.assigned_trip_scenario_title = textCell_(answer.scenario_title || "");
   } else if (/^(hotelq|postreview)_/.test(questionId)) {
     applyMatrixAnswer_(record, questionId, answer, assignment);
   } else if (questionId === "post_review_choice") {
     record.chosen_hotel_id = textCell_(answer.hotel_id || "");
-    record.chosen_hotel_name = textCell_(answer.hotel_name || hotelName_(answer.hotel_id));
-  } else if (questionId === "post_review_reveal") {
-    record.revealed_attributes_acknowledged = answer.value === true ? 1 : 0;
-    record.revealed_attributes_json = jsonCell_(answer.true_attributes || {});
   } else if (questionId === "post_review_satisfaction") {
     record.satisfaction_1_to_7 = numberOrBlank_(answer.value);
   } else if (questionId === "post_review_switch") {
     record.would_switch_hotel = textCell_(answer.value || "");
   } else if (questionId === "post_review_likelihood_surprise") {
     record.switch_likelihood_1_to_5 = switchLikelihoodNumeric_(answer.switch_likelihood);
-    record.switch_likelihood_label = fivePointLabel_(answer.switch_likelihood);
     const surprise = objectValue_(answer.surprise_values);
     for (let i = 0; i < ATTRIBUTES.length; i++) {
       const rawSurprise = surprise[ATTRIBUTES[i].id];
       record["surprise_" + ATTRIBUTES[i].id + "_1_to_5"] = surpriseNumeric_(rawSurprise);
-      record["surprise_" + ATTRIBUTES[i].id + "_label"] = fivePointLabel_(rawSurprise);
     }
   } else if (questionId === "post_review_ai_use_frequency") {
     record.ai_use_frequency_1_to_7 = numberOrBlank_(answer.value);
-    record.ai_use_frequency_label = aiUseFrequencyLabel_(answer.value);
   }
 
   if (answer.bot_detection_triggered || answer.bot_detection_response) {
@@ -424,7 +397,6 @@ function updateBrowsingCombination_(sheet, events, surveyUserId, prolificId, con
   record.condition = textCell_(condition);
   record.browsing_stage = textCell_(stage);
   record.hotel_id = textCell_(hotel.id);
-  record.hotel_name = textCell_(hotel.name);
 
   for (let i = 0; i < events.length; i++) {
     const event = events[i] || {};
@@ -478,6 +450,63 @@ function updateBrowsingCombination_(sheet, events, surveyUserId, prolificId, con
         6
       );
     }
+    record.summary_viewing_seconds = roundNumber_(
+      numericValue_(record.summary_viewing_seconds) + numericValue_(value.summary_viewing_ms) / 1000,
+      3
+    );
+    record.individual_reviews_viewing_seconds = roundNumber_(
+      numericValue_(record.individual_reviews_viewing_seconds) + numericValue_(value.individual_reviews_viewing_ms) / 1000,
+      3
+    );
+    const displayPosition = numericValue_(value.hotel_display_position);
+    if (displayPosition > 0) record.hotel_display_position = displayPosition;
+
+    const seenPositions = uniqueNumbers_(
+      parseJsonArray_(record.review_seen_positions_json).concat(Array.isArray(value.review_seen_order) ? value.review_seen_order : [])
+    );
+    const readPositions = uniqueNumbers_(
+      parseJsonArray_(record.review_read_positions_json).concat(Array.isArray(value.review_read_order) ? value.review_read_order : [])
+    );
+    const readIds = uniqueStrings_(
+      parseJsonArray_(record.review_read_ids_json).concat(Array.isArray(value.review_read_ids) ? value.review_read_ids : [])
+    );
+    const visibilitySeconds = parseJsonObject_(record.review_visibility_seconds_json);
+    const currentVisibility = Array.isArray(value.review_visibility) ? value.review_visibility : [];
+    for (let v = 0; v < currentVisibility.length; v++) {
+      const position = String(numberOrBlank_(currentVisibility[v].position));
+      if (!position) continue;
+      visibilitySeconds[position] = roundNumber_(
+        numericValue_(visibilitySeconds[position]) + numericValue_(currentVisibility[v].visible_ms) / 1000,
+        3
+      );
+    }
+    const readingSessions = parseJsonArray_(record.review_reading_sessions_json);
+    if (value.review_seen_count || value.review_read_count || currentVisibility.length) {
+      readingSessions.push({
+        visit_id: String(visitId),
+        seen_order: Array.isArray(value.review_seen_order) ? value.review_seen_order : [],
+        read_order: Array.isArray(value.review_read_order) ? value.review_read_order : [],
+        read_ids: Array.isArray(value.review_read_ids) ? value.review_read_ids : [],
+        stopping_position: numberOrBlank_(value.review_stopping_position),
+        furthest_position_seen: numberOrBlank_(value.review_furthest_position_seen),
+        reading_pattern: textCell_(value.review_reading_pattern || "none")
+      });
+    }
+    record.reviews_seen_count = seenPositions.length;
+    record.reviews_read_count = readPositions.length;
+    record.review_seen_positions_json = jsonCell_(seenPositions);
+    record.review_read_positions_json = jsonCell_(readPositions);
+    record.review_read_ids_json = jsonCell_(readIds);
+    if (value.review_stopping_position !== undefined && value.review_stopping_position !== null) {
+      record.review_stopping_position = numberOrBlank_(value.review_stopping_position);
+    }
+    record.review_furthest_position_seen = Math.max(
+      numericValue_(record.review_furthest_position_seen),
+      numericValue_(value.review_furthest_position_seen)
+    );
+    if (value.review_reading_pattern) record.review_reading_pattern = textCell_(value.review_reading_pattern);
+    record.review_visibility_seconds_json = jsonCell_(visibilitySeconds);
+    record.review_reading_sessions_json = jsonCell_(readingSessions);
     record.last_exit_reason = textCell_(value.exit_reason || "");
     processed.add(String(visitId));
     processedVisitIds.push(String(visitId));
@@ -487,8 +516,6 @@ function updateBrowsingCombination_(sheet, events, surveyUserId, prolificId, con
   if (!recorded && rowNumbers.length <= 1) return 0;
   record.record_updated_at = receivedAt;
   record.time_limit_reached = stage === "no_reviews" && numericValue_(record.total_viewing_seconds) >= 29.5 ? 1 : 0;
-  record.five_minute_warning_shown = stage !== "no_reviews" &&
-    numericValue_(record.maximum_single_view_seconds) >= 299.5 ? 1 : 0;
   record.processed_visit_ids_json = jsonCell_(processedVisitIds);
 
   const values = BROWSING_HEADERS.map(header => record[header] === undefined ? "" : record[header]);
@@ -603,34 +630,15 @@ function ensureSheet_(ss, name, headers) {
 }
 
 function ensureBrowsingSheet_(ss) {
-  const existing = ss.getSheetByName(BROWSING_SHEET);
-  if (existing && existing.getLastRow() > 0) {
-    const width = Math.min(existing.getLastColumn(), BROWSING_HEADERS.length);
-    const existingHeaders = existing.getRange(1, 1, 1, width).getDisplayValues()[0];
-    const compatible = existingHeaders.every((header, index) => !header || header === BROWSING_HEADERS[index]);
-    if (!compatible) {
-      existing.setName(uniqueSheetName_(ss, BROWSING_SHEET + "_Legacy"));
-    }
-  }
   return ensureSheet_(ss, BROWSING_SHEET, BROWSING_HEADERS);
-}
-
-function uniqueSheetName_(ss, base) {
-  if (!ss.getSheetByName(base)) return base;
-  let suffix = 2;
-  while (ss.getSheetByName(base + "_" + suffix)) suffix += 1;
-  return base + "_" + suffix;
 }
 
 function applySheetLayout_(sheet, name, headers) {
   for (let i = 1; i <= headers.length; i++) sheet.setColumnWidth(i, name === BROWSING_SHEET ? 145 : 125);
-  sheet.setFrozenColumns(name === BROWSING_SHEET ? 6 : 2);
+  sheet.setFrozenColumns(name === BROWSING_SHEET ? 5 : 2);
   setWidthByHeader_(sheet, headers, "survey_user_id", 330);
   setWidthByHeader_(sheet, headers, "prolific_id", 220);
-  setWidthByHeader_(sheet, headers, "assigned_trip_scenario_title", 250);
-  setWidthByHeader_(sheet, headers, "prior_hotel_attributes", 340);
   setWidthByHeader_(sheet, headers, "bot_detection_details", 320);
-  setWidthByHeader_(sheet, headers, "all_answers_json", 500);
   setWidthByHeader_(sheet, headers, "processed_visit_ids_json", 420);
 }
 
@@ -638,8 +646,6 @@ function formatSurveyRow_(sheet, row) {
   formatDateHeader_(sheet, SURVEY_HEADERS, row, 1, "first_recorded_at");
   formatDateHeader_(sheet, SURVEY_HEADERS, row, 1, "last_recorded_at");
   formatDateHeader_(sheet, SURVEY_HEADERS, row, 1, "completed_at");
-  wrapHeader_(sheet, SURVEY_HEADERS, row, 1, "prior_hotel_attributes");
-  wrapHeader_(sheet, SURVEY_HEADERS, row, 1, "all_answers_json");
 }
 
 function formatBrowsingRow_(sheet, row) {
@@ -734,19 +740,9 @@ function hotelForId_(id) {
   return null;
 }
 
-function hotelName_(id) {
-  const hotel = hotelForId_(id);
-  return hotel ? hotel.name : "";
-}
-
 function attributeForId_(id) {
   for (let i = 0; i < ATTRIBUTES.length; i++) if (ATTRIBUTES[i].id === String(id || "")) return ATTRIBUTES[i];
   return null;
-}
-
-function attributeLabel_(id) {
-  const attribute = attributeForId_(id);
-  return attribute ? attribute.label : "";
 }
 
 function likelihoodNumeric_(value) {
@@ -773,34 +769,6 @@ function surpriseNumeric_(value) {
     very_surprised: 4,
     extremely_surprised: 5
   };
-  return map[String(value || "")] || "";
-}
-
-function fivePointLabel_(value) {
-  const labels = {
-    very_unlikely: "Very unlikely",
-    unlikely: "Unlikely",
-    neither_likely_nor_unlikely: "Neither likely nor unlikely",
-    likely: "Likely",
-    very_likely: "Very likely",
-    not_at_all_surprised: "Not at all surprised",
-    slightly_surprised: "Slightly surprised",
-    moderately_surprised: "Moderately surprised",
-    very_surprised: "Very surprised",
-    extremely_surprised: "Extremely surprised"
-  };
-  return textCell_(labels[String(value || "")] || value || "");
-}
-
-function aiUseFrequencyLabel_(value) {
-  const numeric = Number(value);
-  if (numeric === 1) return "Never";
-  if (numeric === 7) return "Always every time I shop online";
-  return Number.isFinite(numeric) && numeric >= 2 && numeric <= 6 ? String(numeric) : "";
-}
-
-function confidenceNumeric_(value) {
-  const map = { low: 1, medium: 2, high: 3 };
   return map[String(value || "")] || "";
 }
 
@@ -834,6 +802,32 @@ function parseJsonArray_(value) {
   } catch (_) {
     return [];
   }
+}
+
+function uniqueNumbers_(values) {
+  const seen = {};
+  const result = [];
+  for (let i = 0; i < values.length; i++) {
+    const number = Number(values[i]);
+    if (!Number.isFinite(number)) continue;
+    const key = String(number);
+    if (seen[key]) continue;
+    seen[key] = true;
+    result.push(number);
+  }
+  return result.sort((a, b) => a - b);
+}
+
+function uniqueStrings_(values) {
+  const seen = {};
+  const result = [];
+  for (let i = 0; i < values.length; i++) {
+    const value = String(values[i] == null ? "" : values[i]);
+    if (!value || seen[value]) continue;
+    seen[value] = true;
+    result.push(value);
+  }
+  return result;
 }
 
 function isBlank_(value) {
@@ -882,10 +876,6 @@ function textCell_(value) {
   if (value === "" || value == null) return "";
   const text = String(value);
   return /^[=+@-]/.test(text) ? "'" + text : text;
-}
-
-function joinCell_(values) {
-  return Array.isArray(values) ? values.map(value => String(value)).join(" | ") : "";
 }
 
 function jsonCell_(value) {

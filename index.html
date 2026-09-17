@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbyBmS8V5n3M0smur248ScVqHNxYG5vZ8Ax9D9ZL38qc_TjiLPuDT04n0ErT57RX_o1V/exec"
     />
-    <link rel="stylesheet" href="./assets/css/site.css?v=20260917-1" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260917-2" />
   </head>
   <body data-survey-page="true">
     <main class="survey-shell" aria-label="Hotel booking survey">
@@ -30,7 +30,7 @@
       </section>
     </main>
 
-    <script src="./assets/js/survey-tracking.js?v=20260903-1"></script>
+    <script src="./assets/js/survey-tracking.js?v=20260917-4"></script>
     <script src="./assets/js/shopper-profile.js?v=20260917-1"></script>
     <script>
       (function () {
@@ -211,9 +211,9 @@
         const postReviewOutcomePages = [
           { id: "post_review_choice", type: "hotelChoice" },
           { id: "post_review_reveal", type: "actualReveal" },
+          { id: "post_review_likelihood_surprise", type: "likelihoodSurprise" },
           { id: "post_review_satisfaction", type: "likert7" },
           { id: "post_review_switch", type: "switchChoice" },
-          { id: "post_review_likelihood_surprise", type: "likelihoodSurprise" },
           { id: "post_review_ai_use_frequency", type: "aiUseFrequency" }
         ];
         const postReviewPages = [
@@ -334,6 +334,30 @@
           return copy;
         }
 
+        function stableShuffled(items, seedText) {
+          let seed = 2166136261;
+          const normalized = String(seedText || "");
+          for (let i = 0; i < normalized.length; i++) {
+            seed ^= normalized.charCodeAt(i);
+            seed = Math.imul(seed, 16777619);
+          }
+          const random = function () {
+            seed += 0x6D2B79F5;
+            let value = seed;
+            value = Math.imul(value ^ (value >>> 15), value | 1);
+            value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+            return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+          };
+          const copy = items.slice();
+          for (let i = copy.length - 1; i > 0; i--) {
+            const j = Math.floor(random() * (i + 1));
+            const temp = copy[i];
+            copy[i] = copy[j];
+            copy[j] = temp;
+          }
+          return copy;
+        }
+
         function getSharedAssignment() {
           try {
             const stored = localStorage.getItem(SHARED_ASSIGNMENT_STORAGE_KEY);
@@ -382,7 +406,11 @@
             ? assignment.attribute_ids.filter(id => validAttributeIds.has(id))
             : [];
           if (assignedAttributeIds.length !== ASSIGNED_ATTRIBUTE_COUNT) {
-            assignment.attribute_ids = shuffled(attributePool.map(attribute => attribute.id)).slice(0, ASSIGNED_ATTRIBUTE_COUNT);
+            const attributeIds = attributePool.map(attribute => attribute.id);
+            assignment.attribute_ids = (participantIdentity
+              ? stableShuffled(attributeIds, `hotel-attributes-v1:${participantIdentity.trim().toUpperCase()}`)
+              : shuffled(attributeIds)
+            ).slice(0, ASSIGNED_ATTRIBUTE_COUNT);
             assignment.attribute_labels = assignment.attribute_ids.map(id => {
               const attribute = attributePool.find(item => item.id === id);
               return attribute ? attribute.label : id;
@@ -711,11 +739,21 @@
         }
 
         function setQuestionHtml(html) {
+          const page = activePages()[currentIndex()];
+          const isGeneralQuestion = page && page.type === "aiUseFrequency";
+          const canReviewRevealedAttributes = postReviewMode && page && [
+            "likelihoodSurprise",
+            "likert7",
+            "switchChoice"
+          ].includes(page.type);
           document.getElementById("surveyQuestion").innerHTML = `
-            ${hotelQuestionnaireMode || postReviewMode ? `
+            ${(hotelQuestionnaireMode || postReviewMode) && !isGeneralQuestion ? `
               <div class="survey-profile-tools">
                 <button class="btn2 shopper-profile-button" type="button" data-view-shopper-profile>View your shopper profile</button>
                 <button class="btn2 hotel-order-button" type="button" data-view-hotel-order>View hotel browsing order</button>
+                ${canReviewRevealedAttributes ? `
+                  <button class="btn2 revealed-attributes-button" type="button" data-view-revealed-attributes>View revealed hotel attributes</button>
+                ` : ""}
               </div>
             ` : ""}
             <div class="survey-notice">
@@ -751,7 +789,14 @@
               return ordered;
             }
           } catch (_) { /* use the default order below */ }
-          return hotels.slice();
+          if (!participantIdentity) return hotels.slice();
+          const orderedIds = stableShuffled(
+            hotels.map(hotel => hotel.id),
+            `hotel-order-v1:${participantStorageId.toUpperCase()}`
+          );
+          try { localStorage.setItem(hotelOrderStorageKey(), JSON.stringify(orderedIds)); }
+          catch (_) { /* the deterministic order can be recomputed */ }
+          return orderedIds.map(id => hotelById.get(id)).filter(Boolean);
         }
 
         function ensureHotelOrderModalRoot() {
@@ -812,6 +857,53 @@
 
         function closeHotelOrderModal() {
           const root = document.getElementById("hotelOrderModalRoot");
+          if (!root || !root.classList.contains("is-open")) return;
+          const trigger = root._lastTrigger;
+          root.classList.remove("is-open");
+          root.setAttribute("aria-hidden", "true");
+          root.innerHTML = "";
+          document.body.style.overflow = root.dataset.previousOverflow || "";
+          if (trigger && typeof trigger.focus === "function") trigger.focus();
+          root._lastTrigger = null;
+        }
+
+        function openRevealedAttributesModal(trigger) {
+          const hotel = chosenHotel();
+          let root = document.getElementById("revealedAttributesModalRoot");
+          if (!root) {
+            root = document.createElement("div");
+            root.id = "revealedAttributesModalRoot";
+            root.className = "modal-root revealed-attributes-modal-root";
+            root.setAttribute("aria-hidden", "true");
+            document.body.appendChild(root);
+          }
+          root.dataset.previousOverflow = document.body.style.overflow || "";
+          root.innerHTML = `
+            <div class="modal-backdrop" data-close-revealed-attributes></div>
+            <section class="modal revealed-attributes-modal" role="dialog" aria-modal="true" aria-labelledby="revealedAttributesTitle">
+              <header class="modal__head">
+                <div>
+                  <p class="modal__eyebrow">Your selected hotel: ${escapeHtml(hotel.name)}</p>
+                  <h2 class="modal__title" id="revealedAttributesTitle">Revealed: Actual Hotel Attributes</h2>
+                </div>
+                <button class="xbtn" type="button" data-close-revealed-attributes aria-label="Close">x</button>
+              </header>
+              <div class="revealed-attributes-modal__body">
+                <p>Review the actual values and your post-review choices before answering.</p>
+                ${trueAttributeTableHtml(hotel)}
+              </div>
+            </section>
+          `;
+          root._lastTrigger = trigger || document.activeElement;
+          root.classList.add("is-open");
+          root.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+          const closeButton = root.querySelector("[data-close-revealed-attributes]");
+          if (closeButton) closeButton.focus();
+        }
+
+        function closeRevealedAttributesModal() {
+          const root = document.getElementById("revealedAttributesModalRoot");
           if (!root || !root.classList.contains("is-open")) return;
           const trigger = root._lastTrigger;
           root.classList.remove("is-open");
@@ -1027,6 +1119,9 @@
 
         function aiUseFrequencyHtml() {
           return `
+            <div class="survey-context-note" role="note">
+              This is a general question for you as a survey participant. It is separate from the hotel browsing condition you just completed.
+            </div>
             <h1 class="survey-title">How often do you use AI-generated summaries or recommendations when shopping or booking online?</h1>
             ${radioOptionList("ai_use_frequency", [
               ["1", "1 - Never"],
@@ -1323,15 +1418,34 @@
             return;
           }
           const closeButton = event.target && event.target.closest && event.target.closest("[data-close-hotel-order]");
-          if (closeButton) closeHotelOrderModal();
+          if (closeButton) {
+            closeHotelOrderModal();
+            return;
+          }
+          const revealedButton = event.target && event.target.closest && event.target.closest("[data-view-revealed-attributes]");
+          if (revealedButton) {
+            openRevealedAttributesModal(revealedButton);
+            return;
+          }
+          const closeRevealedButton = event.target && event.target.closest && event.target.closest("[data-close-revealed-attributes]");
+          if (closeRevealedButton) closeRevealedAttributesModal();
         });
 
         document.addEventListener("keydown", function (event) {
           const root = document.getElementById("hotelOrderModalRoot");
-          if (event.key !== "Escape" || !root || !root.classList.contains("is-open")) return;
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          closeHotelOrderModal();
+          const revealedRoot = document.getElementById("revealedAttributesModalRoot");
+          if (event.key !== "Escape") return;
+          if (revealedRoot && revealedRoot.classList.contains("is-open")) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            closeRevealedAttributesModal();
+            return;
+          }
+          if (root && root.classList.contains("is-open")) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            closeHotelOrderModal();
+          }
         }, true);
 
         document.getElementById("surveyForm").addEventListener("submit", function (event) {
