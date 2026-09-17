@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbyBmS8V5n3M0smur248ScVqHNxYG5vZ8Ax9D9ZL38qc_TjiLPuDT04n0ErT57RX_o1V/exec"
     />
-    <link rel="stylesheet" href="./assets/css/site.css?v=20260917-2" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260917-3" />
   </head>
   <body data-survey-page="true">
     <main class="survey-shell" aria-label="Hotel booking survey">
@@ -881,16 +881,19 @@
           root.innerHTML = `
             <div class="modal-backdrop" data-close-revealed-attributes></div>
             <section class="modal revealed-attributes-modal" role="dialog" aria-modal="true" aria-labelledby="revealedAttributesTitle">
-              <header class="modal__head">
-                <div>
-                  <p class="modal__eyebrow">Your selected hotel: ${escapeHtml(hotel.name)}</p>
+              <header class="modal__top revealed-attributes-modal__header">
+                <div class="revealed-attributes-modal__heading">
+                  <p class="modal__eyebrow">Selected hotel</p>
                   <h2 class="modal__title" id="revealedAttributesTitle">Revealed: Actual Hotel Attributes</h2>
+                  <p class="revealed-attributes-modal__hotel">${escapeHtml(hotel.name)}</p>
                 </div>
-                <button class="xbtn" type="button" data-close-revealed-attributes aria-label="Close">x</button>
+                <button class="xbtn" type="button" data-close-revealed-attributes aria-label="Close">&times;</button>
               </header>
               <div class="revealed-attributes-modal__body">
-                <p>Review the actual values and your post-review choices before answering.</p>
-                ${trueAttributeTableHtml(hotel)}
+                <p class="revealed-attributes-modal__intro">Review the actual values alongside your post-review choices before answering.</p>
+                <div class="revealed-attributes-modal__table-wrap">
+                  ${trueAttributeTableHtml(hotel)}
+                </div>
               </div>
             </section>
           `;
