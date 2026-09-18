@@ -9195,10 +9195,6 @@
     return LOCATION_INFO_RE.test(String(value || ""));
   }
 
-  function visibleTags(hotel) {
-    return (hotel.tags || []).filter(tag => !isLocationInfoText(tag));
-  }
-
   function visibleFacts(hotel) {
     return (hotel.facts || []).filter(fact => {
       const text = String(fact || "");
@@ -9494,7 +9490,7 @@
         <div class="card__body">
           <div>
             <h3 class="hotel-title">${escapeXml(h.name)}</h3>
-            ${state.showReviews ? "" : hotelListingPreviewHtml(h)}
+            ${state.showReviews ? "" : hotelListingPreviewHtml()}
           </div>
 
           <div class="priceBox priceBox--text">
@@ -9516,14 +9512,9 @@
     renderStudyFlowCta();
   }
 
-  function hotelListingPreviewHtml(hotel) {
-    const tags = visibleTags(hotel);
+  function hotelListingPreviewHtml() {
     return `
       <div class="booking-roomline">One selected room option available for this listing</div>
-      ${tags.length ? `<div>${tags.map(t => `<span class="pill2">${escapeXml(t)}</span>`).join("")}</div>` : ""}
-      <div class="amenities">
-        ${(hotel.amenities || []).slice(0, 4).map(a => amenityChipHtml(a)).join("")}
-      </div>
     `;
   }
 
