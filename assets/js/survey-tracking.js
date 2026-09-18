@@ -70,6 +70,14 @@
     }
   }
 
+  function currentSurveyStage() {
+    try {
+      return new URLSearchParams(location.search).get("survey_stage") || "";
+    } catch (e) {
+      return "";
+    }
+  }
+
   function pageCondition() {
     try {
       var p = new URLSearchParams(location.search);
@@ -888,6 +896,13 @@
     };
 
     log("hotel_modal_open", hotelId, { hash: location.hash || "" });
+    log("popup_open", "hotel:" + hotelId, {
+      popup_type: "hotel",
+      hotel_id: hotelId,
+      page_context: "hotel_browsing",
+      survey_stage: currentSurveyStage(),
+      page_hash: location.hash || ""
+    });
   }
 
   var lastModalOpen = false;

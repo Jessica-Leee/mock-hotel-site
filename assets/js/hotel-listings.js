@@ -9306,6 +9306,15 @@
     });
   }
 
+  function trackHotelPopupInventory() {
+    if (typeof window.HOTEL_EXPERIMENT_TRACK !== "function") return;
+    const hotelIds = visibleHotels().map(hotel => hotel.id);
+    window.HOTEL_EXPERIMENT_TRACK("popup_inventory", "hotel_popups", {
+      popup_type: "hotel",
+      hotel_ids: hotelIds
+    });
+  }
+
   function surveyQueryString(nextStage) {
     const params = new URLSearchParams(location.search || "");
     if (nextStage) params.set("survey_stage", nextStage);
@@ -10147,6 +10156,7 @@
 
   function init() {
     renderResults();
+    trackHotelPopupInventory();
     wireGlobalHandlers();
     startBrowseCountdown();
 

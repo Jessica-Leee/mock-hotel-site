@@ -30,8 +30,8 @@
       </section>
     </main>
 
-    <script src="./assets/js/survey-tracking.js?v=20260918-2"></script>
-    <script src="./assets/js/shopper-profile.js?v=20260917-1"></script>
+    <script src="./assets/js/survey-tracking.js?v=20260918-3"></script>
+    <script src="./assets/js/shopper-profile.js?v=20260918-2"></script>
     <script>
       (function () {
         const SURVEY_STORAGE_PREFIX = "mock_hotel_survey_v1";
@@ -858,6 +858,16 @@
           return root;
         }
 
+        function trackSurveyPopupOpen(popupType, details) {
+          if (typeof window.HOTEL_EXPERIMENT_TRACK !== "function") return;
+          window.HOTEL_EXPERIMENT_TRACK("popup_open", popupType, Object.assign({
+            popup_type: popupType,
+            page_context: postReviewMode ? "post_review_questionnaire" : "hotel_questionnaire",
+            survey_stage: surveyStage,
+            page_hash: location.hash || ""
+          }, details || {}));
+        }
+
         function openHotelOrderModal(trigger) {
           const root = ensureHotelOrderModalRoot();
           const order = hotelBrowsingOrder();
@@ -899,6 +909,7 @@
           root.classList.add("is-open");
           root.setAttribute("aria-hidden", "false");
           document.body.style.overflow = "hidden";
+          trackSurveyPopupOpen("hotel_order");
           const closeButton = root.querySelector("[data-close-hotel-order]");
           if (closeButton) closeButton.focus();
         }
@@ -949,6 +960,7 @@
           root.classList.add("is-open");
           root.setAttribute("aria-hidden", "false");
           document.body.style.overflow = "hidden";
+          trackSurveyPopupOpen("revealed_attributes", { hotel_id: hotel.id });
           const closeButton = root.querySelector("[data-close-revealed-attributes]");
           if (closeButton) closeButton.focus();
         }

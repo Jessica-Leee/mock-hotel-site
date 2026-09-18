@@ -32,6 +32,26 @@
     return SCENARIOS[0];
   }
 
+  function trackProfilePopupOpen() {
+    if (typeof window.HOTEL_EXPERIMENT_TRACK !== "function") return;
+    const params = new URLSearchParams(location.search || "");
+    const hotelRoot = document.getElementById("modalRoot");
+    const hotelId = hotelRoot && hotelRoot.classList.contains("is-open")
+      ? hotelRoot.getAttribute("data-active-hotel") || ""
+      : "";
+    window.HOTEL_EXPERIMENT_TRACK("popup_open", "shopper_profile", {
+      popup_type: "shopper_profile",
+      page_context: hotelId
+        ? "hotel_modal"
+        : location.pathname.toLowerCase().includes("search-")
+          ? "hotel_browsing"
+          : "questionnaire",
+      survey_stage: params.get("survey_stage") || "",
+      page_hash: location.hash || "",
+      hotel_id: hotelId
+    });
+  }
+
   function profileRowsHtml(rows) {
     return rows.map(row => `
       <div class="shopper-profile-row${row[2] ? " is-top" : ""}" role="row">
@@ -86,6 +106,7 @@
     root.classList.add("is-open");
     root.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
+    trackProfilePopupOpen();
     const closeButton = root.querySelector("[data-close-shopper-profile]");
     if (closeButton) closeButton.focus();
   }

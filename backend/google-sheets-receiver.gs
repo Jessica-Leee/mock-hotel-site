@@ -12,7 +12,7 @@
  * Deploy as a Web App (Execute as: Me, Who has access: Anyone).
  */
 
-const SCHEMA_VERSION = "19";
+const SCHEMA_VERSION = "20";
 const WITHOUT_AI_SHEET = "Without_AI_Survey";
 const AI_SUMMARY_SHEET = "AI_Summary_Survey";
 const BROWSING_SHEET = "Browsing_Information";
@@ -43,6 +43,8 @@ const BROWSING_HEADERS = [
   "browsing_stage",
   "hotel_id",
   "hotel_display_position",
+  "popup_opened",
+  "popup_click_count",
   "first_opened_at",
   "last_opened_at",
   "last_closed_at",
@@ -57,6 +59,7 @@ const BROWSING_HEADERS = [
   "last_exit_reason",
   "time_limit_reached",
   "processed_visit_ids_json",
+  "processed_popup_event_ids_json",
   "summary_viewing_seconds",
   "individual_reviews_viewing_seconds",
   "reviews_seen_count",
@@ -104,7 +107,18 @@ function buildSurveyHeaders_() {
     headers.push("surprise_" + ATTRIBUTES[i].id + "_1_to_5");
   }
 
-  headers.push("ai_use_frequency_1_to_7", "bot_detection_flag", "bot_detection_details");
+  headers.push(
+    "ai_use_frequency_1_to_7",
+    "shopper_profile_popup_opened",
+    "shopper_profile_popup_open_count",
+    "hotel_order_popup_opened",
+    "hotel_order_popup_open_count",
+    "revealed_attributes_popup_opened",
+    "revealed_attributes_popup_open_count",
+    "processed_popup_event_ids_json",
+    "bot_detection_flag",
+    "bot_detection_details"
+  );
   return headers;
 }
 
@@ -201,7 +215,12 @@ function jsonResponse_(value) {
 
 function updateSurveyRow_(sheet, events, payload, receivedAt) {
   const surveyEvents = events.filter(event => {
-    return event && (event.event_type === "survey_submit" || event.event_type === "survey_completion_snapshot");
+    if (!event) return false;
+    if (event.event_type === "survey_submit" || event.event_type === "survey_completion_snapshot") return true;
+    if (event.event_type !== "popup_open") return false;
+    const value = objectValue_(event.value);
+    const popupType = String(value.popup_type || event.element_id || "");
+    return ["shopper_profile", "hotel_order", "revealed_attributes"].indexOf(popupType) >= 0;
   });
   if (!surveyEvents.length) return false;
 
@@ -225,9 +244,15 @@ function updateSurveyRow_(sheet, events, payload, receivedAt) {
   record.first_recorded_at = record.first_recorded_at || receivedAt;
   record.last_recorded_at = receivedAt;
   record.completion_status = record.completion_status || "in_progress";
+  initializeSurveyPopupFields_(record);
   for (let i = 0; i < surveyEvents.length; i++) {
     const event = surveyEvents[i] || {};
     const value = objectValue_(event.value);
+
+    if (event.event_type === "popup_open") {
+      applySurveyPopupOpen_(record, event);
+      continue;
+    }
 
     if (event.event_type === "survey_completion_snapshot") {
       const snapshotAnswers = objectValue_(value.answers);
@@ -265,6 +290,46 @@ function updateSurveyRow_(sheet, events, payload, receivedAt) {
   formatSurveyRow_(sheet, targetRow);
   ensureFilter_(sheet);
   return true;
+}
+
+function initializeSurveyPopupFields_(record) {
+  const prefixes = [
+    "shopper_profile_popup",
+    "hotel_order_popup",
+    "revealed_attributes_popup"
+  ];
+  for (let i = 0; i < prefixes.length; i++) {
+    const prefix = prefixes[i];
+    record[prefix + "_opened"] = numericValue_(record[prefix + "_opened"]) > 0 ? 1 : 0;
+    record[prefix + "_open_count"] = numericValue_(record[prefix + "_open_count"]);
+  }
+}
+
+function applySurveyPopupOpen_(record, event) {
+  const value = objectValue_(event.value);
+  const popupType = String(value.popup_type || event.element_id || "");
+  const prefixes = {
+    shopper_profile: "shopper_profile_popup",
+    hotel_order: "hotel_order_popup",
+    revealed_attributes: "revealed_attributes_popup"
+  };
+  const prefix = prefixes[popupType];
+  if (!prefix) return;
+
+  const eventId = String(event.event_id || recordId_([
+    popupType,
+    event.timestamp || "",
+    value.page_context || "",
+    value.page_hash || "",
+    value.hotel_id || ""
+  ]));
+  const processedIds = parseJsonArray_(record.processed_popup_event_ids_json).map(String);
+  if (processedIds.indexOf(eventId) >= 0) return;
+
+  record[prefix + "_opened"] = 1;
+  record[prefix + "_open_count"] = numericValue_(record[prefix + "_open_count"]) + 1;
+  processedIds.push(eventId);
+  record.processed_popup_event_ids_json = jsonCell_(processedIds);
 }
 
 function mergeSurveyRecord_(target, source) {
@@ -353,13 +418,24 @@ function updateBrowsingRow_(sheet, events, payload, receivedAt) {
   if (!validBrowsingCombination_(condition, browsingStage)) return 0;
   const studentId = studentIdFrom_(payload, events);
   const eventsByHotel = {};
+  const inventoryPositions = {};
 
   for (let i = 0; i < events.length; i++) {
     const event = events[i] || {};
-    if (event.event_type !== "page_timing") continue;
     const value = objectValue_(event.value);
-    if (value.context !== "hotel_modal") continue;
-    const hotelId = event.element_id || value.hotel_id || "";
+    if (event.event_type === "popup_inventory" && value.popup_type === "hotel") {
+      const hotelIds = Array.isArray(value.hotel_ids) ? value.hotel_ids : [];
+      for (let p = 0; p < hotelIds.length; p++) {
+        const inventoryHotel = hotelForId_(hotelIds[p]);
+        if (inventoryHotel) inventoryPositions[inventoryHotel.id] = p + 1;
+      }
+      continue;
+    }
+
+    const isTimingEvent = event.event_type === "page_timing" && value.context === "hotel_modal";
+    const isPopupEvent = event.event_type === "popup_open" && value.popup_type === "hotel";
+    if (!isTimingEvent && !isPopupEvent) continue;
+    const hotelId = value.hotel_id || event.element_id || "";
     const hotel = hotelForId_(hotelId);
     if (!hotel) continue;
     if (!eventsByHotel[hotel.id]) eventsByHotel[hotel.id] = [];
@@ -367,24 +443,25 @@ function updateBrowsingRow_(sheet, events, payload, receivedAt) {
   }
 
   let totalRecorded = 0;
-  const hotelIds = Object.keys(eventsByHotel);
+  const hotelIds = uniqueStrings_(Object.keys(eventsByHotel).concat(Object.keys(inventoryPositions)));
   for (let i = 0; i < hotelIds.length; i++) {
     const hotel = hotelForId_(hotelIds[i]);
     totalRecorded += updateBrowsingCombination_(
       sheet,
-      eventsByHotel[hotel.id],
+      eventsByHotel[hotel.id] || [],
       surveyUserId,
       studentId,
       condition,
       browsingStage,
       hotel,
-      receivedAt
+      receivedAt,
+      inventoryPositions[hotel.id] || 0
     );
   }
   return totalRecorded;
 }
 
-function updateBrowsingCombination_(sheet, events, surveyUserId, studentId, condition, stage, hotel, receivedAt) {
+function updateBrowsingCombination_(sheet, events, surveyUserId, studentId, condition, stage, hotel, receivedAt, inventoryPosition) {
   const rowNumbers = findBrowsingRows_(sheet, surveyUserId, studentId, condition, stage, hotel.id);
   const rowNumber = rowNumbers.length ? rowNumbers[0] : 0;
   const record = rowNumber
@@ -392,6 +469,8 @@ function updateBrowsingCombination_(sheet, events, surveyUserId, studentId, cond
     : emptyRecord_(BROWSING_HEADERS);
   const processedVisitIds = parseJsonArray_(record.processed_visit_ids_json);
   const processed = new Set(processedVisitIds.map(String));
+  const processedPopupEventIds = parseJsonArray_(record.processed_popup_event_ids_json);
+  const processedPopupEvents = new Set(processedPopupEventIds.map(String));
   let recorded = 0;
 
   record.survey_user_id = textCell_(surveyUserId);
@@ -399,10 +478,41 @@ function updateBrowsingCombination_(sheet, events, surveyUserId, studentId, cond
   record.condition = textCell_(condition);
   record.browsing_stage = textCell_(stage);
   record.hotel_id = textCell_(hotel.id);
+  record.popup_opened = numericValue_(record.popup_opened) > 0 ? 1 : 0;
+  record.popup_click_count = numericValue_(record.popup_click_count);
+  if (inventoryPosition > 0) record.hotel_display_position = inventoryPosition;
 
   for (let i = 0; i < events.length; i++) {
     const event = events[i] || {};
     const value = objectValue_(event.value);
+    if (event.event_type === "popup_open" && value.popup_type === "hotel") {
+      const popupEventId = String(event.event_id || recordId_([
+        surveyUserId,
+        condition,
+        stage,
+        hotel.id,
+        "popup_open",
+        event.timestamp || ""
+      ]));
+      if (processedPopupEvents.has(popupEventId)) continue;
+      const openedAt = dateValue_(event.timestamp) || receivedAt;
+      record.popup_opened = 1;
+      record.first_opened_at = earliestDate_(record.first_opened_at, openedAt);
+      record.last_opened_at = latestDate_(record.last_opened_at, openedAt);
+      processedPopupEvents.add(popupEventId);
+      processedPopupEventIds.push(popupEventId);
+      record.popup_click_count = Math.max(
+        numericValue_(record.popup_click_count),
+        processedPopupEventIds.length
+      );
+      recorded += 1;
+      continue;
+    }
+    if (event.event_type !== "page_timing" || value.context !== "hotel_modal") continue;
+    if (!record.popup_opened) {
+      record.popup_opened = 1;
+      if (!record.popup_click_count) record.popup_click_count = 1;
+    }
     const visitId = event.event_id || recordId_([
       surveyUserId,
       condition,
@@ -515,10 +625,11 @@ function updateBrowsingCombination_(sheet, events, surveyUserId, studentId, cond
     recorded += 1;
   }
 
-  if (!recorded && rowNumbers.length <= 1) return 0;
+  if (!recorded && !rowNumber && inventoryPosition <= 0) return 0;
   record.record_updated_at = receivedAt;
   record.time_limit_reached = stage === "no_reviews" && numericValue_(record.total_viewing_seconds) >= 29.5 ? 1 : 0;
   record.processed_visit_ids_json = jsonCell_(processedVisitIds);
+  record.processed_popup_event_ids_json = jsonCell_(processedPopupEventIds);
 
   const values = BROWSING_HEADERS.map(header => record[header] === undefined ? "" : record[header]);
   const targetRow = rowNumber || sheet.getLastRow() + 1;
@@ -644,12 +755,14 @@ function applySheetLayout_(sheet, name, headers) {
   setWidthByHeader_(sheet, headers, "student_id", 220);
   setWidthByHeader_(sheet, headers, "bot_detection_details", 320);
   setWidthByHeader_(sheet, headers, "processed_visit_ids_json", 420);
+  setWidthByHeader_(sheet, headers, "processed_popup_event_ids_json", 420);
 }
 
 function formatSurveyRow_(sheet, row) {
   formatDateHeader_(sheet, SURVEY_HEADERS, row, 1, "first_recorded_at");
   formatDateHeader_(sheet, SURVEY_HEADERS, row, 1, "last_recorded_at");
   formatDateHeader_(sheet, SURVEY_HEADERS, row, 1, "completed_at");
+  wrapHeader_(sheet, SURVEY_HEADERS, row, 1, "processed_popup_event_ids_json");
 }
 
 function formatBrowsingRow_(sheet, row) {
@@ -658,6 +771,7 @@ function formatBrowsingRow_(sheet, row) {
   formatDateHeader_(sheet, BROWSING_HEADERS, row, 1, "last_closed_at");
   formatDateHeader_(sheet, BROWSING_HEADERS, row, 1, "record_updated_at");
   wrapHeader_(sheet, BROWSING_HEADERS, row, 1, "processed_visit_ids_json");
+  wrapHeader_(sheet, BROWSING_HEADERS, row, 1, "processed_popup_event_ids_json");
 }
 
 function formatDateHeader_(sheet, headers, startRow, count, header) {
