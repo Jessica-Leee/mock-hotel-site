@@ -7,10 +7,12 @@
  * 3) Browsing_Information - one row per participant, condition, stage, and hotel.
  *
  * The sheets intentionally omit submission_id, session_id, and study_id.
+ * Student ID is the participant-provided identifier; legacy Prolific parameters
+ * remain accepted so older study links continue to work.
  * Deploy as a Web App (Execute as: Me, Who has access: Anyone).
  */
 
-const SCHEMA_VERSION = "18";
+const SCHEMA_VERSION = "19";
 const WITHOUT_AI_SHEET = "Without_AI_Survey";
 const AI_SUMMARY_SHEET = "AI_Summary_Survey";
 const BROWSING_SHEET = "Browsing_Information";
@@ -36,7 +38,7 @@ const SURVEY_HEADERS = buildSurveyHeaders_();
 
 const BROWSING_HEADERS = [
   "survey_user_id",
-  "prolific_id",
+  "student_id",
   "condition",
   "browsing_stage",
   "hotel_id",
@@ -72,7 +74,7 @@ const BROWSING_HEADERS = [
 function buildSurveyHeaders_() {
   const headers = [
     "survey_user_id",
-    "prolific_id",
+    "student_id",
     "first_recorded_at",
     "last_recorded_at",
     "completion_status",
@@ -206,8 +208,8 @@ function updateSurveyRow_(sheet, events, payload, receivedAt) {
   const surveyUserId = surveyUserIdFrom_(payload, surveyEvents);
   if (!surveyUserId) return false;
 
-  const prolificId = prolificIdFrom_(payload, surveyEvents);
-  const rowNumbers = participantRows_(sheet, surveyUserId, prolificId);
+  const studentId = studentIdFrom_(payload, surveyEvents);
+  const rowNumbers = participantRows_(sheet, surveyUserId, studentId);
   const rowNumber = rowNumbers.length ? rowNumbers[0] : 0;
   const record = emptyRecord_(SURVEY_HEADERS);
   for (let i = 0; i < rowNumbers.length; i++) {
@@ -219,7 +221,7 @@ function updateSurveyRow_(sheet, events, payload, receivedAt) {
   }
 
   record.survey_user_id = textCell_(surveyUserId);
-  record.prolific_id = textCell_(prolificId || record.prolific_id || "");
+  record.student_id = textCell_(studentId || record.student_id || "");
   record.first_recorded_at = record.first_recorded_at || receivedAt;
   record.last_recorded_at = receivedAt;
   record.completion_status = record.completion_status || "in_progress";
@@ -290,8 +292,8 @@ function applyAssignment_(record, assignment) {
 }
 
 function applyAnswer_(record, questionId, answer, assignment) {
-  if (questionId === "prolific_id") {
-    record.prolific_id = textCell_(answer.value || record.prolific_id || "");
+  if (questionId === "student_id" || questionId === "prolific_id") {
+    record.student_id = textCell_(answer.value || record.student_id || "");
   } else if (/^(hotelq|postreview)_/.test(questionId)) {
     applyMatrixAnswer_(record, questionId, answer, assignment);
   } else if (questionId === "post_review_choice") {
@@ -349,7 +351,7 @@ function updateBrowsingRow_(sheet, events, payload, receivedAt) {
   const condition = browsingCondition_(conditionFromPayload_(payload));
   const browsingStage = browsingStageFromPayload_(payload);
   if (!validBrowsingCombination_(condition, browsingStage)) return 0;
-  const prolificId = prolificIdFrom_(payload, events);
+  const studentId = studentIdFrom_(payload, events);
   const eventsByHotel = {};
 
   for (let i = 0; i < events.length; i++) {
@@ -372,7 +374,7 @@ function updateBrowsingRow_(sheet, events, payload, receivedAt) {
       sheet,
       eventsByHotel[hotel.id],
       surveyUserId,
-      prolificId,
+      studentId,
       condition,
       browsingStage,
       hotel,
@@ -382,8 +384,8 @@ function updateBrowsingRow_(sheet, events, payload, receivedAt) {
   return totalRecorded;
 }
 
-function updateBrowsingCombination_(sheet, events, surveyUserId, prolificId, condition, stage, hotel, receivedAt) {
-  const rowNumbers = findBrowsingRows_(sheet, surveyUserId, prolificId, condition, stage, hotel.id);
+function updateBrowsingCombination_(sheet, events, surveyUserId, studentId, condition, stage, hotel, receivedAt) {
+  const rowNumbers = findBrowsingRows_(sheet, surveyUserId, studentId, condition, stage, hotel.id);
   const rowNumber = rowNumbers.length ? rowNumbers[0] : 0;
   const record = rowNumber
     ? rowObject_(BROWSING_HEADERS, sheet.getRange(rowNumber, 1, 1, BROWSING_HEADERS.length).getValues()[0])
@@ -393,7 +395,7 @@ function updateBrowsingCombination_(sheet, events, surveyUserId, prolificId, con
   let recorded = 0;
 
   record.survey_user_id = textCell_(surveyUserId);
-  record.prolific_id = textCell_(prolificId || record.prolific_id || "");
+  record.student_id = textCell_(studentId || record.student_id || "");
   record.condition = textCell_(condition);
   record.browsing_stage = textCell_(stage);
   record.hotel_id = textCell_(hotel.id);
@@ -565,11 +567,11 @@ function browsingStageFromPayload_(payload) {
 }
 
 function surveyUserIdFrom_(payload, events) {
-  const prolificId = prolificIdFrom_(payload, events);
-  if (prolificId) {
+  const studentId = studentIdFrom_(payload, events);
+  if (studentId) {
     return "survey_user_" + recordId_([
       "hotel-survey-participant-v1",
-      String(prolificId).trim().toUpperCase()
+      String(studentId).trim().toUpperCase()
     ]);
   }
   const prolific = objectValue_(payload.prolific);
@@ -583,15 +585,17 @@ function surveyUserIdFrom_(payload, events) {
   return "";
 }
 
-function prolificIdFrom_(payload, events) {
+function studentIdFrom_(payload, events) {
   const prolific = objectValue_(payload.prolific);
+  if (prolific.student_id) return String(prolific.student_id);
   if (prolific.prolific_pid) return String(prolific.prolific_pid);
   for (let i = 0; i < events.length; i++) {
     const event = events[i] || {};
     const value = objectValue_(event.value);
     const answer = objectValue_(value.answer);
-    if (event.element_id === "prolific_id" && answer.value) return String(answer.value);
+    if ((event.element_id === "student_id" || event.element_id === "prolific_id") && answer.value) return String(answer.value);
     const nestedProlific = objectValue_(value.prolific);
+    if (nestedProlific.student_id) return String(nestedProlific.student_id);
     if (nestedProlific.prolific_pid) return String(nestedProlific.prolific_pid);
   }
   return "";
@@ -637,7 +641,7 @@ function applySheetLayout_(sheet, name, headers) {
   for (let i = 1; i <= headers.length; i++) sheet.setColumnWidth(i, name === BROWSING_SHEET ? 145 : 125);
   sheet.setFrozenColumns(name === BROWSING_SHEET ? 5 : 2);
   setWidthByHeader_(sheet, headers, "survey_user_id", 330);
-  setWidthByHeader_(sheet, headers, "prolific_id", 220);
+  setWidthByHeader_(sheet, headers, "student_id", 220);
   setWidthByHeader_(sheet, headers, "bot_detection_details", 320);
   setWidthByHeader_(sheet, headers, "processed_visit_ids_json", 420);
 }
@@ -701,24 +705,24 @@ function findRowsByValue_(sheet, column, value) {
   return rows;
 }
 
-function participantRows_(sheet, surveyUserId, prolificId) {
+function participantRows_(sheet, surveyUserId, studentId) {
   const rows = findRowsByValue_(sheet, 1, surveyUserId);
-  if (prolificId) {
-    const prolificRows = findRowsByValue_(sheet, 2, prolificId);
-    for (let i = 0; i < prolificRows.length; i++) {
-      if (rows.indexOf(prolificRows[i]) === -1) rows.push(prolificRows[i]);
+  if (studentId) {
+    const studentRows = findRowsByValue_(sheet, 2, studentId);
+    for (let i = 0; i < studentRows.length; i++) {
+      if (rows.indexOf(studentRows[i]) === -1) rows.push(studentRows[i]);
     }
   }
   return rows.sort((a, b) => a - b);
 }
 
-function findBrowsingRows_(sheet, surveyUserId, prolificId, condition, stage, hotelId) {
+function findBrowsingRows_(sheet, surveyUserId, studentId, condition, stage, hotelId) {
   if (sheet.getLastRow() < 2) return [];
   const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, 5).getDisplayValues();
   const rows = [];
   for (let i = 0; i < values.length; i++) {
     const sameParticipant = String(values[i][0]) === String(surveyUserId) ||
-      (prolificId && String(values[i][1]) === String(prolificId));
+      (studentId && String(values[i][1]) === String(studentId));
     if (sameParticipant && String(values[i][2]) === String(condition) &&
         String(values[i][3]) === String(stage) && String(values[i][4]) === String(hotelId)) {
       rows.push(i + 2);

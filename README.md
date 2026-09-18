@@ -16,7 +16,7 @@ Hosted on [GitHub Pages](https://pages.github.com/) from the `main` branch. Push
 
 `index.html` is the full-review survey entry page. `survey-ai-summaries.html` starts the parallel AI-summary survey. Participants can complete both versions in sequence. Hotel details are text-only; hotel photos and galleries are not rendered.
 
-For paired data, open both versions with the same `PROLIFIC_PID` value. The two pages share one GitHub Pages origin, so the hidden random `survey_user_id` is reused for the same participant. `STUDY_ID`, `SESSION_ID`, and `submission_id` are not written to the analysis sheets.
+For paired data, open both versions with the same `STUDENT_ID` value. The two pages share one GitHub Pages origin, so the hidden random `survey_user_id` is reused for the same participant. Legacy `PROLIFIC_PID` links remain accepted, while `STUDY_ID`, `SESSION_ID`, and `submission_id` are not written to the analysis sheets.
 
 ## Project structure
 
@@ -79,10 +79,10 @@ The receiver writes new data to three tabs:
 
 The two survey sheets have identical columns. Each participant's row contains:
 
-- the shared random `survey_user_id` and their Prolific ID answer;
+- the shared random `survey_user_id` and their Student ID answer;
 - the three randomly assigned hotel attribute IDs;
 - their pre-review and post-review likelihood answers for Pendry, Nobu, and Arlo;
-- their chosen hotel, satisfaction, switching answer, likelihood of changing that answer, and eight surprise ratings;
+- their chosen hotel, satisfaction, switching answer, likelihood of changing their hotel selection, and surprise ratings for their three assigned attributes;
 - their AI-summary use frequency and automated-response checks.
 
 Each survey tab has exactly 42 current columns. Deleted questions, the fixed Solo City Exploration scenario, fixed preference-profile values, fixed hotel names, revealed attribute constants, redundant text labels, legacy confidence scales, and recovery JSON are not written. Hotel-attribute likelihood answers, likelihood of changing the answer, and surprise answers are coded from 1 to 5. AI-summary use is coded from 1 to 7. The attribute IDs in `assigned_attribute_1_id` through `assigned_attribute_3_id` identify which randomized question each numbered hotel answer column represents.
@@ -93,7 +93,7 @@ Review reading is measured through viewport exposure inside the hotel popup. A r
 
 `condition` is `without_ai` or `ai_summary`. `browsing_stage` is `no_reviews`, `full_reviews`, or `ai_summary_reviews`, depending on which page the participant viewed.
 
-The same `survey_user_id` appears once in each survey sheet and on every browsing observation belonging to that participant, making the tables directly pairable. A participant completing both versions and viewing all hotels can have up to 12 browsing rows: 2 conditions × 2 stages × 3 hotels. When a Prolific ID is available, the receiver derives the same pseudonymous `survey_user_id` from it, even if the participant reopens the survey or uses another browser. The three assigned attributes and hotel order use stable participant-specific randomization, so the same Prolific ID receives the same assignment in both conditions and across browsers. Survey answers and popup state remain separate between versions.
+The same `survey_user_id` appears once in each survey sheet and on every browsing observation belonging to that participant, making the tables directly pairable. A participant completing both versions and viewing all hotels can have up to 12 browsing rows: 2 conditions × 2 stages × 3 hotels. When a Student ID is available, the receiver derives the same pseudonymous `survey_user_id` from it, even if the participant reopens the survey or uses another browser. The three assigned attributes and hotel order use stable participant-specific randomization, so the same Student ID receives the same assignment in both conditions and across browsers. Survey answers and popup state remain separate between versions.
 
 The script uses a write lock so simultaneous requests cannot create duplicate rows. `survey_user_id` is the unique key in each survey sheet. The four-field combination above is the unique key in `Browsing_Information`. Repeated deliveries update the matching row, duplicate rows for the same key are collapsed, and hotel visits are deduplicated by visit ID before any totals are changed.
 

@@ -482,6 +482,27 @@ body{
   text-align:center;
   padding:36px 0 24px;
 }
+.survey-debrief{
+  max-width:680px;
+  margin:24px auto 0;
+  padding:20px 24px;
+  border:1px solid #d7dee8;
+  border-radius:6px;
+  background:#f7f9fc;
+  color:#334155;
+  text-align:left;
+}
+.survey-debrief h2{
+  margin:0;
+  color:#1f2937;
+  font-size:20px;
+  line-height:1.35;
+}
+.survey-debrief p{
+  margin:8px 0 0;
+  font-size:16px;
+  line-height:1.55;
+}
 .survey-complete__instruction{
   max-width:680px;
   margin:28px auto 0;

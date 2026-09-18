@@ -7894,7 +7894,7 @@
 
   function participantStorageSuffix() {
     const params = new URLSearchParams(location.search || "");
-    const identity = params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") ||
+    const identity = params.get("STUDENT_ID") || params.get("student_id") || params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") ||
       params.get("SESSION_ID") || params.get("session_id") || "anonymous";
     return encodeURIComponent(identity);
   }
@@ -7909,7 +7909,9 @@
   }
 
   function studyRunStorageSuffix() {
-    return `${participantStorageSuffix()}:${studyCondition()}`;
+    const params = new URLSearchParams(location.search || "");
+    const browsingRunId = params.get("browsing_run") || params.get("submission_id") || "legacy";
+    return `${participantStorageSuffix()}:${studyCondition()}:${encodeURIComponent(browsingRunId)}`;
   }
 
   function hotelViewStorageKey() {
@@ -8018,11 +8020,23 @@
   }
 
   function getLogs() {
-    return safeJsonParse(localStorage.getItem(STORAGE_KEY), []) || [];
+    try {
+      return safeJsonParse(localStorage.getItem(STORAGE_KEY), []) || [];
+    } catch (_) {
+      return [];
+    }
   }
 
   function setLogs(logs) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+    const limits = [600, 300, 100, 25];
+    for (let i = 0; i < limits.length; i += 1) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(logs.slice(-limits[i])));
+        return;
+      } catch (_) {
+        /* Retry with a smaller local audit buffer. */
+      }
+    }
   }
 
   function getUiState() {
@@ -8168,10 +8182,6 @@
               {
                   "title": "Exceptional facilities",
                   "text": "Guests enjoy a fitness center, free bicycles, terrace, restaurant, bar, and complimentary WiFi. Additional amenities include a lounge, games room, and electric vehicle charging station."
-              },
-              {
-                  "title": "Prime location",
-                  "text": "Pendry Hotel is located in Chicago city center, offering easy access to key attractions. Ohio Street Beach is a 19-minute walk away, while the Art Institute of Chicago lies less than 0.6 mi from the hotel."
               },
               {
                   "title": "Comfortable accommodations",
@@ -9439,20 +9449,6 @@
     }
   }
 
-  function updateBrowseNotice() {
-    const notice = document.querySelector(".survey-notice--browse");
-    if (!notice) return;
-
-    const state = pageState();
-    if (state.showReviews) {
-      notice.textContent = state.showAiSummary
-        ? "Continue carefully: you cannot return to earlier pages. Open the review popup and AI summary for each hotel before continuing."
-        : "Continue carefully: you cannot return to earlier pages. Open the review popup for each hotel before continuing.";
-    } else {
-      notice.textContent = "Continue carefully: you cannot return to earlier pages. Open each hotel detail popup before continuing.";
-    }
-  }
-
   function renderResults() {
     const state = pageState();
     const phaseLabel = document.getElementById("phaseLabel");
@@ -10159,7 +10155,6 @@
   }
 
   function init() {
-    updateBrowseNotice();
     renderResults();
     wireGlobalHandlers();
     startBrowseCountdown();

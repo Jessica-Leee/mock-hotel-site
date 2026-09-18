@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbyBmS8V5n3M0smur248ScVqHNxYG5vZ8Ax9D9ZL38qc_TjiLPuDT04n0ErT57RX_o1V/exec"
     />
-    <link rel="stylesheet" href="./assets/css/site.css?v=20260917-3" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260918-1" />
   </head>
   <body data-survey-page="true">
     <main class="survey-shell" aria-label="Hotel booking survey">
@@ -30,7 +30,7 @@
       </section>
     </main>
 
-    <script src="./assets/js/survey-tracking.js?v=20260917-4"></script>
+    <script src="./assets/js/survey-tracking.js?v=20260918-2"></script>
     <script src="./assets/js/shopper-profile.js?v=20260917-1"></script>
     <script>
       (function () {
@@ -45,8 +45,8 @@
         const SURVEY_USER_ID_STORAGE_PREFIX = "mock_hotel_survey_user_id_v1";
         const SURVEY_USER_ID_CURRENT_KEY = `${SURVEY_USER_ID_STORAGE_PREFIX}:current`;
         const params = new URLSearchParams(location.search);
-        const prolificId = params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "";
-        const participantIdentity = prolificId || params.get("SESSION_ID") || params.get("session_id") || "";
+        const studentId = params.get("STUDENT_ID") || params.get("student_id") || params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "";
+        const participantIdentity = studentId || params.get("SESSION_ID") || params.get("session_id") || "";
         const participantStorageId = encodeURIComponent(participantIdentity || "anonymous");
         const requestedStudyCondition = (params.get("study_condition") || "").toLowerCase();
         const studyCondition = requestedStudyCondition === "ai_summary" || params.get("study_version") === "3"
@@ -74,12 +74,17 @@
         ];
 
         function hotelViewStorageKey() {
-          return `${HOTEL_VIEW_STATE_KEY}:${runStorageSuffix}`;
+          return `${HOTEL_VIEW_STATE_KEY}:${hotelViewingRunSuffix()}`;
         }
 
         function hotelReviewViewStorageKey() {
           const prefix = studyCondition === "ai_summary" ? HOTEL_AI_REVIEW_VIEW_STATE_KEY : HOTEL_REVIEW_VIEW_STATE_KEY;
-          return `${prefix}:${runStorageSuffix}`;
+          return `${prefix}:${hotelViewingRunSuffix()}`;
+        }
+
+        function hotelViewingRunSuffix() {
+          const browsingRunId = params.get("browsing_run") || params.get("submission_id") || "legacy";
+          return `${runStorageSuffix}:${encodeURIComponent(browsingRunId)}`;
         }
 
         function noReviewViewingComplete() {
@@ -100,7 +105,7 @@
 
         if (hotelQuestionnaireMode && !noReviewViewingComplete()) {
           const nextParams = new URLSearchParams(location.search || "");
-          if (prolificId) nextParams.set("PROLIFIC_PID", prolificId);
+          if (studentId) nextParams.set("STUDENT_ID", studentId);
           nextParams.set("survey_stage", "search_1");
           location.replace("search-no-reviews.html?" + nextParams.toString());
           return;
@@ -108,7 +113,7 @@
 
         if (postReviewMode && !reviewViewingComplete()) {
           const nextParams = new URLSearchParams(location.search || "");
-          if (prolificId) nextParams.set("PROLIFIC_PID", prolificId);
+          if (studentId) nextParams.set("STUDENT_ID", studentId);
           nextParams.set("survey_stage", postReviewAiMode ? "search_3" : "search_2");
           location.replace((postReviewAiMode ? "search-ai-summaries.html?" : "search-reviews.html?") + nextParams.toString());
           return;
@@ -224,7 +229,7 @@
         function standardPages() {
           const scenario = assignedScenario();
           return [
-            { id: "prolific_id", type: "prolific" },
+            { id: "student_id", type: "studentId" },
             { id: scenario.id, type: "scenario", scenario },
             { id: "browse_intro", type: "browseIntro" }
           ];
@@ -283,6 +288,50 @@
             try { localStorage.setItem(key, id); }
             catch (_) { /* sessionStorage remains as a fallback */ }
           }
+        }
+
+        function copyStorageValue(sourceKey, targetKey, fallbackValue) {
+          let value = fallbackValue;
+          if (value === undefined) {
+            try { value = localStorage.getItem(sourceKey); }
+            catch (_) { value = null; }
+            if (value === null) {
+              try { value = sessionStorage.getItem(sourceKey); }
+              catch (_) { value = null; }
+            }
+          }
+          if (value === null || value === undefined) return;
+          try { localStorage.setItem(targetKey, value); }
+          catch (_) { /* sessionStorage remains as a fallback */ }
+          try { sessionStorage.setItem(targetKey, value); }
+          catch (_) { /* storage can be unavailable in strict privacy modes */ }
+        }
+
+        function migrateParticipantStorage(identity, state) {
+          const normalizedIdentity = String(identity || "").trim();
+          if (!normalizedIdentity) return;
+          const targetParticipantStorageId = encodeURIComponent(normalizedIdentity);
+          if (targetParticipantStorageId === participantStorageId) return;
+
+          const targetRunStorageSuffix = `${targetParticipantStorageId}:${studyCondition}`;
+          copyStorageValue(
+            STORAGE_KEY,
+            `${SURVEY_STORAGE_PREFIX}:${targetRunStorageSuffix}`,
+            JSON.stringify(state || getState())
+          );
+          copyStorageValue(
+            SURVEY_EVENT_STORAGE_KEY,
+            `${SURVEY_EVENT_STORAGE_PREFIX}:${targetRunStorageSuffix}`
+          );
+          copyStorageValue(
+            SURVEY_OUTBOX_STORAGE_KEY,
+            `${SURVEY_OUTBOX_STORAGE_PREFIX}:${targetRunStorageSuffix}`
+          );
+          copyStorageValue(
+            SHARED_ASSIGNMENT_STORAGE_KEY,
+            `${SHARED_ASSIGNMENT_STORAGE_PREFIX}:${targetParticipantStorageId}`,
+            JSON.stringify((state && state.assignment) || ensureRandomization())
+          );
         }
 
         function getOrCreateSurveyUserId(identity) {
@@ -491,9 +540,11 @@
         }
 
         function prolificMeta(state) {
+          const currentStudentId = (state && (state.student_id || state.prolific_id)) || studentId;
           return {
             survey_user_id: (state && state.survey_user_id) || surveyUserId,
-            prolific_pid: (state && state.prolific_id) || prolificId || params.get("PROLIFIC_PID") || params.get("prolific_pid") || "",
+            student_id: currentStudentId,
+            prolific_pid: params.get("PROLIFIC_PID") || params.get("prolific_pid") || currentStudentId,
             study_id: params.get("STUDY_ID") || params.get("study_id") || "",
             session_id: params.get("SESSION_ID") || params.get("session_id") || "",
             submission_id: (state && state.submission_id) || params.get("submission_id") || "",
@@ -733,7 +784,7 @@
         }
 
         function pageUrl(index) {
-          const query = location.search || (prolificId ? "?PROLIFIC_PID=" + encodeURIComponent(prolificId) : "");
+          const query = location.search || (studentId ? "?STUDENT_ID=" + encodeURIComponent(studentId) : "");
           const prefix = postReviewMode ? "#pr" : hotelQuestionnaireMode ? "#hq" : "#q";
           return location.pathname + query + prefix + (index + 1);
         }
@@ -756,9 +807,6 @@
                 ` : ""}
               </div>
             ` : ""}
-            <div class="survey-notice">
-              Continue carefully: you cannot return to earlier pages.
-            </div>
             ${html}
           `;
         }
@@ -1083,9 +1131,9 @@
 
         function switchingLikelihoodHtml() {
           return `
-            <h1 class="survey-title">How likely are you to change your answer?</h1>
+            <h1 class="survey-title">How likely are you to change your hotel selection?</h1>
             <p class="survey-copy">Select one response.</p>
-            ${fiveChoiceScaleHtml("switch_likelihood", "Likelihood of changing your answer", [
+            ${fiveChoiceScaleHtml("switch_likelihood", "Likelihood of changing your hotel selection", [
               ["very_unlikely", "Very unlikely"],
               ["unlikely", "Unlikely"],
               ["neither_likely_nor_unlikely", "Neither likely nor unlikely"],
@@ -1107,7 +1155,7 @@
             <h1 class="survey-title">For each attribute of your chosen hotel, how surprised are you by the true value revealed?</h1>
             <p class="survey-copy">Select one response for each attribute.</p>
             <div class="survey-five-scale-list">
-              ${attributePool.map(attribute => fiveChoiceScaleHtml(attribute.id, attribute.label, surpriseOptions)).join("")}
+              ${selectedAttributeRows("surprise").map(row => fiveChoiceScaleHtml(row[0], row[1], surpriseOptions)).join("")}
             </div>
           `;
         }
@@ -1174,16 +1222,16 @@
             card.classList.toggle("survey-card--reveal", page.type === "actualReveal");
           }
 
-          if (page.type === "prolific") {
+          if (page.type === "studentId") {
             setQuestionHtml(`
               <div class="survey-disclaimer" role="note">
                 <strong>Important:</strong> Responses generated by AI or automated tools will not be compensated.
               </div>
-              <h1 class="survey-title">What is your Prolific ID?</h1>
-              <p class="survey-copy">Please note that this response should auto-fill with the correct ID.</p>
+              <h1 class="survey-title">What is your Student ID?</h1>
+              <p class="survey-copy">Please enter your Student ID.</p>
               <label class="survey-field">
-                <span>Prolific ID</span>
-                <input id="answerInput" name="prolific_id" type="text" value="${escapeHtml(prolificId)}" required autocomplete="off" ${prolificId ? "readonly" : ""} />
+                <span>Student ID</span>
+                <input id="answerInput" name="student_id" type="text" value="${escapeHtml(studentId)}" required autocomplete="off" ${studentId ? "readonly" : ""} />
               </label>
             `);
           } else if (page.type === "scenario") {
@@ -1236,13 +1284,14 @@
         function saveAnswer(page) {
           const state = getState();
           const assignment = ensureRandomization();
-          state.prolific_id = state.prolific_id || prolificId;
+          state.student_id = state.student_id || state.prolific_id || studentId;
           state.updated_at = new Date().toISOString();
           state.assignment = assignment;
           state.answers = state.answers || {};
-          if (page.type === "prolific") {
+          if (page.type === "studentId") {
             const value = document.getElementById("answerInput").value.trim();
-            state.prolific_id = value;
+            state.student_id = value;
+            delete state.prolific_id;
             state.survey_user_id = state.survey_user_id || surveyUserId;
             persistSurveyUserId(state.survey_user_id, value);
             state.answers[page.id] = { value, submitted_at: state.updated_at };
@@ -1316,9 +1365,9 @@
             };
           } else if (page.type === "attributeSurprise") {
             const values = {};
-            attributePool.forEach(attribute => {
-              const input = document.querySelector(`input[name="${attribute.id}"]:checked`);
-              values[attribute.id] = input ? input.value : "";
+            selectedAttributeRows("surprise").forEach(row => {
+              const input = document.querySelector(`input[name="${row[0]}"]:checked`);
+              values[row[0]] = input ? input.value : "";
             });
             state.answers[page.id] = {
               hotel_id: chosenHotel().id,
@@ -1329,9 +1378,9 @@
           } else if (page.type === "likelihoodSurprise") {
             const likelihoodInput = document.querySelector(`input[name="switch_likelihood"]:checked`);
             const values = {};
-            attributePool.forEach(attribute => {
-              const input = document.querySelector(`input[name="${attribute.id}"]:checked`);
-              values[attribute.id] = input ? input.value : "";
+            selectedAttributeRows("surprise").forEach(row => {
+              const input = document.querySelector(`input[name="${row[0]}"]:checked`);
+              values[row[0]] = input ? input.value : "";
             });
             state.answers[page.id] = {
               hotel_id: chosenHotel().id,
@@ -1349,29 +1398,37 @@
           }
           setState(state);
           logSurveyEvent(page, state.answers[page.id], state);
+          if (page.type === "studentId") migrateParticipantStorage(state.student_id, state);
           return state;
         }
 
         function goToHotelBrowsing(state) {
           const nextParams = new URLSearchParams(location.search || "");
           const surveyState = state || getState();
-          const pid = surveyState.prolific_id || prolificId || "";
-          if (pid) nextParams.set("PROLIFIC_PID", pid);
+          const sid = surveyState.student_id || surveyState.prolific_id || studentId || "";
+          if (sid) nextParams.set("STUDENT_ID", sid);
           nextParams.set("submission_id", ensureSubmissionId(surveyState));
+          const browsingRunId = createRecordId("browsing_run");
+          surveyState.browsing_run_id = browsingRunId;
+          nextParams.set("browsing_run", browsingRunId);
           nextParams.set("study_condition", studyCondition);
           nextParams.set("study_version", studyVersion);
           setState(surveyState);
           nextParams.set("survey_stage", "search_1");
           logSurveyEvent({ id: "browse_intro", type: "transition" }, { value: "start_hotel_browsing" }, surveyState);
+          migrateParticipantStorage(sid, surveyState);
           location.replace("search-no-reviews.html?" + nextParams.toString());
         }
 
         function goToReviewBrowsing(state) {
           const nextParams = new URLSearchParams(location.search || "");
           const surveyState = state || getState();
-          const pid = surveyState.prolific_id || prolificId || "";
-          if (pid) nextParams.set("PROLIFIC_PID", pid);
+          const sid = surveyState.student_id || surveyState.prolific_id || studentId || "";
+          if (sid) nextParams.set("STUDENT_ID", sid);
           nextParams.set("submission_id", ensureSubmissionId(surveyState));
+          const browsingRunId = params.get("browsing_run") || surveyState.browsing_run_id || createRecordId("browsing_run");
+          surveyState.browsing_run_id = browsingRunId;
+          nextParams.set("browsing_run", browsingRunId);
           nextParams.set("study_condition", studyCondition);
           nextParams.set("study_version", studyVersion);
           setState(surveyState);
@@ -1390,6 +1447,10 @@
             <div class="survey-complete">
               <h1 class="survey-title">Website task complete</h1>
               <p class="survey-copy">Your responses on this website have been saved.</p>
+              <div class="survey-debrief" role="note">
+                <h2>Debriefing</h2>
+                <p>The product attributes and reviews shown in this study were hypothetical materials created for research purposes. They should not be interpreted as factual information about the hotels.</p>
+              </div>
               <div class="survey-complete__instruction" role="status">
                 <strong>Return to the Qualtrics survey</strong>
                 <p>Please return to the Qualtrics tab now to continue the study and submit your response.</p>

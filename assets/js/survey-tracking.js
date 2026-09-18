@@ -4,8 +4,8 @@
  * Each event: { event_type, element_id, timestamp, value }
  * All events are stored in a JSON array (in memory + sessionStorage payload.events).
  *
- * Prolific / survey handoff:
- *   1) URL query: ?PROLIFIC_PID=…&STUDY_ID=…&SESSION_ID=… (Prolific defaults; echoed in payload.prolific).
+ * Student / survey handoff:
+ *   1) URL query: ?STUDENT_ID=… (legacy Prolific parameters remain accepted).
  *   2) Optional beacon: <meta name="tracking-beacon-url" content="https://…"> or ?beacon=https://…
  *      → full JSON POSTed via navigator.sendBeacon on pagehide / visibility hidden.
  *   3) Optional completion URL: <meta name="prolific-completion-url" content="https://app.prolific.com/submissions/complete?cc=CODE">
@@ -143,7 +143,7 @@
   function participantIdentity() {
     try {
       var p = new URLSearchParams(location.search);
-      return p.get("PROLIFIC_PID") || p.get("prolific_pid") || p.get("participant_id") ||
+      return p.get("STUDENT_ID") || p.get("student_id") || p.get("PROLIFIC_PID") || p.get("prolific_pid") || p.get("participant_id") ||
         p.get("SESSION_ID") || p.get("session_id") || "";
     } catch (e) {
       return "";
@@ -180,7 +180,7 @@
 
   function streamOutboxStorageKey() {
     var prolific = prolificMeta();
-    var participant = prolific.survey_user_id || prolific.prolific_pid || prolific.session_id || "anonymous";
+    var participant = prolific.survey_user_id || prolific.student_id || prolific.prolific_pid || prolific.session_id || "anonymous";
     var submission = prolific.submission_id || "pending";
     return STREAM_OUTBOX_STORAGE_PREFIX + ":" + encodeURIComponent(participant) + ":" +
       studyRunCondition() + ":" + encodeURIComponent(submission);
@@ -448,9 +448,11 @@
 
   function prolificMeta() {
     var p = new URLSearchParams(location.search);
+    var studentId = p.get("STUDENT_ID") || p.get("student_id") || null;
     return {
       survey_user_id: surveyUserId || getOrCreateSurveyUserId(),
-      prolific_pid: p.get("PROLIFIC_PID") || p.get("prolific_pid") || null,
+      student_id: studentId,
+      prolific_pid: p.get("PROLIFIC_PID") || p.get("prolific_pid") || studentId,
       study_id: p.get("STUDY_ID") || p.get("study_id") || null,
       session_id: p.get("SESSION_ID") || p.get("session_id") || null,
       submission_id: p.get("submission_id") || null,
