@@ -43,8 +43,6 @@ const BROWSING_HEADERS = [
   "browsing_stage",
   "hotel_id",
   "hotel_display_position",
-  "popup_opened",
-  "popup_click_count",
   "first_opened_at",
   "last_opened_at",
   "last_closed_at",
@@ -59,7 +57,6 @@ const BROWSING_HEADERS = [
   "last_exit_reason",
   "time_limit_reached",
   "processed_visit_ids_json",
-  "processed_popup_event_ids_json",
   "summary_viewing_seconds",
   "individual_reviews_viewing_seconds",
   "reviews_seen_count",
@@ -71,7 +68,10 @@ const BROWSING_HEADERS = [
   "review_reading_pattern",
   "review_visibility_seconds_json",
   "review_reading_sessions_json",
-  "review_furthest_position_seen"
+  "review_furthest_position_seen",
+  "popup_opened",
+  "popup_click_count",
+  "processed_popup_event_ids_json"
 ];
 
 function buildSurveyHeaders_() {
@@ -109,15 +109,15 @@ function buildSurveyHeaders_() {
 
   headers.push(
     "ai_use_frequency_1_to_7",
+    "bot_detection_flag",
+    "bot_detection_details",
     "shopper_profile_popup_opened",
     "shopper_profile_popup_open_count",
     "hotel_order_popup_opened",
     "hotel_order_popup_open_count",
     "revealed_attributes_popup_opened",
     "revealed_attributes_popup_open_count",
-    "processed_popup_event_ids_json",
-    "bot_detection_flag",
-    "bot_detection_details"
+    "processed_popup_event_ids_json"
   );
   return headers;
 }

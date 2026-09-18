@@ -98,7 +98,7 @@ The same `survey_user_id` appears once in each survey sheet and on every browsin
 
 The script uses a write lock so simultaneous requests cannot create duplicate rows. `survey_user_id` is the unique key in each survey sheet. The four-field combination above is the unique key in `Browsing_Information`. Repeated deliveries update the matching row, duplicate rows for the same key are collapsed, and hotel visits are deduplicated by visit ID before any totals are changed.
 
-This schema intentionally does not preserve old survey columns. For a clean pilot dataset, paste the updated Apps Script, select `resetHotelSurveySheets` in the Apps Script function menu, and click **Run** once. This manually clears and rebuilds only `Without_AI_Survey`, `AI_Summary_Survey`, and `Browsing_Information` with the exact current headers. It does not touch any other tab. Do this only after exporting any old data you want to retain.
+When upgrading from schema 19, the receiver appends the new popup-tracking columns to the existing three tabs automatically, so existing rows can remain in place. Earlier rows will have blank popup fields because those interactions were not captured before this update. For a completely clean pilot dataset, you can instead select `resetHotelSurveySheets` in the Apps Script function menu and click **Run** once; this clears and rebuilds only `Without_AI_Survey`, `AI_Summary_Survey`, and `Browsing_Information`. Do this only after exporting any old data you want to retain.
 
 After you change `backend/google-sheets-receiver.gs`, use **Deploy → Manage deployments → Edit → New version → Deploy** so the live Web App picks up changes.
 
