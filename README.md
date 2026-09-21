@@ -82,7 +82,7 @@ The receiver writes new data to three tabs:
 The two survey sheets have identical columns. Each participant's row contains:
 
 - the shared random `survey_user_id` and their Student ID answer;
-- the three randomly assigned hotel attribute IDs;
+- the three assigned hotel attribute IDs: location convenience, fitness facilities, and one randomly selected remaining attribute;
 - their pre-review and post-review likelihood answers for Hotel A and Hotel B;
 - their chosen hotel, satisfaction, switching answer, likelihood of changing their hotel selection, and surprise ratings for their three assigned attributes;
 - whether and how many times they opened the shopper-profile, hotel-order, and revealed-attributes popups;
@@ -96,7 +96,9 @@ Review reading is measured through viewport exposure inside the hotel popup. A r
 
 `condition` is `without_ai` or `ai_summary`. `browsing_stage` is `no_reviews`, `full_reviews`, or `ai_summary_reviews`, depending on which page the participant viewed.
 
-The same `survey_user_id` appears once in each survey sheet and on every browsing observation belonging to that participant, making the tables directly pairable. A participant completing both versions and viewing all hotels can have up to 8 current browsing rows: 2 conditions × 2 stages × 2 hotels. When a Student ID is available, the receiver derives the same pseudonymous `survey_user_id` from it, even if the participant reopens the survey or uses another browser. The three assigned attributes and hotel order use stable participant-specific randomization, so the same Student ID receives the same assignment in both conditions and across browsers. Survey answers and popup state remain separate between versions.
+The same `survey_user_id` appears once in each survey sheet and on every browsing observation belonging to that participant, making the tables directly pairable. A participant completing both versions and viewing all hotels can have up to 8 current browsing rows: 2 conditions × 2 stages × 2 hotels. When a Student ID is available, the receiver derives the same pseudonymous `survey_user_id` from it, even if the participant reopens the survey or uses another browser. Location convenience and fitness facilities are always assigned first and second. The third attribute is selected from the other six using stable participant-specific randomization, so the same Student ID receives the same three attributes in both conditions and in the pre-review, post-review, and surprise questions. Hotel order also uses stable participant-specific randomization. Survey answers and popup state remain separate between versions.
+
+The actual-attributes reveal and its reminder popup show only the eight preference-profile attributes. Actual values use the study's binary table (1 = Good, 0 = Bad), not the numeric browsing-category scores. Hotel A uses the Arlo column; Hotel B uses the Nobu column.
 
 The script uses a write lock so simultaneous requests cannot create duplicate rows. `survey_user_id` is the unique key in each survey sheet. The four-field combination above is the unique key in `Browsing_Information`. Repeated deliveries update the matching row, duplicate rows for the same key are collapsed, and hotel visits are deduplicated by visit ID before any totals are changed.
 
