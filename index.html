@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbyBmS8V5n3M0smur248ScVqHNxYG5vZ8Ax9D9ZL38qc_TjiLPuDT04n0ErT57RX_o1V/exec"
     />
-    <link rel="stylesheet" href="./assets/css/site.css?v=20260921-2" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260921-3" />
   </head>
   <body data-survey-page="true">
     <main class="survey-shell" aria-label="Hotel booking survey">
@@ -186,7 +186,13 @@
           ));
         }
 
-        const hotelQuestionnairePages = hotelMatrixPages("hotelq");
+        const hotelQuestionnairePages = [
+          {
+            id: "pre_review_hotel_ratings",
+            type: "hotelMatrices",
+            pages: hotelMatrixPages("hotelq").sort((a, b) => a.hotel.name.localeCompare(b.hotel.name))
+          }
+        ];
         const postReviewOutcomePages = [
           { id: "post_review_choice", type: "hotelChoice" },
           { id: "post_review_reveal", type: "actualReveal" },
@@ -1102,33 +1108,47 @@
           `;
         }
 
-        function fiveChoiceScaleHtml(name, legend, options) {
+        function fiveChoiceMatrixHtml(rows, options, headingId) {
           return `
-            <fieldset class="survey-five-scale">
-              <legend>${escapeHtml(legend)}</legend>
-              <div class="survey-five-scale__options">
-                ${options.map(option => `
-                  <label class="survey-five-scale__choice">
-                    <input type="radio" name="${escapeHtml(name)}" value="${escapeHtml(option[0])}" required />
-                    <span>${escapeHtml(option[1])}</span>
-                  </label>
-                `).join("")}
-              </div>
-            </fieldset>
+            <div class="survey-matrix-wrap">
+              <table class="survey-matrix" aria-labelledby="${escapeHtml(headingId)}">
+                <thead>
+                  <tr>
+                    <th scope="col"><span class="survey-matrix-hotel-name">${escapeHtml(chosenHotel().name)}</span></th>
+                    ${options.map(option => `<th scope="col">${escapeHtml(option[1])}</th>`).join("")}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rows.map(row => `
+                    <tr>
+                      <th scope="row">${escapeHtml(row[1])}</th>
+                      ${options.map(option => `
+                        <td>
+                          <label class="survey-radio">
+                            <input type="radio" name="${escapeHtml(row[0])}" value="${escapeHtml(option[0])}" required />
+                            <span>${escapeHtml(option[1])}</span>
+                          </label>
+                        </td>
+                      `).join("")}
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
           `;
         }
 
         function switchingLikelihoodHtml() {
           return `
-            <h1 class="survey-title">How likely are you to change your selection of ${escapeHtml(chosenHotel().name)}?</h1>
+            <h1 id="switch_likelihood_title" class="survey-title survey-title--matrix">How likely are you to change your selection of ${escapeHtml(chosenHotel().name)}?</h1>
             <p class="survey-copy">Select one response.</p>
-            ${fiveChoiceScaleHtml("switch_likelihood", "Likelihood of changing your hotel selection", [
+            ${fiveChoiceMatrixHtml([["switch_likelihood", "Likelihood of changing your hotel selection"]], [
               ["very_unlikely", "Very unlikely"],
               ["unlikely", "Unlikely"],
               ["neither_likely_nor_unlikely", "Neither likely nor unlikely"],
               ["likely", "Likely"],
               ["very_likely", "Very likely"]
-            ])}
+            ], "switch_likelihood_title")}
           `;
         }
 
@@ -1141,11 +1161,9 @@
             ["extremely_surprised", "Extremely surprised"]
           ];
           return `
-            <h1 class="survey-title">For each attribute of ${escapeHtml(chosenHotel().name)}, how surprised are you by the true value revealed?</h1>
+            <h2 id="attribute_surprise_title" class="survey-title survey-title--matrix">For each attribute of ${escapeHtml(chosenHotel().name)}, how surprised are you by the true value revealed?</h2>
             <p class="survey-copy">Select one response for each attribute.</p>
-            <div class="survey-five-scale-list">
-              ${selectedAttributeRows("surprise").map(row => fiveChoiceScaleHtml(row[0], row[1], surpriseOptions)).join("")}
-            </div>
+            ${fiveChoiceMatrixHtml(selectedAttributeRows("surprise"), surpriseOptions, "attribute_surprise_title")}
           `;
         }
 
@@ -1192,7 +1210,7 @@
                 : "Next";
           if (card) {
             card.classList.toggle("survey-card--scenario", page.type === "scenario");
-            card.classList.toggle("survey-card--matrix", page.type === "hotelMatrix" || page.type === "hotelMatrices");
+            card.classList.toggle("survey-card--matrix", ["hotelMatrix", "hotelMatrices", "rangeLikelihood", "attributeSurprise", "likelihoodSurprise"].includes(page.type));
             card.classList.toggle("survey-card--reveal", page.type === "actualReveal");
           }
 
