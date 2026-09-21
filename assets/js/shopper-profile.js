@@ -7,12 +7,12 @@
       rows: [
         ["Cleanliness", "2 - moderately important", false],
         ["Service quality", "2 - moderately important", false],
-        ["Room comfort", "2 - moderately important", false],
+        ["Comfortable room", "2 - moderately important", false],
         ["Wi-Fi reliability", "2 - moderately important", false],
-        ["Noise level (quietness)", "2 - moderately important", false],
-        ["Location convenience", "3 - most important", true],
+        ["Low Noise level (quietness)", "2 - moderately important", false],
+        ["Convenient location", "3 - most important", true],
         ["Fitness facilities", "3 - most important", true],
-        ["Breakfast quality", "1 - least important", false]
+        ["High-quality breakfast", "1 - least important", false]
       ]
     }
   ];

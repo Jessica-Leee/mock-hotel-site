@@ -2514,12 +2514,12 @@
           "ratingBreakdown": {
               "Cleanliness": 3.25,
               "Service quality": 4.5,
-              "Room comfort": 4.75,
+              "Comfortable room": 4.75,
               "Wi-Fi reliability": 4.0,
-              "Noise level (quietness)": 4.5,
-              "Location convenience": 3.25,
+              "Low Noise level (quietness)": 4.5,
+              "Convenient location": 3.25,
               "Fitness facilities": 3.0,
-              "Breakfast quality": 2.75
+              "High-quality breakfast": 2.75
           },
           "areaInfo": [
               {
@@ -2665,12 +2665,12 @@
           "ratingBreakdown": {
               "Cleanliness": 4.0,
               "Service quality": 3.0,
-              "Room comfort": 3.25,
+              "Comfortable room": 3.25,
               "Wi-Fi reliability": 4.75,
-              "Noise level (quietness)": 3.5,
-              "Location convenience": 4.25,
+              "Low Noise level (quietness)": 3.5,
+              "Convenient location": 4.25,
               "Fitness facilities": 4.5,
-              "Breakfast quality": 3.75
+              "High-quality breakfast": 3.75
           },
           "areaInfo": [
               {
