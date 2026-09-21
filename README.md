@@ -35,7 +35,9 @@ For paired data, open both versions with the same `STUDENT_ID` value. The two pa
 └── backend/google-sheets-receiver.gs # Google Apps Script receiver and Sheet schema
 ```
 
-The complete six-hotel corpus remains embedded in `assets/js/hotel-listings.js`. Only the three experiment hotels are rendered, but the other hotel records have not been deleted.
+The current experiment contains Hotel A (formerly Arlo) and Hotel B (formerly Nobu), each with 150 reviews. Pendry and the unused hotel datasets have been removed from the website. Each hotel popup has a cumulative 45-second budget per participant, condition, browsing run, and stage. Closing pauses the budget; reopening resumes it. Expiry closes and locks that popup. There is no listing-page countdown or automatic jump to the questionnaire. Participants can continue once both hotel popups have been opened and closed.
+
+Schema 21 preserves the existing Sheet headers and historical rows. The six legacy Pendry answer columns remain for compatibility but receive no new answers. Internal hotel IDs remain `arlo-chicago` (Hotel A) and `nobu-hotel-chicago` (Hotel B), so historical data still joins correctly. Do not reset the sheets for this update. Replace the Apps Script code and deploy a new version of the existing Web App. The Student ID page includes a visually hidden optional honeypot expecting `wrong id`; filling it or entering that phrase as the Student ID sets the existing bot-detection fields. This is a signal for review, not proof of automated participation.
 
 ## Ensure multiple participants are recorded
 
@@ -81,12 +83,12 @@ The two survey sheets have identical columns. Each participant's row contains:
 
 - the shared random `survey_user_id` and their Student ID answer;
 - the three randomly assigned hotel attribute IDs;
-- their pre-review and post-review likelihood answers for Pendry, Nobu, and Arlo;
+- their pre-review and post-review likelihood answers for Hotel A and Hotel B;
 - their chosen hotel, satisfaction, switching answer, likelihood of changing their hotel selection, and surprise ratings for their three assigned attributes;
 - whether and how many times they opened the shopper-profile, hotel-order, and revealed-attributes popups;
 - their AI-summary use frequency and automated-response checks.
 
-Each survey tab has exactly 49 current columns. Deleted questions, the fixed Solo City Exploration scenario, fixed preference-profile values, fixed hotel names, revealed attribute constants, redundant text labels, legacy confidence scales, and recovery JSON are not written. Hotel-attribute likelihood answers, likelihood of changing the answer, and surprise answers are coded from 1 to 5. AI-summary use is coded from 1 to 7. The attribute IDs in `assigned_attribute_1_id` through `assigned_attribute_3_id` identify which randomized question each numbered hotel answer column represents. Popup events are deduplicated by event ID before their counts are updated.
+Each survey tab keeps 49 columns, including six legacy Pendry columns retained only to preserve historical data. Deleted questions, the fixed Solo City Exploration scenario, fixed preference-profile values, fixed hotel names, revealed attribute constants, redundant text labels, legacy confidence scales, and recovery JSON are not written. Hotel-attribute likelihood answers, likelihood of changing the answer, and surprise answers are coded from 1 to 5. AI-summary use is coded from 1 to 7. The attribute IDs in `assigned_attribute_1_id` through `assigned_attribute_3_id` identify which randomized question each numbered hotel answer column represents. Popup events are deduplicated by event ID before their counts are updated.
 
 `Browsing_Information` has 35 columns and uses a long format. Its unique combination is `survey_user_id + condition + browsing_stage + hotel_id`. `hotel_display_position` records the participant's randomized hotel order. `popup_opened` explicitly records whether that hotel popup was clicked, and `popup_click_count` records repeated openings. Reopening the same hotel in the same stage updates that row's counts, cumulative viewing time, longest single visit, scrolling measures, and latest exit reason instead of adding another row. Moving to another condition, stage, or hotel creates a separate observation row. `processed_visit_ids_json` and `processed_popup_event_ids_json` prevent network retries from being counted twice. Fixed or redundant values such as the hotel-name copy, the universal 750 ms read threshold, and the obsolete five-minute warning are not written. Comment-source metadata is not written to the Sheet. The sheet does not include `submission_id`, `SESSION_ID`, or `STUDY_ID`.
 
@@ -94,7 +96,7 @@ Review reading is measured through viewport exposure inside the hotel popup. A r
 
 `condition` is `without_ai` or `ai_summary`. `browsing_stage` is `no_reviews`, `full_reviews`, or `ai_summary_reviews`, depending on which page the participant viewed.
 
-The same `survey_user_id` appears once in each survey sheet and on every browsing observation belonging to that participant, making the tables directly pairable. A participant completing both versions and viewing all hotels can have up to 12 browsing rows: 2 conditions × 2 stages × 3 hotels. When a Student ID is available, the receiver derives the same pseudonymous `survey_user_id` from it, even if the participant reopens the survey or uses another browser. The three assigned attributes and hotel order use stable participant-specific randomization, so the same Student ID receives the same assignment in both conditions and across browsers. Survey answers and popup state remain separate between versions.
+The same `survey_user_id` appears once in each survey sheet and on every browsing observation belonging to that participant, making the tables directly pairable. A participant completing both versions and viewing all hotels can have up to 8 current browsing rows: 2 conditions × 2 stages × 2 hotels. When a Student ID is available, the receiver derives the same pseudonymous `survey_user_id` from it, even if the participant reopens the survey or uses another browser. The three assigned attributes and hotel order use stable participant-specific randomization, so the same Student ID receives the same assignment in both conditions and across browsers. Survey answers and popup state remain separate between versions.
 
 The script uses a write lock so simultaneous requests cannot create duplicate rows. `survey_user_id` is the unique key in each survey sheet. The four-field combination above is the unique key in `Browsing_Information`. Repeated deliveries update the matching row, duplicate rows for the same key are collapsed, and hotel visits are deduplicated by visit ID before any totals are changed.
 
@@ -106,7 +108,7 @@ After you change `backend/google-sheets-receiver.gs`, use **Deploy → Manage de
 
 1. **No new tabs** - Confirm the site is using the correct `/exec` URL. In Apps Script, open **Executions** and check that `doPost` runs are successful.
 2. **Survey sheet is empty** - A survey row is created or updated whenever a participant clicks **Next** on a question. Check the corresponding condition tab.
-3. **`Browsing_Information` is empty** - A review-stage row is created when the participant opens a hotel review popup; viewing-time fields are added when the popup closes. A no-review row is created after the participant closes a hotel detail popup.
+3. **`Browsing_Information` is empty** - Entering a browsing stage initializes a row for each of its two hotel popups, with zero open counts. Opening updates the count, and closing adds viewing time.
 4. **Wrong spreadsheet** - Prefer creating the script through **Extensions -> Apps Script** inside the target Sheet. For a standalone script, set the `SPREADSHEET_ID` script property to the ID from the Sheet URL.
 
 ### Completion audit

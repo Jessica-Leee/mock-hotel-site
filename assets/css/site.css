@@ -969,6 +969,12 @@ body{
   font-variant-numeric:tabular-nums;
   text-align:right;
 }
+.popup-countdown{
+  position:static;
+  flex-shrink:0;
+  margin:8px 16px;
+  box-shadow:none;
+}
 .browse-countdown.is-urgent{
   border-color:#c2410c;
   background:#fff4e6;

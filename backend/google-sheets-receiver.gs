@@ -12,13 +12,12 @@
  * Deploy as a Web App (Execute as: Me, Who has access: Anyone).
  */
 
-const SCHEMA_VERSION = "20";
+const SCHEMA_VERSION = "21";
 const WITHOUT_AI_SHEET = "Without_AI_Survey";
 const AI_SUMMARY_SHEET = "AI_Summary_Survey";
 const BROWSING_SHEET = "Browsing_Information";
 
 const HOTELS = [
-  { id: "pendry-chicago", slug: "pendry_chicago" },
   { id: "nobu-hotel-chicago", slug: "nobu_hotel_chicago" },
   { id: "arlo-chicago", slug: "arlo_chicago" }
 ];
@@ -88,10 +87,12 @@ function buildSurveyHeaders_() {
   ];
 
   const stages = ["pre_review", "post_review"];
-  for (let h = 0; h < HOTELS.length; h++) {
+  // Preserve existing sheet positions and historical answers when retiring a hotel.
+  const columnHotels = [{ slug: "pendry_chicago" }].concat(HOTELS);
+  for (let h = 0; h < columnHotels.length; h++) {
     for (let s = 0; s < stages.length; s++) {
       for (let slot = 1; slot <= 3; slot++) {
-        headers.push(matrixColumn_(stages[s], HOTELS[h].slug, slot, "likelihood"));
+        headers.push(matrixColumn_(stages[s], columnHotels[h].slug, slot, "likelihood"));
       }
     }
   }
@@ -627,7 +628,7 @@ function updateBrowsingCombination_(sheet, events, surveyUserId, studentId, cond
 
   if (!recorded && !rowNumber && inventoryPosition <= 0) return 0;
   record.record_updated_at = receivedAt;
-  record.time_limit_reached = stage === "no_reviews" && numericValue_(record.total_viewing_seconds) >= 29.5 ? 1 : 0;
+  record.time_limit_reached = record.last_exit_reason === "popup_time_limit" || numericValue_(record.total_viewing_seconds) >= 45 ? 1 : 0;
   record.processed_visit_ids_json = jsonCell_(processedVisitIds);
   record.processed_popup_event_ids_json = jsonCell_(processedPopupEventIds);
 

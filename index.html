@@ -9,18 +9,11 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbyBmS8V5n3M0smur248ScVqHNxYG5vZ8Ax9D9ZL38qc_TjiLPuDT04n0ErT57RX_o1V/exec"
     />
-    <link rel="stylesheet" href="./assets/css/site.css?v=20260918-1" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260920-1" />
   </head>
   <body data-survey-page="true">
     <main class="survey-shell" aria-label="Hotel booking survey">
       <section class="survey-card">
-        <div class="survey-progress" aria-live="polite" hidden>
-          <span id="surveyStepLabel"></span>
-          <div class="survey-progress__bar" aria-hidden="true">
-            <span id="surveyProgressFill"></span>
-          </div>
-        </div>
-
         <form id="surveyForm" class="survey-form" autocomplete="off">
           <div id="surveyQuestion"></div>
           <div class="survey-actions">
@@ -30,8 +23,8 @@
       </section>
     </main>
 
-    <script src="./assets/js/survey-tracking.js?v=20260918-3"></script>
-    <script src="./assets/js/shopper-profile.js?v=20260918-2"></script>
+    <script src="./assets/js/survey-tracking.js?v=20260920-1"></script>
+    <script src="./assets/js/shopper-profile.js?v=20260920-1"></script>
     <script>
       (function () {
         const SURVEY_STORAGE_PREFIX = "mock_hotel_survey_v1";
@@ -68,9 +61,8 @@
         let surveyOutboxRetryTimer = null;
 
         const hotels = [
-          { id: "pendry-chicago", name: "Pendry Hotel", priceNightly: 147 },
-          { id: "nobu-hotel-chicago", name: "Nobu Hotel", priceNightly: 145 },
-          { id: "arlo-chicago", name: "Arlo Hotel", priceNightly: 143 }
+          { id: "nobu-hotel-chicago", name: "Hotel B", priceNightly: 145 },
+          { id: "arlo-chicago", name: "Hotel A", priceNightly: 143 }
         ];
 
         function hotelViewStorageKey() {
@@ -136,18 +128,6 @@
         ]);
 
         const trueAttributeValues = {
-          "pendry-chicago": {
-            cleanliness: 9.0,
-            service_quality: 8.5,
-            room_comfort: 8.0,
-            wifi_reliability: 6.0,
-            noise_level: 5.5,
-            location_convenience: 9.5,
-            fitness_facilities: 6.5,
-            breakfast_quality: 9.0,
-            parking_convenience: 6.0,
-            physical_accessibility: 9.0
-          },
           "nobu-hotel-chicago": {
             cleanliness: 6.5,
             service_quality: 9.0,
@@ -176,7 +156,7 @@
 
         const matrixConfigs = {
           likelihood: {
-            title: () => "Select how likely you think the hotel has each attribute",
+            title: hotel => `Select how likely you think ${escapeHtml(hotel.name)} has each attribute.`,
             rows: () => selectedAttributeRows("likelihood"),
             columns: [
               ["extremely_unlikely", "Extremely<br>unlikely"],
@@ -890,7 +870,7 @@
                     <b>Search</b>
                   </div>
                   <div class="hotel-order-preview__results">
-                    <strong class="hotel-order-preview__heading">Chicago: 3 properties found</strong>
+                    <strong class="hotel-order-preview__heading">Chicago: 2 properties found</strong>
                     ${order.map((hotel, position) => `
                       <div class="hotel-order-preview__card">
                         <span class="hotel-order-preview__position">${position + 1}</span>
@@ -982,10 +962,9 @@
           const rows = typeof config.rows === "function" ? config.rows() : config.rows;
           const isPostReviewLikelihood = page.matrix === "likelihood" && page.id.startsWith("postreview_");
           const questionTitle = isPostReviewLikelihood
-            ? "Select how likely you think the hotel has each attribute after seeing the reviews"
+            ? `Select how likely you think ${escapeHtml(page.hotel.name)} has each attribute after seeing the reviews.`
             : config.title(page.hotel);
           return `
-            <p class="survey-hotel-name">Hotel: <strong>${escapeHtml(page.hotel.name)}</strong></p>
             <h1 class="survey-title survey-title--matrix">${questionTitle}</h1>
             ${isPostReviewLikelihood ? botTrapHtml(`post_review_${page.hotel.id}`, "REVIEW-CHECK-63") : ""}
             <div class="survey-matrix-wrap">
@@ -1101,8 +1080,7 @@
         function likert7Html() {
           const hotel = chosenHotel();
           return `
-            <h1 class="survey-title">Knowing the actual attribute values of your chosen hotel, how satisfied are you with your choice?</h1>
-            <p class="survey-copy"><strong>Your selected hotel:</strong> ${escapeHtml(hotel.name)}</p>
+            <h1 class="survey-title">Knowing the actual attribute values of ${escapeHtml(hotel.name)}, how satisfied are you with your choice?</h1>
             ${radioOptionList("satisfaction", [
               ["1", "1 - Very dissatisfied"],
               ["2", "2"],
@@ -1117,7 +1095,7 @@
 
         function switchChoiceHtml() {
           return `
-            <h1 class="survey-title">Would you choose a different hotel if you were booking again, knowing what you know now?</h1>
+            <h1 class="survey-title">Would you choose a different hotel instead of ${escapeHtml(chosenHotel().name)} if you were booking again, knowing what you know now?</h1>
             ${radioOptionList("switch_choice", [
               ["yes", "Yes - I would switch to a different hotel"],
               ["no", "No - I would choose the same hotel again"]
@@ -1143,7 +1121,7 @@
 
         function switchingLikelihoodHtml() {
           return `
-            <h1 class="survey-title">How likely are you to change your hotel selection?</h1>
+            <h1 class="survey-title">How likely are you to change your selection of ${escapeHtml(chosenHotel().name)}?</h1>
             <p class="survey-copy">Select one response.</p>
             ${fiveChoiceScaleHtml("switch_likelihood", "Likelihood of changing your hotel selection", [
               ["very_unlikely", "Very unlikely"],
@@ -1164,7 +1142,7 @@
             ["extremely_surprised", "Extremely surprised"]
           ];
           return `
-            <h1 class="survey-title">For each attribute of your chosen hotel, how surprised are you by the true value revealed?</h1>
+            <h1 class="survey-title">For each attribute of ${escapeHtml(chosenHotel().name)}, how surprised are you by the true value revealed?</h1>
             <p class="survey-copy">Select one response for each attribute.</p>
             <div class="survey-five-scale-list">
               ${selectedAttributeRows("surprise").map(row => fiveChoiceScaleHtml(row[0], row[1], surpriseOptions)).join("")}
@@ -1203,24 +1181,9 @@
           const index = currentIndex();
           const pageSet = activePages();
           const page = pageSet[index];
-          const stepLabel = document.getElementById("surveyStepLabel");
-          const fill = document.getElementById("surveyProgressFill");
           const submit = document.getElementById("surveySubmit");
           const card = document.querySelector(".survey-card");
-          const progress = document.querySelector(".survey-progress");
           submit.hidden = false;
-          if (progress) progress.hidden = !postReviewMode && !hotelQuestionnaireMode;
-
-          if (postReviewMode) {
-            stepLabel.textContent = `Post-review questionnaire ${index + 1} of ${pageSet.length}`;
-          } else if (hotelQuestionnaireMode) {
-            stepLabel.textContent = `Hotel questionnaire ${index + 1} of ${pageSet.length}`;
-          } else {
-            const questionCount = pageSet.filter(item => item.type !== "browseIntro").length;
-            const displayedStep = Math.min(index + 1, questionCount);
-            stepLabel.textContent = page.type === "browseIntro" ? "Next: Browse Hotel Listings" : "Question " + displayedStep + " of " + questionCount;
-          }
-          fill.style.width = (Math.min(index + 1, pageSet.length) / pageSet.length * 100) + "%";
           submit.textContent = page.type === "browseIntro"
             ? "Start hotel browsing"
             : index === pageSet.length - 1 && hotelQuestionnaireMode
@@ -1245,6 +1208,7 @@
                 <span>Student ID</span>
                 <input id="answerInput" name="student_id" type="text" value="${escapeHtml(studentId)}" required autocomplete="off" ${studentId ? "readonly" : ""} />
               </label>
+              ${botTrapHtml("student_id", "wrong id")}
             `);
           } else if (page.type === "scenario") {
             const scenario = page.scenario;
@@ -1287,7 +1251,7 @@
               : "the version with full reviews";
             setQuestionHtml(`
               <h1 class="survey-title">Next: Browse Hotel Listings</h1>
-              <p class="survey-copy">You will now visit the hotel browsing platform to view 3 hotel listings. Browse each hotel carefully - examine photos, amenities, and descriptions.</p>
+              <p class="survey-copy">You will now view 2 hotel listings. You can reopen each hotel's popup, with a total viewing limit of 45 seconds per hotel in each browsing stage.</p>
               <p class="survey-copy">First you will see listings without reviews. After that, you will continue to ${secondStage}.</p>
             `);
           }
@@ -1306,7 +1270,12 @@
             delete state.prolific_id;
             state.survey_user_id = state.survey_user_id || surveyUserId;
             persistSurveyUserId(state.survey_user_id, value);
-            state.answers[page.id] = { value, submitted_at: state.updated_at };
+            const detection = botDetectionData();
+            if (/^wrong\s+id$/i.test(value)) {
+              detection.bot_detection_triggered = true;
+              detection.bot_detection_response = "wrong id (Student ID field)";
+            }
+            state.answers[page.id] = { value, ...detection, submitted_at: state.updated_at };
           } else if (page.type === "scenario") {
             state.answers[page.id] = {
               value: true,
@@ -1470,8 +1439,6 @@
             </div>
           `;
           document.getElementById("surveySubmit").hidden = true;
-          document.getElementById("surveyStepLabel").textContent = "Complete";
-          document.getElementById("surveyProgressFill").style.width = "100%";
         }
 
         function finishPostReviewQuestionnaire(state) {

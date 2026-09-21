@@ -1076,6 +1076,11 @@
     window.HOTEL_EXPERIMENT_GET_EVENTS = function () {
       return events.slice();
     };
+    window.HOTEL_EXPERIMENT_FINALIZE_MODAL = function (reason) {
+      if (modalBindings) modalBindings.finalize(reason || "modal_closed");
+      teardownModalBindings();
+      lastModalOpen = false;
+    };
     window.HOTEL_EXPERIMENT_GET_PAYLOAD = function () {
       return buildPayload();
     };
