@@ -785,6 +785,26 @@ body{
 .study-flow--status{
   margin:16px 0;
 }
+.study-flow--status.is-locked{
+  padding:18px 20px;
+  border:1px solid #e6a119;
+  border-left:6px solid #d97706;
+  background:#fff4ce;
+  color:#5d3900;
+  font-size:16px;
+  line-height:1.5;
+}
+.study-flow--status.is-locked strong{
+  display:block;
+  margin-bottom:4px;
+  color:#713f12;
+  font-size:18px;
+}
+.study-flow--status.is-locked .study-flow__note{
+  margin-top:10px;
+  color:#713f12;
+  font-size:16px;
+}
 .study-flow--actions{
   justify-content:flex-end;
   border:0;

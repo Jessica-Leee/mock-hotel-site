@@ -3093,6 +3093,7 @@
       results.insertAdjacentElement("beforebegin", status);
     }
     status.replaceChildren(box.firstElementChild);
+    status.classList.toggle("is-locked", box.querySelector("button").disabled);
   }
 
   function renderResults() {
