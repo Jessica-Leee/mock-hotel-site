@@ -782,6 +782,15 @@ body{
 .study-flow strong{
   color:#003b95;
 }
+.study-flow--status{
+  margin:16px 0;
+}
+.study-flow--actions{
+  justify-content:flex-end;
+  border:0;
+  background:transparent;
+  padding:12px 0;
+}
 .study-flow__btn{
   flex:0 0 auto;
   display:inline-flex;
@@ -843,6 +852,18 @@ body{
 .card__body{padding:16px; display:grid; grid-template-columns: minmax(0,1fr) 226px; gap:16px}
 .card__body > div:first-of-type{min-width:0}
 .hotel-title{margin:0; font-size:22px; line-height:1.2; letter-spacing:0; color:#006ce4}
+.hotel-title__link{
+  border:0;
+  padding:0;
+  background:transparent;
+  color:inherit;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+.hotel-title__link:hover:not(:disabled){text-decoration:underline}
+.hotel-title__link:focus-visible{outline:2px solid var(--brand);outline-offset:4px}
+.hotel-title__link:disabled{cursor:default;color:#666}
 .sub{margin-top:6px; color:var(--muted); font-size:12px; line-height:1.4}
 .map-link{
   appearance:none;

@@ -12,7 +12,8 @@
  * Deploy as a Web App (Execute as: Me, Who has access: Anyone).
  */
 
-const SCHEMA_VERSION = "21";
+const SCHEMA_VERSION = "22";
+const ASSIGNED_ATTRIBUTE_COUNT = 4;
 const WITHOUT_AI_SHEET = "Without_AI_Survey";
 const AI_SUMMARY_SHEET = "AI_Summary_Survey";
 const BROWSING_SHEET = "Browsing_Information";
@@ -120,6 +121,13 @@ function buildSurveyHeaders_() {
     "revealed_attributes_popup_open_count",
     "processed_popup_event_ids_json"
   );
+  // Append new fields so existing survey rows keep their original column positions.
+  headers.push("assigned_attribute_4_id");
+  for (let h = 0; h < HOTELS.length; h++) {
+    for (let s = 0; s < stages.length; s++) {
+      headers.push(matrixColumn_(stages[s], HOTELS[h].slug, 4, "likelihood"));
+    }
+  }
   return headers;
 }
 
@@ -352,7 +360,7 @@ function mergeSurveyRecord_(target, source) {
 function applyAssignment_(record, assignment) {
   if (!assignment) return;
   const ids = Array.isArray(assignment.attribute_ids) ? assignment.attribute_ids : [];
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < ASSIGNED_ATTRIBUTE_COUNT; i++) {
     record["assigned_attribute_" + (i + 1) + "_id"] = textCell_(ids[i] || "");
   }
 }
@@ -403,7 +411,7 @@ function applyMatrixAnswer_(record, questionId, answer, assignment) {
       : assignedAttributeIdsFromRecord_(record);
   const values = objectValue_(answer.values);
 
-  for (let i = 0; i < Math.min(3, assignedIds.length); i++) {
+  for (let i = 0; i < Math.min(ASSIGNED_ATTRIBUTE_COUNT, assignedIds.length); i++) {
     const attribute = attributeForId_(assignedIds[i]);
     if (!attribute) continue;
     const raw = values[attribute.likelihoodKey];
@@ -851,7 +859,7 @@ function removeDuplicateRows_(sheet, rows) {
 }
 
 function assignedAttributeIdsFromRecord_(record) {
-  return [record.assigned_attribute_1_id, record.assigned_attribute_2_id, record.assigned_attribute_3_id].filter(Boolean);
+  return [record.assigned_attribute_1_id, record.assigned_attribute_2_id, record.assigned_attribute_3_id, record.assigned_attribute_4_id].filter(Boolean);
 }
 
 function hotelForId_(id) {

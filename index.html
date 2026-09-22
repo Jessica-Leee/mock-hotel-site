@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbyBmS8V5n3M0smur248ScVqHNxYG5vZ8Ax9D9ZL38qc_TjiLPuDT04n0ErT57RX_o1V/exec"
     />
-    <link rel="stylesheet" href="./assets/css/site.css?v=20260921-3" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260921-4" />
   </head>
   <body data-survey-page="true">
     <main class="survey-shell" aria-label="Hotel booking survey">
@@ -56,13 +56,13 @@
         const hotelQuestionnaireMode = surveyStage === "hotel_questionnaire" || (location.hash || "").startsWith("#hq");
         const postReviewAiMode = surveyStage === "post_review_ai";
         const postReviewMode = surveyStage === "post_review" || postReviewAiMode || (location.hash || "").startsWith("#pr");
-        const ASSIGNED_ATTRIBUTE_COUNT = 3;
+        const ASSIGNED_ATTRIBUTE_COUNT = 4;
         let surveyOutboxFlushPromise = null;
         let surveyOutboxRetryTimer = null;
 
         const hotels = [
-          { id: "nobu-hotel-chicago", name: "Hotel B", priceNightly: 145 },
-          { id: "arlo-chicago", name: "Hotel A", priceNightly: 143 }
+          { id: "arlo-chicago", name: "Hotel A", priceNightly: 143 },
+          { id: "nobu-hotel-chicago", name: "Hotel B", priceNightly: 145 }
         ];
 
         function hotelViewStorageKey() {
@@ -437,7 +437,7 @@
           const optionalAttributeIds = attributePool.map(attribute => attribute.id)
             .filter(id => !requiredAttributeIds.includes(id));
           const assignmentIdentity = String(state.student_id || studentId || participantIdentity || surveyUserId).trim().toUpperCase();
-          // Derive the same third attribute in both conditions, including when replacing a cached legacy assignment.
+          // Derive the same two optional attributes in both conditions, including with a cached legacy assignment.
           assignment.attribute_ids = requiredAttributeIds.concat(
             stableShuffled(optionalAttributeIds, `hotel-attributes-v2:${assignmentIdentity}`)
               .slice(0, ASSIGNED_ATTRIBUTE_COUNT - requiredAttributeIds.length)
@@ -803,22 +803,10 @@
         }
 
         function hotelBrowsingOrder() {
-          const hotelById = new Map(hotels.map(hotel => [hotel.id, hotel]));
-          try {
-            const stored = JSON.parse(localStorage.getItem(hotelOrderStorageKey()) || "[]");
-            const ordered = Array.isArray(stored) ? stored.map(id => hotelById.get(id)).filter(Boolean) : [];
-            if (ordered.length === hotels.length && new Set(ordered.map(hotel => hotel.id)).size === hotels.length) {
-              return ordered;
-            }
-          } catch (_) { /* use the default order below */ }
-          if (!participantIdentity) return hotels.slice();
-          const orderedIds = stableShuffled(
-            hotels.map(hotel => hotel.id),
-            `hotel-order-v1:${participantStorageId.toUpperCase()}`
-          );
+          const orderedIds = hotels.map(hotel => hotel.id);
           try { localStorage.setItem(hotelOrderStorageKey(), JSON.stringify(orderedIds)); }
-          catch (_) { /* the deterministic order can be recomputed */ }
-          return orderedIds.map(id => hotelById.get(id)).filter(Boolean);
+          catch (_) { /* the fixed order does not depend on storage */ }
+          return hotels.slice();
         }
 
         function ensureHotelOrderModalRoot() {
@@ -1140,7 +1128,7 @@
 
         function switchingLikelihoodHtml() {
           return `
-            <h1 id="switch_likelihood_title" class="survey-title survey-title--matrix">How likely are you to change your selection of ${escapeHtml(chosenHotel().name)}?</h1>
+            <h1 id="switch_likelihood_title" class="survey-title survey-title--matrix">Based on your experience at ${escapeHtml(chosenHotel().name)}, if you could choose your hotel again, how likely would you be to choose a different hotel instead?</h1>
             <p class="survey-copy">Select one response.</p>
             ${fiveChoiceMatrixHtml([["switch_likelihood", "Likelihood of changing your hotel selection"]], [
               ["very_unlikely", "Very unlikely"],

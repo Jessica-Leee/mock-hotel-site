@@ -10,7 +10,7 @@
 
   let activeHotelSession = null;
   let modalScrollCleanup = null;
-  let randomizedVisibleHotelIds = null;
+  let visibleHotelIds = null;
   let balancedVisibleReviewCount = null;
   let popupCountdownTimer = null;
   const REVIEW_INITIAL_VISIBLE = 12;
@@ -2231,23 +2231,12 @@
 
   function persistedVisibleHotelIds() {
     const required = requiredHotelIds();
-    const requiredSet = new Set(required);
     const stored = safeJsonParse(localStorage.getItem(hotelOrderStorageKey()), []);
-    const validStored = Array.isArray(stored)
-      ? stored.filter(id => requiredSet.has(id))
-      : [];
-
-    if (validStored.length === required.length && new Set(validStored).size === required.length) {
-      return validStored;
+    if (JSON.stringify(stored) !== JSON.stringify(required)) {
+      localStorage.setItem(hotelOrderStorageKey(), JSON.stringify(required));
+      logEvent("hotel_order_fixed", { hotelIds: required });
     }
-
-    const participant = participantStorageSuffix();
-    const nextOrder = participant === "anonymous"
-      ? shuffled(required)
-      : stableShuffled(required, `hotel-order-v1:${participant.toUpperCase()}`);
-    localStorage.setItem(hotelOrderStorageKey(), JSON.stringify(nextOrder));
-    logEvent("hotel_order_randomized", { hotelIds: nextOrder });
-    return nextOrder;
+    return required;
   }
 
   function getHotelViewState() {
@@ -2283,7 +2272,7 @@
   }
 
   function requiredHotelIds() {
-    return Array.from(VISIBLE_HOTEL_IDS);
+    return ["arlo-chicago", "nobu-hotel-chicago"].filter(id => VISIBLE_HOTEL_IDS.has(id));
   }
 
   function markNoReviewHotelViewed(hotelId, reason = "view_complete") {
@@ -2936,11 +2925,11 @@
   }
 
   function visibleHotels() {
-    if (!randomizedVisibleHotelIds) {
-      randomizedVisibleHotelIds = persistedVisibleHotelIds();
+    if (!visibleHotelIds) {
+      visibleHotelIds = persistedVisibleHotelIds();
     }
     const hotelById = new Map(HOTELS.map(hotel => [hotel.id, hotel]));
-    return randomizedVisibleHotelIds.map(id => hotelById.get(id)).filter(Boolean);
+    return visibleHotelIds.map(id => hotelById.get(id)).filter(Boolean);
   }
 
   function balancedReviewCount() {
@@ -3050,7 +3039,7 @@
       results.insertAdjacentElement("afterend", box);
     }
     box.id = "studyFlowCta";
-    box.className = "study-flow";
+    box.className = "study-flow study-flow--actions";
 
     if (state.showReviews) {
       const postReviewStage = state.showAiSummary ? "post_review_ai" : "post_review";
@@ -3095,6 +3084,15 @@
         <button class="btn study-flow__btn" type="button" disabled>Continue to hotel questions</button>
       `;
     }
+    let status = document.getElementById("studyFlowStatus");
+    if (!status) {
+      status = document.createElement("div");
+      status.id = "studyFlowStatus";
+      status.className = "study-flow study-flow--status";
+      status.setAttribute("role", "status");
+      results.insertAdjacentElement("beforebegin", status);
+    }
+    status.replaceChildren(box.firstElementChild);
   }
 
   function renderResults() {
@@ -3141,7 +3139,7 @@
       card.innerHTML = `
         <div class="card__body">
           <div>
-            <h3 class="hotel-title">${escapeXml(h.name)}</h3>
+            <h3 class="hotel-title"><button class="hotel-title__link" type="button" data-open="${h.id}" ${popupUsedMs(h.id) >= POPUP_TIME_LIMIT_MS ? "disabled" : ""}>${escapeXml(h.name)}</button></h3>
           </div>
 
           <div class="priceBox priceBox--text">
