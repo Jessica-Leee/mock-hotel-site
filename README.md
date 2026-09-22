@@ -2,29 +2,29 @@
 
 ## Live site
 
-**https://jessica-leee.github.io/mock-hotel-site**
+**https://chicago-hotel-survey.pages.dev/**
 
-Hosted on [GitHub Pages](https://pages.github.com/) from the `main` branch. Pushes to `main` update the live site automatically.
+Hosted on Cloudflare Pages from the `main` branch of `Jessica-Leee/mock-hotel-site`. Automatic deployments are enabled. The previous GitHub Pages site at https://jessica-leee.github.io/mock-hotel-site/ remains available.
 
 ## Study URLs
 
-- **Survey (entry):** https://jessica-leee.github.io/mock-hotel-site/
-- **Survey Summaries (summary condition):** https://jessica-leee.github.io/mock-hotel-site/survey-summaries.html
-- **Search without reviews:** https://jessica-leee.github.io/mock-hotel-site/search-no-reviews.html?survey_stage=search_1
-- **Search with reviews:** https://jessica-leee.github.io/mock-hotel-site/search-reviews.html?survey_stage=search_2
-- **Search with AI summaries:** https://jessica-leee.github.io/mock-hotel-site/search-ai-summaries.html?survey_stage=search_3
+- **Survey (entry):** https://chicago-hotel-survey.pages.dev/
+- **Survey Summaries (summary condition):** https://chicago-hotel-survey.pages.dev/survey-summaries.html
+- **Search without reviews:** https://chicago-hotel-survey.pages.dev/search-no-reviews.html?survey_stage=search_1
+- **Search with reviews:** https://chicago-hotel-survey.pages.dev/search-reviews.html?survey_stage=search_2
+- **Search with AI summaries:** https://chicago-hotel-survey.pages.dev/search-ai-summaries.html?survey_stage=search_3
 
 `index.html` is the full-review survey entry page. `survey-summaries.html` starts the parallel summary survey using the existing numeric `study_version=3` parameter. The old `survey-ai-summaries.html` entry redirects to it, preserving incoming parameters. Internal condition identifiers and Google Sheets destinations remain unchanged. Participants can complete both versions in sequence. Hotel details are text-only; hotel photos and galleries are not rendered.
 
-## Cloudflare Pages deployment (pending account setup)
+## Cloudflare Pages deployment
 
-The intended shared hostname is `chicago-hotel-survey.pages.dev`; availability and deployment must be confirmed in Cloudflare before distributing these links. The standard survey uses `/`, and Survey Summaries uses `/survey-summaries.html` (Cloudflare may canonicalize this to `/survey-summaries`).
+The shared hostname is `chicago-hotel-survey.pages.dev`, deployed and checked on September 21, 2026. The standard survey uses `/`, and Survey Summaries uses `/survey-summaries.html` (Cloudflare canonicalizes this to `/survey-summaries` before the entry redirects into the shared questionnaire with `study_version=3`). Both entries rendered the Student ID question successfully, and all three search pages and shared CSS/JS returned HTTP 200 and matched the repository source. This deployment check did not submit questionnaire answers or verify a new row in Google Sheets.
 
-Connect the existing `Jessica-Leee/mock-hotel-site` GitHub repository through Workers & Pages -> Create application -> Pages -> Import an existing Git repository. Use project name `chicago-hotel-survey`, production branch `main`, framework preset `None`, build command `exit 0`, and build output directory `.`. Leave the root directory at the repository root. No environment variables or new Apps Script deployment are needed for this entry-point change.
+The existing `Jessica-Leee/mock-hotel-site` GitHub repository is connected through Pages. Configuration: project name `chicago-hotel-survey`, production branch `main`, framework preset `None`, build command `exit 0`, and build output directory `.`. The root directory is the repository root. No environment variables or new Apps Script deployment are needed for this entry-point change.
 
 Keep both versions on this same origin. Browser-local survey progress and retry queues from GitHub Pages do not transfer to a new domain, so participants should finish an in-progress survey on its original domain. Matching Student IDs continue to provide paired backend identities; the Sheet schema and receiver URL have not changed. Before distributing the new URLs, verify both entries, their browsing pages, and delivery to the existing Sheet on the deployed hostname.
 
-For paired data, open both versions with the same `STUDENT_ID` value. The two pages share one GitHub Pages origin, so the hidden random `survey_user_id` is reused for the same participant. Legacy `PROLIFIC_PID` links remain accepted, while `STUDY_ID`, `SESSION_ID`, and `submission_id` are not written to the analysis sheets.
+For paired data, open both versions with the same `STUDENT_ID` value. The two pages share one Cloudflare Pages origin, so the hidden random `survey_user_id` is reused for the same participant. Legacy `PROLIFIC_PID` links remain accepted, while `STUDY_ID`, `SESSION_ID`, and `submission_id` are not written to the analysis sheets.
 
 ## Project structure
 
