@@ -10,7 +10,10 @@
     <p>Opening the survey...</p>
     <script>
       (function () {
-        location.replace(`survey-summaries.html${location.search || ""}${location.hash || ""}`);
+        const params = new URLSearchParams(location.search || "");
+        params.delete("study_condition");
+        params.set("study_version", "3");
+        location.replace(`index.html?${params.toString()}#q1`);
       })();
     </script>
   </body>
