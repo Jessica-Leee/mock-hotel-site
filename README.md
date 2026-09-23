@@ -50,7 +50,24 @@ Student ID is optional: participants may leave it blank and select Next. Answers
 
 The opening flow is Student ID (optional) -> trip scenario and a free-text attribute question -> Attribute Preference Profile -> browsing introduction. The new question asks, before showing the profile: "Before seeing your preference profile, please list all hotel attributes you would consider when choosing a hotel under the given scenario." Participants enter their attributes separated by commas; a nonblank response is required. No attribute examples or profile popup are shown on that page. The original response is stored as `scenario_attributes_prior` in both survey sheets.
 
-Schema 23 adds `scenario_attributes_prior` as column 55, after all 54 existing survey columns. Replace `backend/google-sheets-receiver.gs` in Apps Script and deploy a new version of the existing Web App to store this new answer in Google Sheets. The old receiver does not map this answer to a column. Keep the same Web App URL and do not reset or clear the sheets. Existing rows and column positions are preserved; `Browsing_Information` is unchanged.
+Schema 23 added `scenario_attributes_prior` as column 55. Schema 24 appends 12 stage-specific auxiliary-popup count columns, leaving the original 55 columns and all historical answers in place. Replace `backend/google-sheets-receiver.gs` in Apps Script and deploy a new version of the existing Web App before collecting these new fields. Older receivers do not store the added fields. Keep the same Web App URL and do not reset or clear the sheets. `Browsing_Information` is unchanged.
+
+### Auxiliary popups by stage
+
+The new columns use `<stage>_<popup>_popup_open_count`, in both survey sheets:
+
+| Stage prefix | Page |
+| --- | --- |
+| `browsing_1` | First hotel browsing page, before reviews |
+| `questionnaire_1` | First hotel questionnaire |
+| `browsing_2` | Second hotel browsing page, with reviews or summaries |
+| `questionnaire_2` | Post-review questionnaire |
+
+For each stage, the three popup identifiers are `shopper_profile`, `hotel_order`, and `revealed_attributes` (the hotel-experience reminder). For example, `browsing_1_shopper_profile_popup_open_count` and `questionnaire_2_revealed_attributes_popup_open_count`. A count greater than zero means the popup was opened; separate stage-specific boolean columns are unnecessary. The existing six whole-survey opened/count fields remain available for compatibility.
+
+The stage is attached to each popup event when it opens, not when it is uploaded. Repeated deliveries of the same event ID do not increment either the total or stage count twice. A shopper-profile popup opened inside a hotel popup belongs to that hotel's browsing stage. No new popup buttons were added: the hotel-order popup is only available in the questionnaires, and the hotel-experience reminder only in the post-review questionnaire. Unavailable or unopened combinations have zero counts for new participants.
+
+Historical totals cannot be reliably split into stages. Old rows retain blank stage counters until a new attributable event arrives; subsequent counts cover only events processed with the new stage logic, not a reconstructed full history. Legacy events with a recorded `survey_stage`, questionnaire context, or questionnaire hash can still be classified if they have not already been counted. Ambiguous legacy events update only the total, never a guessed stage.
 
 ### Regression tests
 
@@ -59,6 +76,7 @@ Run from the repository root with `jsdom` and `@sinonjs/fake-timers` available t
 ```sh
 node tests/popup-behavior.test.cjs
 node tests/scenario-attributes.test.cjs
+node tests/popup-stages.test.cjs
 ```
 
 The popup test uses simulated time and no network requests to cover all three browsing pages, minimum-time close guards, background pauses, cumulative reopening, the maximum limit, reload persistence, the continue gate, and fixed review ordering across participants and conditions. The scenario test mocks all delivery calls and checks both entry conditions, optional Student ID, the new question appearing before the profile, nonblank answer validation, and the receiver's new column mapping.
@@ -111,10 +129,10 @@ The two survey sheets have identical columns. Each participant's row contains:
 - the four assigned hotel attribute IDs: location convenience, fitness facilities, and two distinct randomly selected remaining attributes;
 - their pre-review and post-review likelihood answers for Hotel A and Hotel B;
 - their chosen hotel, satisfaction, switching answer, likelihood of changing their hotel selection, and surprise ratings for their four assigned attributes;
-- whether and how many times they opened the shopper-profile, hotel-order, and revealed-attributes popups;
+- whether and how many times they opened the shopper-profile, hotel-order, and revealed-attributes popups in total, plus separate counts for each of the four browsing/questionnaire stages;
 - their AI-summary use frequency and automated-response checks.
 
-Each survey tab keeps 55 columns, including the new free-text `scenario_attributes_prior` answer and six legacy Pendry columns retained only to preserve historical data. Deleted questions, the fixed Solo City Exploration scenario, fixed preference-profile values, fixed hotel names, revealed attribute constants, redundant text labels, legacy confidence scales, and recovery JSON are not written. Hotel-attribute likelihood answers, likelihood of changing the answer, and surprise answers are coded from 1 to 5. AI-summary use is coded from 1 to 7. The attribute IDs in `assigned_attribute_1_id` through `assigned_attribute_4_id` identify which question each numbered hotel answer column represents. Popup events are deduplicated by event ID before their counts are updated.
+Each survey tab keeps 67 columns, including 12 stage-specific auxiliary-popup counts, the free-text `scenario_attributes_prior` answer, and six legacy Pendry columns retained only to preserve historical data. Deleted questions, the fixed Solo City Exploration scenario, fixed preference-profile values, fixed hotel names, revealed attribute constants, redundant text labels, legacy confidence scales, and recovery JSON are not written. Hotel-attribute likelihood answers, likelihood of changing the answer, and surprise answers are coded from 1 to 5. AI-summary use is coded from 1 to 7. The attribute IDs in `assigned_attribute_1_id` through `assigned_attribute_4_id` identify which question each numbered hotel answer column represents. Popup events are deduplicated by event ID before their counts are updated.
 
 `Browsing_Information` has 35 columns and uses a long format. Its unique combination is `survey_user_id + condition + browsing_stage + hotel_id`. `hotel_display_position` records the displayed hotel position (now fixed: Hotel A = 1, Hotel B = 2). `popup_opened` explicitly records whether that hotel popup was clicked, and `popup_click_count` records repeated openings. Reopening the same hotel in the same stage updates that row's counts, cumulative viewing time, longest single visit, scrolling measures, and latest exit reason instead of adding another row. Moving to another condition, stage, or hotel creates a separate observation row. `processed_visit_ids_json` and `processed_popup_event_ids_json` prevent network retries from being counted twice. Fixed or redundant values such as the hotel-name copy, the universal 750 ms read threshold, and the obsolete five-minute warning are not written. Comment-source metadata is not written to the Sheet. The sheet does not include `submission_id`, `SESSION_ID`, or `STUDY_ID`.
 

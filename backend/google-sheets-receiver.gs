@@ -12,11 +12,17 @@
  * Deploy as a Web App (Execute as: Me, Who has access: Anyone).
  */
 
-const SCHEMA_VERSION = "23";
+const SCHEMA_VERSION = "24";
 const ASSIGNED_ATTRIBUTE_COUNT = 4;
 const WITHOUT_AI_SHEET = "Without_AI_Survey";
 const AI_SUMMARY_SHEET = "AI_Summary_Survey";
 const BROWSING_SHEET = "Browsing_Information";
+const AUXILIARY_POPUP_STAGES = ["browsing_1", "questionnaire_1", "browsing_2", "questionnaire_2"];
+const AUXILIARY_POPUP_PREFIXES = {
+  shopper_profile: "shopper_profile_popup",
+  hotel_order: "hotel_order_popup",
+  revealed_attributes: "revealed_attributes_popup"
+};
 
 const HOTELS = [
   { id: "nobu-hotel-chicago", slug: "nobu_hotel_chicago" },
@@ -129,6 +135,11 @@ function buildSurveyHeaders_() {
     }
   }
   headers.push("scenario_attributes_prior");
+  AUXILIARY_POPUP_STAGES.forEach(stage => {
+    Object.keys(AUXILIARY_POPUP_PREFIXES).forEach(type => {
+      headers.push(stage + "_" + AUXILIARY_POPUP_PREFIXES[type] + "_open_count");
+    });
+  });
   return headers;
 }
 
@@ -254,7 +265,7 @@ function updateSurveyRow_(sheet, events, payload, receivedAt) {
   record.first_recorded_at = record.first_recorded_at || receivedAt;
   record.last_recorded_at = receivedAt;
   record.completion_status = record.completion_status || "in_progress";
-  initializeSurveyPopupFields_(record);
+  initializeSurveyPopupFields_(record, !rowNumber);
   for (let i = 0; i < surveyEvents.length; i++) {
     const event = surveyEvents[i] || {};
     const value = objectValue_(event.value);
@@ -302,32 +313,45 @@ function updateSurveyRow_(sheet, events, payload, receivedAt) {
   return true;
 }
 
-function initializeSurveyPopupFields_(record) {
-  const prefixes = [
-    "shopper_profile_popup",
-    "hotel_order_popup",
-    "revealed_attributes_popup"
-  ];
+function initializeSurveyPopupFields_(record, isNewRecord) {
+  const prefixes = Object.keys(AUXILIARY_POPUP_PREFIXES).map(type => AUXILIARY_POPUP_PREFIXES[type]);
   for (let i = 0; i < prefixes.length; i++) {
     const prefix = prefixes[i];
     record[prefix + "_opened"] = numericValue_(record[prefix + "_opened"]) > 0 ? 1 : 0;
     record[prefix + "_open_count"] = numericValue_(record[prefix + "_open_count"]);
   }
+  AUXILIARY_POPUP_STAGES.forEach(stage => {
+    prefixes.forEach(prefix => {
+      const column = stage + "_" + prefix + "_open_count";
+      // Unknown historical counts stay blank, rather than becoming false zeroes.
+      if (isNewRecord || !isBlank_(record[column])) record[column] = numericValue_(record[column]);
+    });
+  });
+}
+
+function surveyPopupStage_(value) {
+  const explicit = String(value.usage_stage || "");
+  if (AUXILIARY_POPUP_STAGES.indexOf(explicit) >= 0) return explicit;
+  const stage = String(value.survey_stage || "");
+  const hash = String(value.page_hash || "");
+  const context = String(value.page_context || "");
+  if (/^#pr\d+$/.test(hash) || stage === "post_review" || stage === "post_review_ai" || context === "post_review_questionnaire") return "questionnaire_2";
+  if (/^#hq\d+$/.test(hash) || stage === "hotel_questionnaire" || context === "hotel_questionnaire") return "questionnaire_1";
+  if (stage === "search_1") return "browsing_1";
+  if (stage === "search_2" || stage === "search_3") return "browsing_2";
+  return "";
 }
 
 function applySurveyPopupOpen_(record, event) {
   const value = objectValue_(event.value);
   const popupType = String(value.popup_type || event.element_id || "");
-  const prefixes = {
-    shopper_profile: "shopper_profile_popup",
-    hotel_order: "hotel_order_popup",
-    revealed_attributes: "revealed_attributes_popup"
-  };
-  const prefix = prefixes[popupType];
+  const prefix = AUXILIARY_POPUP_PREFIXES[popupType];
   if (!prefix) return;
+  const stage = surveyPopupStage_(value);
 
   const eventId = String(event.event_id || recordId_([
     popupType,
+    stage,
     event.timestamp || "",
     value.page_context || "",
     value.page_hash || "",
@@ -338,6 +362,10 @@ function applySurveyPopupOpen_(record, event) {
 
   record[prefix + "_opened"] = 1;
   record[prefix + "_open_count"] = numericValue_(record[prefix + "_open_count"]) + 1;
+  if (stage) {
+    const column = stage + "_" + prefix + "_open_count";
+    record[column] = numericValue_(record[column]) + 1;
+  }
   processedIds.push(eventId);
   record.processed_popup_event_ids_json = jsonCell_(processedIds);
 }

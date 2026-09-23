@@ -6,8 +6,8 @@ const { JSDOM, VirtualConsole } = require('jsdom');
 const receiver = vm.createContext({});
 vm.runInContext(fs.readFileSync('backend/google-sheets-receiver.gs', 'utf8'), receiver);
 const headers = vm.runInContext('SURVEY_HEADERS', receiver);
-assert.equal(headers.length, 55);
-assert.equal(headers.at(-1), 'scenario_attributes_prior');
+assert.equal(headers.length, 67);
+assert.equal(headers[54], 'scenario_attributes_prior');
 assert.equal(vm.runInContext('BROWSING_HEADERS.length', receiver), 35);
 
 async function check(version) {

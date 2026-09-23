@@ -89,6 +89,19 @@
     }
   }
 
+  function auxiliaryPopupStage() {
+    var version = document.body && document.body.dataset.reviewVersion;
+    if (version === "without") return "browsing_1";
+    if (version === "with" || version === "with-ai-summary") return "browsing_2";
+    var stage = currentSurveyStage();
+    var hash = location.hash || "";
+    if (/^#pr\d+$/.test(hash) || stage === "post_review" || stage === "post_review_ai") return "questionnaire_2";
+    if (/^#hq\d+$/.test(hash) || stage === "hotel_questionnaire") return "questionnaire_1";
+    if (stage === "search_1") return "browsing_1";
+    if (stage === "search_2" || stage === "search_3") return "browsing_2";
+    return "";
+  }
+
   function studyRunCondition() {
     try {
       var p = new URLSearchParams(location.search);
@@ -375,6 +388,10 @@
     var eventValue = value && typeof value === "object" && !Array.isArray(value)
       ? Object.assign({}, value, { survey_user_id: surveyUserId || getOrCreateSurveyUserId() })
       : { event_value: value === undefined ? null : value, survey_user_id: surveyUserId || getOrCreateSurveyUserId() };
+    if (event_type === "popup_open" && ["shopper_profile", "hotel_order", "revealed_attributes"].indexOf(eventValue.popup_type || element_id) >= 0) {
+      // Capture at opening time; a queued event may be delivered on a later page.
+      eventValue.usage_stage = auxiliaryPopupStage();
+    }
     var entry = {
       event_id: createEventId(),
       event_type: event_type,
