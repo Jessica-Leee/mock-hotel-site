@@ -235,6 +235,15 @@ body{
   font-size:16px;
   line-height:1.7;
 }
+.survey-scenario-summary--elicitation{
+  padding:24px;
+  border:0;
+  border-left:6px solid #15506f;
+  background:#f5f6f9;
+}
+.survey-attribute-elicitation{margin-top:28px;gap:16px}
+.survey-attribute-elicitation .survey-copy{margin:0;font-size:16px}
+.survey-attribute-elicitation textarea{min-height:150px}
 .preference-table{
   border:0;
   border-radius:0;

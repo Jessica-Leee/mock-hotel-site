@@ -9,7 +9,7 @@
       name="tracking-stream-url"
       content="https://script.google.com/macros/s/AKfycbyBmS8V5n3M0smur248ScVqHNxYG5vZ8Ax9D9ZL38qc_TjiLPuDT04n0ErT57RX_o1V/exec"
     />
-    <link rel="stylesheet" href="./assets/css/site.css?v=20260922-1" />
+    <link rel="stylesheet" href="./assets/css/site.css?v=20260922-2" />
   </head>
   <body data-survey-page="true">
     <main class="survey-shell" aria-label="Hotel booking survey">
@@ -214,6 +214,7 @@
           const scenario = assignedScenario();
           return [
             { id: "student_id", type: "studentId" },
+            { id: "scenario_attributes_prior", type: "scenarioAttributes", scenario },
             { id: scenario.id, type: "scenario", scenario },
             { id: "browse_intro", type: "browseIntro" }
           ];
@@ -1215,6 +1216,21 @@
               </label>
               ${botTrapHtml("student_id", "wrong id")}
             `);
+          } else if (page.type === "scenarioAttributes") {
+            const previous = getState().answers[page.id];
+            setQuestionHtml(`
+              <section class="survey-scenario-summary survey-scenario-summary--elicitation">
+                <h1 class="survey-title">Your ${escapeHtml(page.scenario.title)}</h1>
+                <p class="survey-copy">${escapeHtml(page.scenario.description)}</p>
+              </section>
+              <div class="survey-field survey-attribute-elicitation">
+                <label for="answerInput" class="survey-copy">Before seeing your preference profile, please list all hotel attributes you would consider when choosing a hotel under the given scenario.</label>
+                <p id="attributeEntryHint" class="survey-copy">Separate them with commas.</p>
+                <textarea id="answerInput" name="scenario_attributes_prior" rows="5" required aria-describedby="attributeEntryHint">${escapeHtml(previous && previous.value || "")}</textarea>
+              </div>
+            `);
+            const input = document.getElementById("answerInput");
+            input.addEventListener("input", () => input.setCustomValidity(""));
           } else if (page.type === "scenario") {
             const scenario = page.scenario;
             setQuestionHtml(`
@@ -1288,6 +1304,11 @@
               detection.bot_detection_response = "wrong id (Student ID field)";
             }
             state.answers[page.id] = { value, ...detection, submitted_at: state.updated_at };
+          } else if (page.type === "scenarioAttributes") {
+            state.answers[page.id] = {
+              value: document.getElementById("answerInput").value.trim(),
+              submitted_at: state.updated_at
+            };
           } else if (page.type === "scenario") {
             state.answers[page.id] = {
               value: true,
@@ -1509,6 +1530,14 @@
           const index = currentIndex();
           const pageSet = activePages();
           const page = pageSet[index];
+          if (page.type === "scenarioAttributes") {
+            const input = document.getElementById("answerInput");
+            if (!input.value.trim()) {
+              input.setCustomValidity("Please list the hotel attributes you would consider.");
+              input.reportValidity();
+              return;
+            }
+          }
           if (page.type === "browseIntro") {
             goToHotelBrowsing(getState());
             return;

@@ -12,7 +12,7 @@
  * Deploy as a Web App (Execute as: Me, Who has access: Anyone).
  */
 
-const SCHEMA_VERSION = "22";
+const SCHEMA_VERSION = "23";
 const ASSIGNED_ATTRIBUTE_COUNT = 4;
 const WITHOUT_AI_SHEET = "Without_AI_Survey";
 const AI_SUMMARY_SHEET = "AI_Summary_Survey";
@@ -128,6 +128,7 @@ function buildSurveyHeaders_() {
       headers.push(matrixColumn_(stages[s], HOTELS[h].slug, 4, "likelihood"));
     }
   }
+  headers.push("scenario_attributes_prior");
   return headers;
 }
 
@@ -368,6 +369,8 @@ function applyAssignment_(record, assignment) {
 function applyAnswer_(record, questionId, answer, assignment) {
   if (questionId === "student_id" || questionId === "prolific_id") {
     record.student_id = textCell_(answer.value || record.student_id || "");
+  } else if (questionId === "scenario_attributes_prior") {
+    record.scenario_attributes_prior = textCell_(answer.value || "");
   } else if (/^(hotelq|postreview)_/.test(questionId)) {
     applyMatrixAnswer_(record, questionId, answer, assignment);
   } else if (questionId === "post_review_choice") {
