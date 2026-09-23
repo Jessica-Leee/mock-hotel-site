@@ -43,6 +43,8 @@
   var streamTimer = null;
   var streamSeq = 0;
   var streamFlushInFlight = false;
+  var streamFlushPromise = null;
+  var streamDeliveryError = "";
   var eventSeq = 0;
   var REVIEW_READ_MIN_MS = 750;
 
@@ -219,7 +221,7 @@
   }
 
   function persistStreamOutbox() {
-    var serialized = JSON.stringify(streamQueue.slice(-2000));
+    var serialized = JSON.stringify(streamQueue);
     var key = streamOutboxStorageKey();
     try {
       localStorage.setItem(key, serialized);
@@ -296,6 +298,13 @@
 
   function enqueueStream(entry) {
     if (!streamUrl) return;
+    // Only these events populate the analysis sheets. Raw UI telemetry remains local.
+    if (["popup_open", "popup_inventory"].indexOf(entry.event_type) < 0 &&
+        !(entry.event_type === "page_timing" && entry.value.context === "hotel_modal")) return;
+    entry.delivery_context = {
+      page_url: location.href, page_path: location.pathname,
+      phase: pagePhase(), cond: pageCondition(), prolific: prolificMeta()
+    };
     if (!streamQueue.some(function (queued) { return queued.event_id === entry.event_id; })) {
       streamQueue.push(entry);
       persistStreamOutbox();
@@ -315,10 +324,17 @@
   function flushStream(reason, preferBeacon) {
     if (!streamUrl) return;
     if (!streamQueue.length) return;
-    if (streamFlushInFlight) return;
+    if (streamFlushInFlight) return streamFlushPromise;
     streamFlushInFlight = true;
 
-    var batch = streamQueue.slice(0, Math.min(streamQueue.length, 400));
+    var context = streamQueue[0].delivery_context || {
+      page_url: location.href, page_path: location.pathname,
+      phase: pagePhase(), cond: pageCondition(), prolific: prolificMeta()
+    };
+    var contextKey = JSON.stringify(context);
+    var batch = streamQueue.filter(function (entry) {
+      return JSON.stringify(entry.delivery_context || context) === contextKey;
+    }).slice(0, 400);
     var body = {
       v: 1,
       kind: "event_batch",
@@ -326,62 +342,41 @@
       sent_at_ms: now(),
       seq_start: streamSeq,
       seq_end: streamSeq + batch.length - 1,
-      page_url: location.href,
-      page_path: location.pathname,
-      phase: pagePhase(),
-      cond: pageCondition(),
-      prolific: prolificMeta(),
+      page_url: context.page_url,
+      page_path: context.page_path,
+      phase: context.phase,
+      cond: context.cond,
+      prolific: context.prolific,
       events: batch
     };
     streamSeq += batch.length;
 
-    if (preferBeacon && navigator.sendBeacon) {
-      try {
-        var beaconBlob = new Blob([JSON.stringify(body)], { type: "text/plain;charset=utf-8" });
-        if (navigator.sendBeacon(streamUrl, beaconBlob)) removeStreamBatch(batch);
-      } catch (beaconError) {
-        /* keep the batch for the next page load */
-      } finally {
-        streamFlushInFlight = false;
-        if (streamQueue.length) scheduleStreamFlush();
-      }
-      return;
-    }
-
-    // Apps Script + cross-origin is often simplest with no-cors.
-    // We don't need to read the response; we just want the sheet to append.
-    try {
-      fetch(streamUrl, {
+    var serialized = JSON.stringify(body);
+    // Navigation may interrupt the response; unacknowledged events stay queued for the next page.
+    streamFlushPromise = Promise.resolve().then(function () {
+      return fetch(streamUrl, {
         method: "POST",
-        mode: "no-cors",
-        keepalive: true,
+        mode: "cors",
+        keepalive: new Blob([serialized]).size < 48000,
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(body)
-      }).then(function () {
-        removeStreamBatch(batch);
-      }).catch(function () {
-        /* keep the batch in the persistent outbox for retry */
-      }).finally(function () {
-        streamFlushInFlight = false;
-        if (streamQueue.length) scheduleStreamFlush();
+        body: serialized
       });
-      return;
-    } catch (e) {
-      /* fall through */
-    }
-
-    // Fallback: sendBeacon (best-effort)
-    try {
-      if (navigator.sendBeacon) {
-        var blob = new Blob([JSON.stringify(body)], { type: "text/plain;charset=utf-8" });
-        if (navigator.sendBeacon(streamUrl, blob)) removeStreamBatch(batch);
-      }
-    } catch (e2) {
-      /* ignore */
-    } finally {
+    }).then(function (response) {
+      if (!response.ok) throw new Error("Storage HTTP " + response.status);
+      return response.json();
+    }).then(function (receipt) {
+      if (receipt.ok !== true) throw new Error(receipt.error || "Storage was not confirmed.");
+      removeStreamBatch(batch);
+      streamDeliveryError = "";
+    }).catch(function (error) {
+      streamDeliveryError = String(error.message || error);
+    }).finally(function () {
       streamFlushInFlight = false;
+      streamFlushPromise = null;
       if (streamQueue.length) scheduleStreamFlush();
-    }
+      window.dispatchEvent(new Event("hotel-storage-status"));
+    });
+    return streamFlushPromise;
   }
 
   function log(event_type, element_id, value) {
@@ -1035,6 +1030,7 @@
       if (!entry.event_id) entry.event_id = createEventId();
     });
     persistStreamOutbox();
+    if (streamQueue.length) scheduleStreamFlush();
     log("session_start", location.pathname, { href: location.href });
 
     window.addEventListener(
@@ -1106,9 +1102,12 @@
     };
     window.HOTEL_EXPERIMENT_FLUSH = function () {
       persistSync();
-      flushStream("manual");
       flushBeacon();
       passPayloadToCompletionUrl();
+      return flushStream("manual");
+    };
+    window.HOTEL_EXPERIMENT_STORAGE_STATUS = function () {
+      return { pending: streamQueue.length, error: streamDeliveryError };
     };
     window.HOTEL_EXPERIMENT_LIVE_CHANNEL = LIVE_CHANNEL;
     window.HOTEL_EXPERIMENT_LIVE_STORAGE_KEY = LIVE_STORAGE_KEY;

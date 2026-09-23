@@ -23,7 +23,7 @@ async function check(version) {
     runScripts: 'dangerously', pretendToBeVisual: true, virtualConsole: vc,
     beforeParse(w) {
       w.scrollTo = () => {};
-      w.fetch = async () => ({ ok: true });
+      w.fetch = async () => ({ ok: true, json: async () => ({ ok: true, survey_row_updated: 1 }) });
       w.navigator.sendBeacon = () => true;
       w.IntersectionObserver = class { observe() {} unobserve() {} disconnect() {} };
     }
@@ -63,6 +63,7 @@ async function check(version) {
     assert.equal(record.scenario_attributes_prior, "'=SUM(A1:A2)");
     assert.deepEqual(errors, []);
   } finally {
+    await new Promise(resolve => setImmediate(resolve));
     dom.window.close();
   }
 }

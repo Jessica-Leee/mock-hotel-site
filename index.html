@@ -23,7 +23,7 @@
       </section>
     </main>
 
-    <script src="./assets/js/survey-tracking.js?v=20260922-3"></script>
+    <script src="./assets/js/survey-tracking.js?v=20260923-1"></script>
     <script src="./assets/js/shopper-profile.js?v=20260921-2"></script>
     <script>
       (function () {
@@ -59,6 +59,7 @@
         const ASSIGNED_ATTRIBUTE_COUNT = 4;
         let surveyOutboxFlushPromise = null;
         let surveyOutboxRetryTimer = null;
+        let surveyDeliveryError = "";
 
         const hotels = [
           { id: "arlo-chicago", name: "Hotel A", priceNightly: 143 },
@@ -543,7 +544,7 @@
         }
 
         function setSurveyOutbox(outbox) {
-          const serialized = JSON.stringify(outbox.slice(-500));
+          const serialized = JSON.stringify(outbox);
           try { localStorage.setItem(SURVEY_OUTBOX_STORAGE_KEY, serialized); }
           catch (_) { /* sessionStorage remains as a fallback */ }
           try { sessionStorage.setItem(SURVEY_OUTBOX_STORAGE_KEY, serialized); }
@@ -578,48 +579,41 @@
           const queued = getSurveyOutbox();
           if (!streamUrl || !queued.length) return Promise.resolve({ dispatched: 0, pending: queued.length });
 
-          if (preferBeacon && navigator.sendBeacon) {
-            const acceptedIds = [];
-            queued.slice(0, 40).forEach(item => {
-              try {
-                const payload = Object.assign({}, item.payload, { reason: reason || item.payload.reason });
-                const accepted = navigator.sendBeacon(
-                  streamUrl,
-                  new Blob([JSON.stringify(payload)], { type: "text/plain;charset=utf-8" })
-                );
-                if (accepted) acceptedIds.push(item.id);
-              } catch (_) {
-                /* keep the item for the next page load */
-              }
-            });
-            if (acceptedIds.length) removeSurveyOutboxItems(acceptedIds);
-            return Promise.resolve({ dispatched: acceptedIds.length, pending: getSurveyOutbox().length });
-          }
-
           if (surveyOutboxFlushPromise) return surveyOutboxFlushPromise;
           surveyOutboxFlushPromise = (async () => {
             let dispatched = 0;
-            const batch = getSurveyOutbox().slice(0, 40);
-            for (const item of batch) {
+            while (getSurveyOutbox().length) {
+              const batch = getSurveyOutbox().slice(0, 40);
+              const payload = Object.assign({}, batch[batch.length - 1].payload, {
+                reason: reason || "retry",
+                events: batch.flatMap(item => item.payload.events)
+              });
+              const body = JSON.stringify(payload);
               try {
-                const payload = Object.assign({}, item.payload, { reason: reason || item.payload.reason });
-                await fetch(streamUrl, {
+                const response = await fetch(streamUrl, {
                   method: "POST",
-                  mode: "no-cors",
-                  keepalive: true,
+                  mode: "cors",
+                  keepalive: new Blob([body]).size < 48000,
                   headers: { "Content-Type": "text/plain;charset=utf-8" },
-                  body: JSON.stringify(payload)
+                  body
                 });
-                removeSurveyOutboxItems([item.id]);
-                dispatched += 1;
-              } catch (_) {
-                const outbox = getSurveyOutbox();
-                const pending = outbox.find(candidate => candidate.id === item.id);
-                if (pending) {
-                  pending.attempts = Number(pending.attempts || 0) + 1;
-                  pending.last_attempt_at = Date.now();
-                  setSurveyOutbox(outbox);
+                if (!response.ok) throw new Error(`Storage HTTP ${response.status}`);
+                const receipt = await response.json();
+                if (receipt.ok !== true || receipt.survey_row_updated !== 1) {
+                  throw new Error(receipt.error || "The receiver did not confirm saving the answers.");
                 }
+                const snapshot = payload.events.find(event => event.event_type === "survey_completion_snapshot");
+                if (snapshot) {
+                  const state = getState();
+                  state.storage_confirmed_submission_id = snapshot.value.submission_id;
+                  state.storage_confirmed_at = new Date().toISOString();
+                  setState(state);
+                }
+                removeSurveyOutboxItems(batch.map(item => item.id));
+                surveyDeliveryError = "";
+                dispatched += batch.length;
+              } catch (error) {
+                surveyDeliveryError = String(error.message || error);
                 break;
               }
             }
@@ -627,6 +621,7 @@
           })().finally(() => {
             surveyOutboxFlushPromise = null;
             scheduleSurveyOutboxRetry();
+            updateCompletionDeliveryStatus();
           });
           return surveyOutboxFlushPromise;
         }
@@ -712,6 +707,10 @@
             existingEvents.push(entry);
             setSurveyEvents(existingEvents);
           }
+          entry.value.answers = state.answers || {};
+          entry.value.assignment = state.assignment || null;
+          entry.value.completed_at = state.completed_at;
+          setSurveyEvents(existingEvents);
           streamSurveyEvent(entry, state);
         }
 
@@ -1288,6 +1287,8 @@
           }
           const state = getState();
           const assignment = ensureRandomization();
+          delete state.storage_confirmed_submission_id;
+          delete state.storage_confirmed_at;
           state.student_id = state.student_id || state.prolific_id || studentId;
           state.updated_at = new Date().toISOString();
           state.assignment = assignment;
@@ -1460,18 +1461,50 @@
           document.getElementById("surveyQuestion").innerHTML = `
             <div class="survey-complete">
               <h1 class="survey-title">Website task complete</h1>
-              <p class="survey-copy">Your responses on this website have been saved.</p>
+              <p id="surveyStorageStatus" class="survey-copy" role="status">Saving your responses. Please keep this tab open.</p>
+              <button id="surveyStorageRetry" class="btn" type="button" hidden>Retry saving</button>
               <div class="survey-debrief" role="note">
                 <h2>Debriefing</h2>
                 <p>The product attributes and reviews shown in this study were hypothetical materials created for research purposes. They should not be interpreted as factual information about the hotels.</p>
               </div>
-              <div class="survey-complete__instruction" role="status">
+              <div id="surveyReturnInstruction" class="survey-complete__instruction" role="status" hidden>
                 <strong>Return to the Qualtrics survey</strong>
                 <p>Please return to the Qualtrics tab now to continue the study and submit your response.</p>
               </div>
             </div>
           `;
           document.getElementById("surveySubmit").hidden = true;
+          document.getElementById("surveyStorageRetry").addEventListener("click", syncCompletedSurvey);
+          updateCompletionDeliveryStatus();
+        }
+
+        function updateCompletionDeliveryStatus() {
+          const status = document.getElementById("surveyStorageStatus");
+          if (!status) return;
+          const state = getState();
+          const behavior = typeof window.HOTEL_EXPERIMENT_STORAGE_STATUS === "function"
+            ? window.HOTEL_EXPERIMENT_STORAGE_STATUS() : { pending: 0, error: "" };
+          const confirmed = state.storage_confirmed_submission_id === state.submission_id &&
+            !!state.storage_confirmed_at && !getSurveyOutbox().length && !behavior.pending;
+          const failed = !surveyStreamUrl() || !!surveyDeliveryError || !!behavior.error;
+          status.textContent = confirmed
+            ? "Your responses have been saved successfully."
+            : failed
+              ? "Your responses are saved on this device, but have not yet been confirmed by the server. Please keep this tab open. We will retry automatically."
+              : "Saving your responses. Please keep this tab open.";
+          document.getElementById("surveyReturnInstruction").hidden = !confirmed;
+          document.getElementById("surveyStorageRetry").hidden = confirmed || !failed;
+        }
+
+        function syncCompletedSurvey() {
+          const state = getState();
+          if (state.completion_status !== "complete") return;
+          if (state.storage_confirmed_submission_id !== state.submission_id || !state.storage_confirmed_at) {
+            logCompletionSnapshot(state);
+          }
+          flushSurveyOutbox("survey_complete");
+          if (typeof window.HOTEL_EXPERIMENT_FLUSH === "function") window.HOTEL_EXPERIMENT_FLUSH();
+          updateCompletionDeliveryStatus();
         }
 
         function finishPostReviewQuestionnaire(state) {
@@ -1486,6 +1519,7 @@
           flushSurveyOutbox("survey_complete");
           renderCompletionScreen();
           history.replaceState(null, "", location.pathname + (location.search || "") + "#complete");
+          syncCompletedSurvey();
         }
 
         document.addEventListener("click", function (event) {
@@ -1563,6 +1597,7 @@
         });
 
         window.addEventListener("online", () => flushSurveyOutbox("online"));
+        window.addEventListener("hotel-storage-status", updateCompletionDeliveryStatus);
         window.addEventListener("pagehide", () => flushSurveyOutbox("pagehide", true));
         document.addEventListener("visibilitychange", () => {
           if (document.visibilityState === "hidden") flushSurveyOutbox("hidden", true);
@@ -1577,7 +1612,9 @@
             completion_status: state.completion_status || "in_progress",
             saved_answer_count: Object.keys(state.answers || {}).length,
             saved_event_count: getSurveyEvents().length,
-            pending_delivery_count: getSurveyOutbox().length
+            pending_delivery_count: getSurveyOutbox().length,
+            server_confirmed_at: state.storage_confirmed_at || "",
+            delivery_error: surveyDeliveryError
           };
         };
 
@@ -1593,7 +1630,11 @@
         }
         ensureRandomization();
         flushSurveyOutbox("page_load");
-        if (postReviewMode && location.hash === "#complete") renderCompletionScreen();
+        if (postReviewMode && location.hash === "#complete") {
+          renderCompletionScreen();
+          // A previous version could discard a request without receiving a server acknowledgement.
+          window.addEventListener("DOMContentLoaded", syncCompletedSurvey, { once: true });
+        }
         else render();
       })();
     </script>
