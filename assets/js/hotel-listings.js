@@ -7,6 +7,7 @@
   const HOTEL_ORDER_STATE_KEY = "mock_hotel_visible_order_v1";
   const POPUP_TIME_STATE_KEY = "hotel_popup_time_45_v1";
   const POPUP_TIME_LIMIT_MS = 45000;
+  const POPUP_MINIMUM_MS = 10000;
 
   let activeHotelSession = null;
   let modalScrollCleanup = null;
@@ -2143,55 +2144,6 @@
     try { return JSON.parse(s); } catch (_) { return fallback; }
   }
 
-  function randomInteger(max) {
-    if (max <= 0) return 0;
-    try {
-      if (window.crypto && window.crypto.getRandomValues) {
-        const array = new Uint32Array(1);
-        window.crypto.getRandomValues(array);
-        return array[0] % max;
-      }
-    } catch (_) {
-      /* fall through to Math.random */
-    }
-    return Math.floor(Math.random() * max);
-  }
-
-  function shuffled(items) {
-    const copy = items.slice();
-    for (let i = copy.length - 1; i > 0; i -= 1) {
-      const j = randomInteger(i + 1);
-      const temp = copy[i];
-      copy[i] = copy[j];
-      copy[j] = temp;
-    }
-    return copy;
-  }
-
-  function stableShuffled(items, seedText) {
-    let seed = 2166136261;
-    const normalized = String(seedText || "");
-    for (let i = 0; i < normalized.length; i += 1) {
-      seed ^= normalized.charCodeAt(i);
-      seed = Math.imul(seed, 16777619);
-    }
-    const random = () => {
-      seed += 0x6D2B79F5;
-      let value = seed;
-      value = Math.imul(value ^ (value >>> 15), value | 1);
-      value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
-      return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
-    };
-    const copy = items.slice();
-    for (let i = copy.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(random() * (i + 1));
-      const temp = copy[i];
-      copy[i] = copy[j];
-      copy[j] = temp;
-    }
-    return copy;
-  }
-
   function participantStorageSuffix() {
     const params = new URLSearchParams(location.search || "");
     const identity = params.get("STUDENT_ID") || params.get("student_id") || params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") ||
@@ -2942,6 +2894,7 @@
   }
 
   function balancedReviews(hotel) {
+    // Shared, fixed ordering for every participant and both review conditions.
     const reviews = Array.isArray(hotel.reviews) ? hotel.reviews : [];
     const limit = balancedReviewCount();
     if (limit <= 0) return reviews;
@@ -3007,16 +2960,26 @@
   }
 
   function startPopupCountdown(hotelId) {
+    clearInterval(popupCountdownTimer);
     const usedMs = popupUsedMs(hotelId);
-    localStorage.setItem(popupTimeStorageKey(hotelId), JSON.stringify({ usedMs, startedAt: Date.now() }));
+    localStorage.setItem(popupTimeStorageKey(hotelId), JSON.stringify({ usedMs, startedAt: document.hidden ? null : Date.now() }));
     const update = () => {
       if (!activeHotelSession || activeHotelSession.hotelId !== hotelId) return;
       const remaining = POPUP_TIME_LIMIT_MS - popupUsedMs(hotelId);
+      const minimumRemaining = Math.max(0, POPUP_MINIMUM_MS - popupUsedMs(hotelId));
       const timer = document.querySelector("[data-popup-countdown]");
       if (timer) {
         timer.querySelector("[data-countdown-value]").textContent = formatCountdown(remaining);
         timer.classList.toggle("is-urgent", remaining <= 10000);
+        timer.classList.toggle("is-locked", minimumRemaining > 0);
+        timer.querySelector("[data-minimum-countdown]").textContent = minimumRemaining > 0
+          ? `You can close this popup in ${Math.ceil(minimumRemaining / 1000)} seconds.`
+          : "Minimum viewing time met. You can close this popup.";
       }
+      document.querySelectorAll("#modalRoot button[data-close='1']").forEach(button => {
+        button.disabled = minimumRemaining > 0;
+        button.setAttribute("aria-label", minimumRemaining > 0 ? "Close (available after 10 seconds of viewing)" : "Close");
+      });
       if (remaining <= 0) closeModal("popup_time_limit");
     };
     popupCountdownTimer = window.setInterval(update, 200);
@@ -3024,7 +2987,15 @@
   }
 
   function popupCountdownHtml() {
-    return `<div class="browse-countdown popup-countdown" data-popup-countdown role="timer"><span>Time remaining for this hotel</span><strong data-countdown-value>0:45</strong></div>`;
+    return `<div class="browse-countdown popup-countdown" data-popup-countdown>
+      <div class="popup-countdown__instructions">
+        <span>View each hotel for at least 10 seconds. Maximum: 45 seconds total.</span>
+        <span class="popup-countdown__minimum" data-minimum-countdown></span>
+      </div>
+      <div class="popup-countdown__remaining" role="timer" aria-label="Viewing time remaining">
+        <span>Time remaining</span><strong data-countdown-value>0:45</strong>
+      </div>
+    </div>`;
   }
 
   function renderStudyFlowCta() {
@@ -3058,7 +3029,7 @@
       ` : `
         <div>
           <strong>Post-review questions locked:</strong>
-          Open the ${state.showAiSummary ? "reviews and AI summary" : "reviews"} for both hotels before continuing.
+          Open the ${state.showAiSummary ? "reviews and AI summary" : "reviews"} for both hotels and view each for at least 10 seconds before continuing.
           <div class="study-flow__note">Completed ${formatCount(viewedCount)} of ${formatCount(required.length)} ${popupLabel}.</div>
         </div>
         <button class="btn study-flow__btn" type="button" disabled>Continue to post-review questions</button>
@@ -3078,7 +3049,7 @@
       ` : `
         <div>
           <strong>Hotel questions locked:</strong>
-          Open each hotel detail popup before continuing.
+          Open each hotel detail popup and view it for at least 10 seconds before continuing.
           <div class="study-flow__note">Completed ${formatCount(viewedCount)} of ${formatCount(required.length)} hotel popups.</div>
         </div>
         <button class="btn study-flow__btn" type="button" disabled>Continue to hotel questions</button>
@@ -3536,7 +3507,10 @@
 
     const page = pageState();
 
-    if (activeHotelSession) closeModal("hotel_switch");
+    if (activeHotelSession && !closeModal("hotel_switch")) {
+      location.hash = "#hotel/" + activeHotelSession.hotelId;
+      return;
+    }
 
     activeHotelSession = { hotelId, startedAt: Date.now(), maxScrollDepth: 0 };
 
@@ -3634,7 +3608,8 @@
 
   function closeModal(source) {
     const root = document.getElementById("modalRoot");
-    if (!root.classList.contains("is-open")) return;
+    if (!root.classList.contains("is-open")) return true;
+    if (activeHotelSession && popupUsedMs(activeHotelSession.hotelId) < POPUP_MINIMUM_MS) return false;
     stopPopupCountdown();
     if (typeof window.HOTEL_EXPERIMENT_FINALIZE_MODAL === "function") window.HOTEL_EXPERIMENT_FINALIZE_MODAL(source);
     const profileClose = document.querySelector("#shopperProfileModalRoot.is-open [data-close-shopper-profile]");
@@ -3675,6 +3650,7 @@
     if ((location.hash || "").startsWith("#hotel/") || (location.hash || "").startsWith("#map/")) location.hash = "#results";
     logEvent("close_modal", { source });
     if (shouldRenderAfterClose) renderResults();
+    return true;
   }
 
   function wireGlobalHandlers() {
@@ -3720,6 +3696,7 @@
 
       const flowContinue = e.target && e.target.closest && e.target.closest("[data-flow-continue]");
       if (flowContinue) {
+        if (activeHotelSession) return;
         const href = flowContinue.getAttribute("data-flow-continue");
         logEvent("study_flow_continue", { href, phase: pageState().phase });
         location.replace(href);
@@ -3784,6 +3761,10 @@
 
   window.addEventListener("pagehide", () => {
     stopPopupCountdown();
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stopPopupCountdown();
+    else if (activeHotelSession) startPopupCountdown(activeHotelSession.hotelId);
   });
   window.addEventListener("pageshow", event => {
     if (event.persisted && activeHotelSession) startPopupCountdown(activeHotelSession.hotelId);

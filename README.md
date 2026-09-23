@@ -44,7 +44,19 @@ For paired data, open both versions with the same `STUDENT_ID` value. The two pa
 └── backend/google-sheets-receiver.gs # Google Apps Script receiver and Sheet schema
 ```
 
-The current experiment contains Hotel A (formerly Arlo) and Hotel B (formerly Nobu), each with 150 reviews. Pendry and the unused hotel datasets have been removed from the website. Each hotel popup has a cumulative 45-second budget per participant, condition, browsing run, and stage. Closing pauses the budget; reopening resumes it. Expiry closes and locks that popup. There is no listing-page countdown or automatic jump to the questionnaire. Participants can continue once both hotel popups have been opened and closed.
+The current experiment contains Hotel A (formerly Arlo) and Hotel B (formerly Nobu), each with 150 reviews in the same fixed order for every participant and both review conditions. Pendry and the unused hotel datasets have been removed from the website. Each hotel popup requires at least 10 cumulative seconds of viewing and has a cumulative 45-second budget per participant, condition, browsing run, and stage. Until the minimum is met, the close button, Escape, backdrop clicks, and switching hotels cannot close the popup. Both limits are displayed in the popup. Closing or hiding the browser tab pauses the budget; reopening or returning resumes it. Reopening after meeting the minimum does not impose another 10-second wait. Expiry closes and locks that popup. There is no listing-page countdown or automatic jump to the questionnaire. Participants can continue once both hotel popups have been viewed for at least 10 seconds and closed.
+
+Student ID is optional: participants may leave it blank and select Next. Answers still carry a generated `survey_user_id`, which the existing receiver accepts without a Student ID. Anonymous pairing depends on retaining browser storage on the same origin; without a Student ID, cross-browser or cross-device matching is not guaranteed. No Sheet schema change is required for these optional-ID and timing changes.
+
+### Popup regression test
+
+Run from the repository root with `jsdom` and `@sinonjs/fake-timers` available to Node (they may be installed in an external temporary directory and exposed using `NODE_PATH`):
+
+```sh
+node tests/popup-behavior.test.cjs
+```
+
+The test uses simulated time and no network requests to cover all three browsing pages, minimum-time close guards, background pauses, cumulative reopening, the maximum limit, reload persistence, the continue gate, and fixed review ordering across participants and conditions.
 
 Schema 22 preserves the existing Sheet headers and historical rows, appending five columns to each survey sheet: `assigned_attribute_4_id` and the fourth pre-review and post-review likelihood answer for Hotel A and Hotel B. Existing three-attribute responses remain unchanged, with the new columns blank. The six legacy Pendry answer columns remain for compatibility but receive no new answers. Internal hotel IDs remain `arlo-chicago` (Hotel A) and `nobu-hotel-chicago` (Hotel B), so historical data still joins correctly. Do not reset the sheets for this update. Replace the Apps Script code and deploy a new version of the existing Web App before collecting four-attribute responses; the older receiver does not store the fourth attribute response for either hotel. The Student ID page includes a visually hidden optional honeypot expecting `wrong id`; filling it or entering that phrase as the Student ID sets the existing bot-detection fields. This is a signal for review, not proof of automated participation.
 
