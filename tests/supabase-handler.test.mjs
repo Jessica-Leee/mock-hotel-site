@@ -202,8 +202,27 @@ test("browsing events survive a refresh and repeated delivery does not double co
     const reviewBatch = await call({ kind: "event_batch", page_path: "/search-reviews",
       events: [reviewEvent] }, cookie);
     assert.equal(reviewBatch.response.status, 200);
-    assert.equal(database.tables.browsing_records.find(row =>
-      row.browsing_stage === "reviews" && row.hotel_id === hotelIds[0]).metrics.review_read_count, 2);
+    const newerReviewEvent = {
+      event_id: `behavior_${crypto.randomUUID()}`, event_type: "page_timing",
+      element_id: hotelIds[0], timestamp: openedAt + 50000,
+      value: { context: "hotel_modal", duration_ms: 10000,
+        review_stopping_position: 20, review_read_order: [20] }
+    };
+    const delayedOlderReviewEvent = {
+      event_id: `behavior_${crypto.randomUUID()}`, event_type: "page_timing",
+      element_id: hotelIds[0], timestamp: openedAt + 40000,
+      value: { context: "hotel_modal", duration_ms: 10000,
+        review_stopping_position: 2, review_read_order: [2] }
+    };
+    assert.equal((await call({ kind: "event_batch", page_path: "/search-reviews",
+      events: [newerReviewEvent] }, cookie)).response.status, 200);
+    assert.equal((await call({ kind: "event_batch", page_path: "/search-reviews",
+      events: [delayedOlderReviewEvent] }, cookie)).response.status, 200);
+    const reviewRecord = database.tables.browsing_records.find(row =>
+      row.browsing_stage === "reviews" && row.hotel_id === hotelIds[0]);
+    assert.equal(reviewRecord.metrics.review_read_count, 2);
+    assert.equal(reviewRecord.metrics.review_stopping_position, 20);
+    assert.deepEqual(reviewRecord.metrics.review_reading_order, [2, 20]);
   } finally {
     globalThis.fetch = originalFetch;
   }

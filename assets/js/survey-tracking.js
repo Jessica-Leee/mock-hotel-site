@@ -143,7 +143,24 @@
     } catch (e) {
       /* fall through */
     }
-    return "behavior_" + pageLoadTs + "_" + eventSeq + "_" + Math.random().toString(36).slice(2, 10);
+    // Keep the fallback compatible with the API's UUID-backed visit IDs.
+    var bytes = new Uint8Array(16);
+    try {
+      if (window.crypto && typeof window.crypto.getRandomValues === "function") {
+        window.crypto.getRandomValues(bytes);
+      } else {
+        for (var i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+      }
+    } catch (e2) {
+      for (var j = 0; j < bytes.length; j++) bytes[j] = Math.floor(Math.random() * 256);
+    }
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    var hex = Array.prototype.map.call(bytes, function (value) {
+      return value.toString(16).padStart(2, "0");
+    }).join("");
+    return "behavior_" + hex.slice(0, 8) + "-" + hex.slice(8, 12) + "-" +
+      hex.slice(12, 16) + "-" + hex.slice(16, 20) + "-" + hex.slice(20);
   }
 
   function createSurveyUserId() {
@@ -204,12 +221,19 @@
   }
 
   function loadStreamOutbox() {
+    var key = streamOutboxStorageKey();
+    var stored = null;
+    try { stored = localStorage.getItem(key); }
+    catch (e) { /* sessionStorage remains available in some privacy modes */ }
+    if (stored === null) {
+      try { stored = sessionStorage.getItem(key); }
+      catch (e2) { /* fall back to the in-memory queue */ }
+    }
+    if (!stored) return streamQueue.slice();
     try {
-      var key = streamOutboxStorageKey();
-      var stored = localStorage.getItem(key) || sessionStorage.getItem(key);
-      var parsed = stored ? JSON.parse(stored) : streamQueue.slice();
+      var parsed = JSON.parse(stored);
       return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
+    } catch (e3) {
       return streamQueue.slice();
     }
   }

@@ -296,7 +296,12 @@ async function save(context, payload, participantId) {
 }
 
 function aggregateVisits(visits) {
-  const all = Object.values(visits);
+  const all = Object.values(visits).sort((left, right) => {
+    const leftClosedAt = Number(left && left.closed_at) || 0;
+    const rightClosedAt = Number(right && right.closed_at) || 0;
+    if (leftClosedAt !== rightClosedAt) return leftClosedAt - rightClosedAt;
+    return String(left && left.visit_id || "").localeCompare(String(right && right.visit_id || ""));
+  });
   const sum = name => all.reduce((total, visit) => total + (Number(visit.metrics[name]) || 0), 0);
   return {
     popup_open_count: all.length,

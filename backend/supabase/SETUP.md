@@ -65,9 +65,9 @@ uses a small browser-local retry queue until the server confirms receipt.
 Existing browser-local popup timers and the fixed hotel order remain part of
 the interface.
 
-The old Apps Script and spreadsheet remain untouched as historical data. The
-new pages do not stream to them. Do not delete those resources to activate the
-new database.
+The old Apps Script deployment and spreadsheet may remain available as
+historical data, but the current pages do not stream to them. The legacy
+receiver source is intentionally no longer part of this application.
 
 ## Verification before pilot use
 

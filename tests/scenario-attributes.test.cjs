@@ -1,17 +1,11 @@
 // Requires jsdom; run from the repository root. All delivery calls are mocked.
 const fs = require('node:fs');
-const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const { JSDOM, VirtualConsole } = require('jsdom');
-const receiver = vm.createContext({});
-vm.runInContext(fs.readFileSync('backend/google-sheets-receiver.gs', 'utf8'), receiver);
-const headers = vm.runInContext('SURVEY_HEADERS', receiver);
-assert.equal(headers.length, 67);
-assert.equal(headers[54], 'scenario_attributes_prior');
-assert.equal(vm.runInContext('BROWSING_HEADERS.length', receiver), 35);
 
 async function check(version) {
   const errors = [];
+  let serverSurvey = null;
   const vc = new VirtualConsole();
   vc.on('jsdomError', error => errors.push(error.message));
   const html = fs.readFileSync('index.html', 'utf8').replace(
@@ -23,44 +17,65 @@ async function check(version) {
     runScripts: 'dangerously', pretendToBeVisual: true, virtualConsole: vc,
     beforeParse(w) {
       w.scrollTo = () => {};
-      w.fetch = async () => ({ ok: true, json: async () => ({ ok: true, survey_row_updated: 1 }) });
+      w.fetch = async (url, options = {}) => {
+        if (!options.body) {
+          return { ok: true, status: 200, json: async () => ({ ok: true, survey: serverSurvey, browsing: [] }) };
+        }
+        const payload = JSON.parse(options.body);
+        if (payload.action === 'start') {
+          serverSurvey = {
+            participant_id: '00000000-0000-4000-8000-000000000001',
+            student_id: payload.student_id,
+            condition: payload.condition,
+            survey_version: payload.condition === 'ai_summary' ? '3' : '2',
+            assigned_attributes: ['location_convenience', 'fitness_facilities', 'cleanliness', 'wifi_reliability'],
+            answers: { student_id: payload.answer }, current_page: 'scenario_attributes_prior',
+            completion_status: 'in_progress', completed_pages: ['student_id']
+          };
+        } else if (payload.action === 'save') {
+          serverSurvey = {
+            ...serverSurvey,
+            answers: { ...serverSurvey.answers, ...payload.answers },
+            current_page: payload.next_page,
+            completed_pages: [...new Set([...(serverSurvey.completed_pages || []), payload.page_id])]
+          };
+        }
+        return { ok: true, status: 200, json: async () => ({ ok: true, survey: serverSurvey }) };
+      };
       w.navigator.sendBeacon = () => true;
       w.IntersectionObserver = class { observe() {} unobserve() {} disconnect() {} };
     }
   });
   try {
-    await new Promise(resolve => setImmediate(resolve));
+    const tick = () => new Promise(resolve => setImmediate(resolve));
+    await tick(); await tick();
     const w = dom.window, d = w.document;
-    const next = () => d.getElementById('surveySubmit').click();
-    assert.equal(d.getElementById('answerInput').required, false);
-    next();
+    const next = async () => { d.getElementById('surveySubmit').click(); await tick(); await tick(); };
+    assert.equal(d.getElementById('answerInput').required, true);
+    await next();
+    assert.equal(w.location.hash, '#q1');
+    d.getElementById('answerInput').value = 'student-7';
+    await next();
     assert.equal(w.location.hash, '#q2');
     assert.equal(d.querySelector('h1').textContent, 'Your Trip Scenario: Solo City Exploration');
     assert.match(d.querySelector('.survey-scenario-summary').textContent, /Duration: 3 nights. Budget: up to \$150\/night/);
     assert.equal(d.querySelector('.survey-profile'), null);
     assert.equal(d.querySelector('[data-view-shopper-profile]'), null);
     assert.equal(d.querySelector('textarea').required, true);
-    next();
+    await next();
     assert.equal(w.location.hash, '#q2');
     const input = d.querySelector('textarea');
     input.value = '  ';
-    next();
+    await next();
     assert.equal(w.location.hash, '#q2');
     const answer = 'Quiet room, walkable location, gym, breakfast';
     input.value = answer;
     input.dispatchEvent(new w.Event('input'));
-    next();
+    await next();
     assert.equal(w.location.hash, '#q3');
     assert.ok(d.querySelector('.survey-profile'));
-    const condition = version === 3 ? 'ai_summary' : 'full_reviews';
-    const saved = JSON.parse(w.localStorage.getItem(`mock_hotel_survey_v1:anonymous:${condition}`));
-    assert.equal(saved.answers.scenario_attributes_prior.value, answer);
-    assert.ok(saved.survey_user_id);
-    const record = {};
-    receiver.applyAnswer_(record, 'scenario_attributes_prior', saved.answers.scenario_attributes_prior, saved.assignment);
-    assert.equal(record.scenario_attributes_prior, answer);
-    receiver.applyAnswer_(record, 'scenario_attributes_prior', { value: '=SUM(A1:A2)' }, {});
-    assert.equal(record.scenario_attributes_prior, "'=SUM(A1:A2)");
+    assert.equal(serverSurvey.answers.scenario_attributes_prior.value, answer);
+    assert.equal(serverSurvey.student_id, 'STUDENT-7');
     assert.deepEqual(errors, []);
   } finally {
     await new Promise(resolve => setImmediate(resolve));
@@ -70,5 +85,5 @@ async function check(version) {
 (async () => {
   await check(2);
   await check(3);
-  console.log('PASS: both conditions; optional ID -> scenario/open response -> profile; no early profile; required nonblank text; saved answer; receiver mapping; formula escaping. No network writes.');
+  console.log('PASS: both conditions; required ID -> scenario/open response -> profile; no early profile; required nonblank text; confirmed server answer. No network writes.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
