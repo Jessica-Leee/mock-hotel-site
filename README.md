@@ -6,6 +6,17 @@
 
 Hosted on Cloudflare Pages from the `main` branch of `Jessica-Leee/mock-hotel-site`. Automatic deployments are enabled. The previous GitHub Pages site at https://jessica-leee.github.io/mock-hotel-site/ remains available.
 
+## Supabase migration
+
+This repository includes a Cloudflare Pages Function and a two-table Supabase
+storage path. The Cloudflare deployment and a completed test submission must
+be verified before participants use it. See
+[`backend/supabase/SETUP.md`](backend/supabase/SETUP.md) for the schema, server
+bindings, save behavior, and pilot verification steps. The Google Sheets
+instructions below describe the older deployment and its historical data.
+The old GitHub Pages hostname cannot run the Pages Function and must not be used
+for new survey submissions.
+
 ## Study URLs
 
 - **Survey (entry):** https://chicago-hotel-survey.pages.dev/
@@ -14,17 +25,17 @@ Hosted on Cloudflare Pages from the `main` branch of `Jessica-Leee/mock-hotel-si
 - **Search with reviews:** https://chicago-hotel-survey.pages.dev/search-reviews.html?survey_stage=search_2
 - **Search with AI summaries:** https://chicago-hotel-survey.pages.dev/search-ai-summaries.html?survey_stage=search_3
 
-`index.html` is the full-review survey entry page. `survey-summaries.html` starts the parallel summary survey using the existing numeric `study_version=3` parameter. The old `survey-ai-summaries.html` entry redirects to it, preserving incoming parameters. Internal condition identifiers and Google Sheets destinations remain unchanged. Participants can complete both versions in sequence. Hotel details are text-only; hotel photos and galleries are not rendered.
+`index.html` is the full-review survey entry page. `survey-summaries.html` starts the summary condition using `study_version=3`. The old `survey-ai-summaries.html` entry redirects to it. In the new database design, each Student ID completes one condition. Hotel details are text-only; hotel photos and galleries are not rendered.
 
 ## Cloudflare Pages deployment
 
 The shared hostname is `chicago-hotel-survey.pages.dev`, deployed and checked on September 21, 2026. The standard survey uses `/`, and Survey Summaries uses `/survey-summaries.html` (Cloudflare canonicalizes this to `/survey-summaries` before the entry redirects into the shared questionnaire with `study_version=3`). Both entries rendered the Student ID question successfully, and all three search pages and shared CSS/JS returned HTTP 200 and matched the repository source. This deployment check did not submit questionnaire answers or verify a new row in Google Sheets.
 
-The existing `Jessica-Leee/mock-hotel-site` GitHub repository is connected through Pages. Configuration: project name `chicago-hotel-survey`, production branch `main`, framework preset `None`, build command `exit 0`, and build output directory `.`. The root directory is the repository root. No environment variables or new Apps Script deployment are needed for this entry-point change.
+The existing `Jessica-Leee/mock-hotel-site` GitHub repository is connected through Pages. Configuration: project name `chicago-hotel-survey`, production branch `main`, framework preset `None`, build command `exit 0`, and build output directory `.`. The Supabase Pages Function requires `SUPABASE_URL` and encrypted `SUPABASE_SECRET_KEY` bindings before deployment.
 
-Keep both versions on this same origin. Browser-local survey progress and retry queues from GitHub Pages do not transfer to a new domain, so participants should finish an in-progress survey on its original domain. Matching Student IDs continue to provide paired backend identities; the Sheet schema and receiver URL have not changed. Before distributing the new URLs, verify both entries, their browsing pages, and delivery to the existing Sheet on the deployed hostname.
+Keep both versions on this same origin. The September 21 deployment used browser-local retry queues and the existing Sheet receiver; participants who started that version should finish on its original domain. Before distributing the Supabase version, verify both entries, their browsing pages, and the database rows created by a complete test run.
 
-For paired data, open both versions with the same `STUDENT_ID` value. The two pages share one Cloudflare Pages origin, so the hidden random `survey_user_id` is reused for the same participant. Legacy `PROLIFIC_PID` links remain accepted, while `STUDY_ID`, `SESSION_ID`, and `submission_id` are not written to the analysis sheets.
+The new Supabase tables use a required Student ID and an internal participant UUID. The same Student ID cannot start a second condition. Historical Google Sheets records remain separate from the new database.
 
 ## Project structure
 
@@ -41,12 +52,19 @@ For paired data, open both versions with the same `STUDENT_ID` value. The two pa
 │   └── js/
 │       ├── hotel-listings.js          # Hotel data, exact reviews, summaries, and modal behavior
 │       └── survey-tracking.js         # Behavioral event capture and delivery
-└── backend/google-sheets-receiver.gs # Google Apps Script receiver and Sheet schema
+├── functions/api/survey.js            # Cloudflare Pages storage API
+├── backend/supabase/                  # Schema, server handler, setup notes
+└── backend/google-sheets-receiver.gs  # Legacy Google Sheets receiver
 ```
 
 The current experiment contains Hotel A (formerly Arlo) and Hotel B (formerly Nobu), each with 150 reviews in the same fixed order for every participant and both review conditions. Pendry and the unused hotel datasets have been removed from the website. Each hotel popup requires at least 10 cumulative seconds of viewing and has a cumulative 45-second budget per participant, condition, browsing run, and stage. Until the minimum is met, the close button, Escape, backdrop clicks, and switching hotels cannot close the popup. Both limits are displayed in the popup. Closing or hiding the browser tab pauses the budget; reopening or returning resumes it. Reopening after meeting the minimum does not impose another 10-second wait. Expiry closes and locks that popup. There is no listing-page countdown or automatic jump to the questionnaire. Participants can continue once both hotel popups have been viewed for at least 10 seconds and closed.
 
-Student ID is optional: participants may leave it blank and select Next. Answers still carry a generated `survey_user_id`, which the existing receiver accepts without a Student ID. Anonymous pairing depends on retaining browser storage on the same origin; without a Student ID, cross-browser or cross-device matching is not guaranteed. No Sheet schema change is required for these optional-ID and timing changes.
+## Historical Google Sheets notes
+
+The following sections document the earlier Apps Script deployment. They are
+not instructions for the new Supabase flow.
+
+Student ID was optional in that deployment: participants could leave it blank and select Next. Answers still carried a generated `survey_user_id`, which the existing receiver accepted without a Student ID. Anonymous pairing depended on retaining browser storage on the same origin.
 
 The opening flow is Student ID (optional) -> trip scenario and a free-text attribute question -> Attribute Preference Profile -> browsing introduction. The new question asks, before showing the profile: "Before seeing your preference profile, please list all hotel attributes you would consider when choosing a hotel under the given scenario." Participants enter their attributes separated by commas; a nonblank response is required. No attribute examples or profile popup are shown on that page. The original response is stored as `scenario_attributes_prior` in both survey sheets.
 
@@ -77,16 +95,32 @@ Run from the repository root with `jsdom` and `@sinonjs/fake-timers` available t
 node tests/popup-behavior.test.cjs
 node tests/scenario-attributes.test.cjs
 node tests/popup-stages.test.cjs
+node tests/storage-delivery.test.cjs
+node --test tests/tracking-reliability.test.cjs
 ```
 
 The popup test uses simulated time and no network requests to cover all three browsing pages, minimum-time close guards, background pauses, cumulative reopening, the maximum limit, reload persistence, the continue gate, and fixed review ordering across participants and conditions. The scenario test mocks all delivery calls and checks both entry conditions, optional Student ID, the new question appearing before the profile, nonblank answer validation, and the receiver's new column mapping.
+
+### Tracking reliability update (September 23, 2026)
+
+The tracking retry queue now preserves events added by a later page while an earlier request is still in flight. Requests time out after 45 seconds instead of blocking the queue indefinitely, and failed requests retry with increasing delays and jitter. Large event batches are split to keep normal requests below the keepalive payload budget. A closed tab cannot keep scheduling retries; participants should wait for "Your responses have been saved successfully." before leaving.
+
+The updated receiver returns `tracking_event_ids` only for recognized, persisted tracking events. The browser retains unconfirmed events, and repeated delivery of acknowledged event IDs does not add visits or popup opens again. Older receivers remain accepted for compatibility, but only the updated receiver provides event-level confirmation. Direct browsing URLs without `survey_stage` are recognized from their page paths. Unknown stages are not guessed. A delayed older visit no longer replaces the last visit's exit reason or review stopping position.
+
+New hotel viewing and review/summary visibility durations exclude time while the document is hidden. The original opening timestamp is sent separately so `first_opened_at` and `last_opened_at` are not shifted by a background pause. Historical durations are not recalculated. Review "read" counts remain visibility-based estimates (at least 50% visible for 750 cumulative milliseconds), not proof that a person read or understood the text.
+
+The receiver no longer repeats header formatting and existing-row formatting on every request. It flushes writes before confirming receipt and releasing the existing script lock. All column names, positions, participant matching, and the three existing sheet names remain unchanged (schema 24: 67 columns per survey sheet, 35 browsing columns).
+
+Deploy the updated `backend/google-sheets-receiver.gs` first: save it in the existing Apps Script project, then choose **Deploy -> Manage deployments -> Edit -> New version -> Deploy**. Keep the same Web App URL and spreadsheet. Do **not** run `resetHotelSurveySheets`, clear rows, or create replacement tabs. Open the existing `/exec` URL with `?health=1`; the new read-only health check must return `tracking_receipts_version: 1` and `schema_version: "24"`. Then publish the website changes. Git commits and website deployments do not update Apps Script automatically.
+
+The reliability tests use mocked HTTP and an in-memory spreadsheet, including both conditions, real listing markup, cross-page queue changes, partial acknowledgements, offline reloads, hanging requests, large batches, duplicate/reordered visits, hidden-tab pauses, and preservation of existing answers and header positions. They never send test records to the live spreadsheet. These tests do not prove why a particular historical event is absent or recover events whose original browser data no longer exists.
 
 The earlier schema 22 migration appended five columns to each survey sheet: `assigned_attribute_4_id` and the fourth pre-review and post-review likelihood answer for Hotel A and Hotel B. Schema 23 retains those fields. Existing three-attribute responses remain unchanged, with the new columns blank. The six legacy Pendry answer columns remain for compatibility but receive no new answers. Internal hotel IDs remain `arlo-chicago` (Hotel A) and `nobu-hotel-chicago` (Hotel B), so historical data still joins correctly. Do not reset the sheets for this update. The Student ID page includes a visually hidden optional honeypot expecting `wrong id`; filling it or entering that phrase as the Student ID sets the existing bot-detection fields. This is a signal for review, not proof of automated participation.
 
 ## Ensure multiple participants are recorded
 
 Every participant’s browser sends events to a server endpoint (Google Apps Script Web App).
-Because each participant makes their own HTTP requests, **multiple simultaneous users are fine**.
+Requests from multiple participants are serialized by the receiver's script lock. Heavy concurrent traffic can cause timeouts; browsers retain unconfirmed events and retry. Check delivery acknowledgements and load-test with separate test data before increasing the participant count.
 
 ## Stream events to Google Sheets (real-time)
 

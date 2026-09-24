@@ -2,7 +2,7 @@
  * Invisible behavioral tracking for hotel listing experiment.
  *
  * Each event: { event_type, element_id, timestamp, value }
- * All events are stored in a JSON array (in memory + sessionStorage payload.events).
+ * Browsing events are mirrored locally until the same-origin API confirms receipt.
  *
  * Student / survey handoff:
  *   1) URL query: ?STUDENT_ID=… (legacy Prolific parameters remain accepted).
@@ -45,6 +45,7 @@
   var streamFlushInFlight = false;
   var streamFlushPromise = null;
   var streamDeliveryError = "";
+  var streamRetryCount = 0;
   var eventSeq = 0;
   var REVIEW_READ_MIN_MS = 750;
 
@@ -130,14 +131,7 @@
   }
 
   function getStreamUrl() {
-    var m = getMeta("tracking-stream-url");
-    if (m) return m;
-    try {
-      var p = new URLSearchParams(location.search);
-      return p.get("stream") || "";
-    } catch (e) {
-      return "";
-    }
+    return "./api/survey";
   }
 
   function createEventId() {
@@ -213,14 +207,22 @@
     try {
       var key = streamOutboxStorageKey();
       var stored = localStorage.getItem(key) || sessionStorage.getItem(key);
-      var parsed = stored ? JSON.parse(stored) : [];
+      var parsed = stored ? JSON.parse(stored) : streamQueue.slice();
       return Array.isArray(parsed) ? parsed : [];
     } catch (e) {
-      return [];
+      return streamQueue.slice();
     }
   }
 
-  function persistStreamOutbox() {
+  function persistStreamOutbox(addedEntries, acknowledgedIds) {
+    // Another page may have queued events while this page was waiting for a receipt.
+    var acknowledged = new Set(acknowledgedIds || []);
+    var seen = new Set();
+    streamQueue = loadStreamOutbox().concat(addedEntries || []).filter(function (entry) {
+      if (acknowledged.has(entry.event_id) || seen.has(entry.event_id)) return false;
+      seen.add(entry.event_id);
+      return true;
+    });
     var serialized = JSON.stringify(streamQueue);
     var key = streamOutboxStorageKey();
     try {
@@ -236,9 +238,7 @@
   }
 
   function removeStreamBatch(batch) {
-    var ids = new Set(batch.map(function (entry) { return entry.event_id; }));
-    streamQueue = streamQueue.filter(function (entry) { return !ids.has(entry.event_id); });
-    persistStreamOutbox();
+    persistStreamOutbox([], batch.map(function (entry) { return entry.event_id; }));
   }
 
   function initLiveRelay() {
@@ -298,16 +298,21 @@
 
   function enqueueStream(entry) {
     if (!streamUrl) return;
-    // Only these events populate the analysis sheets. Raw UI telemetry remains local.
+    // Only these events are sent to the survey database. Other UI telemetry remains local.
     if (["popup_open", "popup_inventory"].indexOf(entry.event_type) < 0 &&
         !(entry.event_type === "page_timing" && entry.value.context === "hotel_modal")) return;
+    var pageUrl = new URL(location.href);
+    var path = location.pathname.toLowerCase().replace(/\.html$/, "");
+    var browsingStage = /\/search-no-reviews$/.test(path) ? "search_1"
+      : /\/search-ai-summaries$/.test(path) ? "search_3"
+        : /\/search-reviews$/.test(path) ? "search_2" : "";
+    if (browsingStage) pageUrl.searchParams.set("survey_stage", browsingStage);
     entry.delivery_context = {
-      page_url: location.href, page_path: location.pathname,
+      page_url: pageUrl.href, page_path: location.pathname,
       phase: pagePhase(), cond: pageCondition(), prolific: prolificMeta()
     };
     if (!streamQueue.some(function (queued) { return queued.event_id === entry.event_id; })) {
-      streamQueue.push(entry);
-      persistStreamOutbox();
+      persistStreamOutbox([entry]);
     }
     scheduleStreamFlush();
   }
@@ -315,16 +320,18 @@
   function scheduleStreamFlush() {
     if (!streamUrl) return;
     if (streamTimer) return;
+    var delay = streamRetryCount ? Math.min(30000, 2000 * Math.pow(2, streamRetryCount)) + Math.floor(Math.random() * 1000) : 2000;
     streamTimer = setTimeout(function () {
       streamTimer = null;
       flushStream("timer");
-    }, 2000);
+    }, delay);
   }
 
   function flushStream(reason, preferBeacon) {
     if (!streamUrl) return;
-    if (!streamQueue.length) return;
     if (streamFlushInFlight) return streamFlushPromise;
+    persistStreamOutbox();
+    if (!streamQueue.length) return;
     streamFlushInFlight = true;
 
     var context = streamQueue[0].delivery_context || {
@@ -349,28 +356,51 @@
       prolific: context.prolific,
       events: batch
     };
-    streamSeq += batch.length;
-
     var serialized = JSON.stringify(body);
+    // Keep batches small enough to survive navigation with fetch keepalive.
+    while (batch.length > 1 && new Blob([serialized]).size >= 48000) {
+      batch = batch.slice(0, Math.ceil(batch.length / 2));
+      body.events = batch;
+      body.seq_end = streamSeq + batch.length - 1;
+      serialized = JSON.stringify(body);
+    }
+    streamSeq += batch.length;
+    var controller = typeof AbortController === "function" ? new AbortController() : null;
+    var timeout;
+    var timedOut = new Promise(function (_, reject) {
+      timeout = setTimeout(function () {
+        reject(new Error("Tracking upload timed out. It will be retried."));
+        if (controller) controller.abort();
+      }, 20000);
+    });
     // Navigation may interrupt the response; unacknowledged events stay queued for the next page.
-    streamFlushPromise = Promise.resolve().then(function () {
+    var request = Promise.resolve().then(function () {
       return fetch(streamUrl, {
         method: "POST",
         mode: "cors",
         keepalive: new Blob([serialized]).size < 48000,
+        signal: controller ? controller.signal : undefined,
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: serialized
       });
     }).then(function (response) {
       if (!response.ok) throw new Error("Storage HTTP " + response.status);
       return response.json();
-    }).then(function (receipt) {
+    });
+    streamFlushPromise = Promise.race([request, timedOut]).then(function (receipt) {
       if (receipt.ok !== true) throw new Error(receipt.error || "Storage was not confirmed.");
-      removeStreamBatch(batch);
+      // Older receivers return ok only; newer receivers confirm individual event IDs.
+      var confirmed = Array.isArray(receipt.tracking_event_ids) ? new Set(receipt.tracking_event_ids) : null;
+      var acknowledged = confirmed ? batch.filter(function (entry) { return confirmed.has(entry.event_id); }) : batch;
+      removeStreamBatch(acknowledged);
+      if (acknowledged.length !== batch.length) throw new Error("The receiver did not confirm every tracking event.");
       streamDeliveryError = "";
+      streamRetryCount = 0;
     }).catch(function (error) {
       streamDeliveryError = String(error.message || error);
+      streamRetryCount += 1;
     }).finally(function () {
+      clearTimeout(timeout);
       streamFlushInFlight = false;
       streamFlushPromise = null;
       if (streamQueue.length) scheduleStreamFlush();
@@ -602,6 +632,7 @@
     if (b.scrollEl && b.scrollHandler) b.scrollEl.removeEventListener("scroll", b.scrollHandler);
     if (b.io) b.io.disconnect();
     if (b.reviewIo) b.reviewIo.disconnect();
+    if (b.onVisibilityChange) document.removeEventListener("visibilitychange", b.onVisibilityChange);
     if (b.detailsEl && b.onDetailsToggle) b.detailsEl.removeEventListener("toggle", b.onDetailsToggle);
     modalBindings = null;
   }
@@ -621,6 +652,8 @@
         return h.split("/")[1] || "unknown";
       })();
     var sessionStart = now();
+    var activeSince = document.hidden ? null : sessionStart;
+    var activeMs = 0;
     var lastY = scrollEl.scrollTop;
     var lastT = 0;
     var lastDir = 0;
@@ -638,6 +671,8 @@
     var reviewReadOrder = [];
     var reviewSeen = {};
     var reviewRead = {};
+    var sectionsInViewport = {};
+    var reviewsInViewport = {};
 
     function reviewPosition(node) {
       return Number(node.getAttribute("data-review-position") || Number(node.getAttribute("data-review-index") || 0) + 1);
@@ -720,7 +755,8 @@
           var sid = en.target.getAttribute("data-track-section") || "section";
           var key = hotelId + ":" + sid;
           var vis = en.isIntersecting && (sid === "reviews" ? en.intersectionRect.height > 0 : en.intersectionRatio > 0.08);
-          if (vis) {
+          sectionsInViewport[key] = vis;
+          if (vis && !document.hidden) {
             if (!sectionVisibleSince[key]) sectionVisibleSince[key] = ts;
           } else {
             if (sectionVisibleSince[key]) {
@@ -750,7 +786,8 @@
             var node = entry.target;
             var key = reviewKey(node);
             var visible = entry.isIntersecting && entry.intersectionRatio >= 0.5;
-            if (visible) {
+            reviewsInViewport[key] = visible;
+            if (visible && !document.hidden) {
               markReviewSeen(node);
               if (!reviewVisibleSince[key]) reviewVisibleSince[key] = ts;
             } else {
@@ -764,6 +801,36 @@
         reviewIo.observe(node);
       });
     }
+
+    function activeDuration(ts) {
+      return activeMs + (activeSince === null ? 0 : ts - activeSince);
+    }
+
+    function onModalVisibilityChange() {
+      var ts = now();
+      if (document.hidden) {
+        if (activeSince !== null) activeMs += ts - activeSince;
+        activeSince = null;
+        Object.keys(sectionVisibleSince).forEach(function (key) {
+          sectionAccumMs[key] = (sectionAccumMs[key] || 0) + (ts - sectionVisibleSince[key]);
+        });
+        sectionVisibleSince = {};
+        Object.keys(reviewVisibleSince).forEach(function (key) {
+          finishReviewVisibility(reviewNodeByPosition[key], ts);
+        });
+      } else {
+        if (activeSince === null) activeSince = ts;
+        Object.keys(sectionsInViewport).forEach(function (key) {
+          if (sectionsInViewport[key] && !sectionVisibleSince[key]) sectionVisibleSince[key] = ts;
+        });
+        Object.keys(reviewsInViewport).forEach(function (key) {
+          if (!reviewsInViewport[key]) return;
+          markReviewSeen(reviewNodeByPosition[key]);
+          if (!reviewVisibleSince[key]) reviewVisibleSince[key] = ts;
+        });
+      }
+    }
+    document.addEventListener("visibilitychange", onModalVisibilityChange);
 
     var detailsEl = root.querySelector("[data-track-section='room_types']");
     var onDetailsToggle = null;
@@ -792,7 +859,7 @@
       var meanSpeed = speedSamples ? speedSum / speedSamples : 0;
       return {
         hotel_id: hotelId,
-        modal_elapsed_ms: ts - sessionStart,
+        modal_elapsed_ms: activeDuration(ts),
         scroll_depth_pct_now: Math.round(Math.min(1, Math.max(0, scrollEl.scrollTop / denom())) * 1000) / 10,
         scroll_max_pct: Math.round(maxDepth * 1000) / 10,
         scroll_dir_changes: dirChanges,
@@ -812,6 +879,7 @@
       scrollHandler: onScroll,
       io: io,
       reviewIo: reviewIo,
+      onVisibilityChange: onModalVisibilityChange,
       hotelId: hotelId,
       sessionStart: sessionStart,
       detailsEl: detailsEl,
@@ -839,7 +907,7 @@
           visBySection[name] = Math.round(sectionAccumMs[k]);
         });
 
-        var duration = ts - sessionStart;
+        var duration = activeDuration(ts);
         var meanSpeed = speedSamples ? speedSum / speedSamples : 0;
         var maxPct = Math.round(maxDepth * 1000) / 10;
         var depthAtExitPct = Math.round(Math.min(1, Math.max(0, scrollEl.scrollTop / denom())) * 1000) / 10;
@@ -877,6 +945,7 @@
 
         log("page_timing", hotelId, {
           context: "hotel_modal",
+          opened_at_ms: sessionStart,
           duration_ms: duration,
           exit_reason: reason || "unknown",
           scroll_depth_pct_at_exit: depthAtExitPct,
@@ -1029,7 +1098,7 @@
     streamQueue.forEach(function (entry) {
       if (!entry.event_id) entry.event_id = createEventId();
     });
-    persistStreamOutbox();
+    persistStreamOutbox(streamQueue);
     if (streamQueue.length) scheduleStreamFlush();
     log("session_start", location.pathname, { href: location.href });
 
@@ -1083,6 +1152,12 @@
     startMouseSampler();
     window.addEventListener("pagehide", onPageHide);
     window.addEventListener("online", function () { flushStream("online"); });
+    window.addEventListener("storage", function (event) {
+      if (event.key !== streamOutboxStorageKey()) return;
+      streamQueue = loadStreamOutbox();
+      if (streamQueue.length) scheduleStreamFlush();
+      window.dispatchEvent(new Event("hotel-storage-status"));
+    });
     document.addEventListener("visibilitychange", onVisibility);
 
     window.HOTEL_EXPERIMENT_STORAGE_KEY = STORAGE_KEY;

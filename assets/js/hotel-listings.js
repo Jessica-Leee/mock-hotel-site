@@ -3680,7 +3680,7 @@
       });
     }
 
-    document.addEventListener("click", (e) => {
+    document.addEventListener("click", async (e) => {
       const open = e.target && e.target.closest && e.target.closest("[data-open]");
       if (open) {
         const hotelId = open.getAttribute("data-open");
@@ -3698,8 +3698,30 @@
       if (flowContinue) {
         if (activeHotelSession) return;
         const href = flowContinue.getAttribute("data-flow-continue");
-        logEvent("study_flow_continue", { href, phase: pageState().phase });
-        location.replace(href);
+        let status = document.getElementById("browsingSaveStatus");
+        if (!status) {
+          status = document.createElement("p");
+          status.id = "browsingSaveStatus";
+          status.className = "survey-copy";
+          status.setAttribute("role", "status");
+          flowContinue.parentElement.appendChild(status);
+        }
+        flowContinue.disabled = true;
+        flowContinue.textContent = "Saving...";
+        status.textContent = "Saving your hotel browsing...";
+        status.style.color = "";
+        try {
+          const stage = pageState().showReviews ? "reviews" : "information";
+          await window.HotelSurveyStorage.browse(stage);
+          logEvent("study_flow_continue", { href, phase: pageState().phase });
+          location.replace(href);
+        } catch (error) {
+          status.textContent = error.message || "Browsing could not be saved. Please try again.";
+          status.style.color = "#b42318";
+          flowContinue.disabled = false;
+          flowContinue.textContent = pageState().showReviews
+            ? "Continue to post-review questions" : "Continue to hotel questions";
+        }
       }
     });
 
