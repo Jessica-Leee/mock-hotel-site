@@ -9,7 +9,7 @@ test('page saves retain one request ID across a failed response and retry', asyn
   const context = vm.createContext({
     window: {},
     document: { body: { dataset: {} } },
-    location: { search: '?survey_stage=hotel_questionnaire' },
+    location: { search: '?participant_id=00000000-0000-4000-8000-000000000099&survey_stage=hotel_questionnaire' },
     URLSearchParams, Date, AbortController, setTimeout, clearTimeout,
     crypto: { randomUUID: () => `00000000-0000-4000-8000-${String(requests.length + 1).padStart(12, '0')}` },
     fetch: async (_url, options) => {
@@ -29,6 +29,7 @@ test('page saves retain one request ID across a failed response and retry', asyn
   }, 'solo_city_exploration', false);
   assert.equal(requests.length, 2);
   assert.equal(requests[0].save_id, requests[1].save_id);
+  assert.equal(requests[0].participant_id, '00000000-0000-4000-8000-000000000099');
 });
 
 test('browsing sends each finalized hotel visit and popup stage', async () => {
@@ -48,7 +49,7 @@ test('browsing sends each finalized hotel visit and popup stage', async () => {
       ] })
     },
     document: { body: { dataset: { reviewVersion: 'without' } } },
-    location: { search: '?survey_stage=search_1' },
+    location: { search: '?participant_id=00000000-0000-4000-8000-000000000099&survey_stage=search_1' },
     URLSearchParams, Date, AbortController, setTimeout, clearTimeout,
     crypto: { randomUUID: () => '00000000-0000-4000-8000-000000000003' },
     fetch: async (_url, options) => {

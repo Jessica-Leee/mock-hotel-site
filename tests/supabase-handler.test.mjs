@@ -50,12 +50,12 @@ function fakeDatabase() {
   return { tables, calls, fetchDb };
 }
 
-async function call(action, cookie = "") {
+async function call(action) {
   const request = new Request(url, action ? {
     method: "POST",
-    headers: { Origin: "https://survey.test", Cookie: cookie, "Content-Type": "application/json" },
+    headers: { Origin: "https://survey.test", "Content-Type": "application/json" },
     body: JSON.stringify(action)
-  } : { headers: { Cookie: cookie } });
+  } : undefined);
   const response = await handleSurveyRequest({ request, env });
   return { response, data: await response.json() };
 }
@@ -65,41 +65,43 @@ test("one student, one condition, confirmed page saves and idempotent browsing",
   const db = fakeDatabase();
   globalThis.fetch = db.fetchDb;
   try {
-    assert.equal((await call()).data.survey, null);
-    const startId = crypto.randomUUID();
-    const started = await call({ action: "start", start_id: startId, student_id: "student-7", condition: "ai_summary",
+    assert.equal((await call()).response.status, 405);
+    const started = await call({ action: "resume", student_id: "student-7", condition: "ai_summary",
       answer: { value: "student-7" } });
     assert.equal(started.response.status, 200);
-    const cookie = started.response.headers.get("Set-Cookie").split(";")[0];
+    assert.equal(started.response.headers.get("Set-Cookie"), null);
+    const participantId = started.data.survey.participant_id;
     const assigned = started.data.survey.assigned_attributes;
     assert.equal(assigned.length, 4);
     assert.deepEqual(assigned.slice(0, 2), ["location_convenience", "fitness_facilities"]);
-    const retriedStart = await call({ action: "start", start_id: startId, student_id: "student-7", condition: "ai_summary" });
+    const retriedStart = await call({ action: "resume", student_id: "student-7", condition: "ai_summary" });
     assert.equal(retriedStart.response.status, 200);
-    assert.equal(retriedStart.response.headers.get("Set-Cookie").split(";")[0], cookie);
-    const duplicate = await call({ action: "start", start_id: crypto.randomUUID(), student_id: "student-7", condition: "full_reviews" });
-    assert.equal(duplicate.response.status, 409);
-    const wrongCondition = await call({ action: "start", start_id: crypto.randomUUID(), student_id: "student-7", condition: "full_reviews" }, cookie);
-    assert.equal(wrongCondition.response.status, 409);
+    assert.equal(retriedStart.data.survey.participant_id, participantId);
+    const duplicate = await call({ action: "resume", student_id: "student-7", condition: "full_reviews" });
+    assert.equal(duplicate.response.status, 200);
+    assert.equal(duplicate.data.survey.condition, "ai_summary");
 
     const saveId = crypto.randomUUID();
     const page = {
-      action: "save", save_id: saveId, page_id: "scenario_attributes_prior",
+      action: "save", participant_id: participantId, save_id: saveId, page_id: "scenario_attributes_prior",
       next_page: "solo_city_exploration",
       answers: { scenario_attributes_prior: { value: "location, fitness" } }
     };
-    assert.equal((await call(page, cookie)).data.survey.revision, 1);
-    assert.equal((await call(page, cookie)).data.survey.revision, 1);
+    assert.equal((await call(page)).data.survey.revision, 1);
+    assert.equal((await call(page)).data.survey.revision, 1);
+    const resumed = await call({ action: "resume", student_id: "STUDENT-7", condition: "full_reviews" });
+    assert.equal(resumed.data.survey.current_page, "solo_city_exploration");
+    assert.equal(resumed.data.survey.answers.scenario_attributes_prior.value, "location, fitness");
 
     const visits = hotelIds.map(hotelId => ({
       visit_id: `behavior_${crypto.randomUUID()}`, hotel_id: hotelId,
       metrics: { duration_ms: 12000, scroll_max_pct: 60, review_read_count: 3 }
     }));
-    const browse = { action: "browse", save_id: crypto.randomUUID(), stage: "information",
+    const browse = { action: "browse", participant_id: participantId, save_id: crypto.randomUUID(), stage: "information",
       visits, popup_events: [{ event_id: visits[0].visit_id, popup_type: "hotel",
         stage: "browsing_1", hotel_id: hotelIds[0], opened_at: Date.now() }] };
-    assert.equal((await call(browse, cookie)).response.status, 200);
-    assert.equal((await call(browse, cookie)).response.status, 200);
+    assert.equal((await call(browse)).response.status, 200);
+    assert.equal((await call(browse)).response.status, 200);
     assert.equal(db.tables.browsing_records.length, 2);
     assert.ok(db.tables.browsing_records.every(row => row.metrics.popup_open_count === 1));
     assert.ok(db.tables.browsing_records.every(row => row.metrics.total_viewing_ms === 12000));
@@ -111,8 +113,8 @@ test("one student, one condition, confirmed page saves and idempotent browsing",
         review_read_ids: ['review-1', 'review-2'], review_read_order: [1, 2]
       }
     }));
-    const reviews = await call({ action: "browse", save_id: crypto.randomUUID(),
-      stage: "reviews", visits: reviewVisits }, cookie);
+    const reviews = await call({ action: "browse", participant_id: participantId, save_id: crypto.randomUUID(),
+      stage: "reviews", visits: reviewVisits });
     assert.equal(reviews.response.status, 200);
     assert.equal(db.tables.browsing_records.length, 4);
     assert.equal(db.tables.browsing_records.find(row => row.browsing_stage === 'reviews').metrics.summary_viewing_ms, 4000);
@@ -132,25 +134,27 @@ test("one student, one condition, confirmed page saves and idempotent browsing",
     for (const prefix of ["hotelq", "postreview"]) {
       for (const hotelId of hotelIds) allAnswers[`${prefix}_${hotelId}_likelihood`] = { hotel_id: hotelId, values: likelihood };
     }
-    const complete = await call({ action: "save", save_id: crypto.randomUUID(),
+    const complete = await call({ action: "save", participant_id: participantId, save_id: crypto.randomUUID(),
       page_id: "post_review_ai_use_frequency", next_page: "complete", complete: true,
-      answers: allAnswers }, cookie);
+      answers: allAnswers });
     assert.equal(complete.response.status, 200);
     assert.equal(complete.data.survey.completion_status, "complete");
     assert.ok(complete.data.survey.completed_at);
-    const session = await call(null, cookie);
+    const resumedComplete = await call({ action: "resume", student_id: "student-7", condition: "full_reviews" });
+    assert.equal(resumedComplete.data.survey.current_page, "complete");
+    const session = await call({ action: "load", participant_id: participantId });
     assert.equal(session.data.survey.answers.post_review_satisfaction.value, "6");
     assert.equal(session.data.browsing.length, 4);
-    assert.equal((await call(page, cookie)).response.status, 409);
-    const control = await call({ action: "start", start_id: crypto.randomUUID(),
+    assert.equal((await call(page)).response.status, 409);
+    const control = await call({ action: "resume",
       student_id: "student-8", condition: "full_reviews" });
     assert.equal(control.data.survey.survey_version, "2");
-    const controlCookie = control.response.headers.get("Set-Cookie").split(";")[0];
-    const incomplete = await call({ action: "save", save_id: crypto.randomUUID(),
+    const controlParticipant = control.data.survey.participant_id;
+    const incomplete = await call({ action: "save", participant_id: controlParticipant, save_id: crypto.randomUUID(),
       page_id: "post_review_ai_use_frequency", next_page: "complete", complete: true,
-      answers: { post_review_ai_use_frequency: { value: "4" } } }, controlCookie);
+      answers: { post_review_ai_use_frequency: { value: "4" } } });
     assert.equal(incomplete.response.status, 400);
-    assert.equal((await call(null, controlCookie)).data.survey.completion_status, "in_progress");
+    assert.equal((await call({ action: "load", participant_id: controlParticipant })).data.survey.completion_status, "in_progress");
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -162,10 +166,10 @@ test("browsing events survive a refresh and repeated delivery does not double co
   globalThis.fetch = database.fetchDb;
   try {
     const started = await call({
-      action: "start", start_id: crypto.randomUUID(), student_id: "refresh-student",
+      action: "resume", student_id: "refresh-student",
       condition: "full_reviews", answer: { value: "refresh-student" }
     });
-    const cookie = started.response.headers.get("Set-Cookie").split(";")[0];
+    const participantId = started.data.survey.participant_id;
     const openedAt = Date.now();
     const events = hotelIds.flatMap((hotelId, index) => [
       {
@@ -179,19 +183,19 @@ test("browsing events survive a refresh and repeated delivery does not double co
         value: { context: "hotel_modal", duration_ms: 12000, scroll_max_pct: 70 }
       }
     ]);
-    const batch = { kind: "event_batch", page_path: "/search-no-reviews", events };
-    const first = await call(batch, cookie);
+    const batch = { kind: "event_batch", participant_id: participantId, page_path: "/search-no-reviews", events };
+    const first = await call(batch);
     assert.equal(first.response.status, 200);
     assert.deepEqual(first.data.tracking_event_ids, events.map(event => event.event_id));
-    assert.equal((await call(batch, cookie)).response.status, 200);
+    assert.equal((await call(batch)).response.status, 200);
     assert.equal(database.tables.browsing_records.length, 2);
     assert.ok(database.tables.browsing_records.every(row => row.metrics.popup_open_count === 1));
     assert.equal(Object.keys(database.tables.survey_responses[0].popup_statistics).length, 2);
     assert.equal(database.tables.survey_responses[0].last_save_id, started.data.survey.last_save_id);
     const continued = await call({
-      action: "browse", save_id: crypto.randomUUID(), stage: "information",
+      action: "browse", participant_id: participantId, save_id: crypto.randomUUID(), stage: "information",
       visits: [], popup_events: []
-    }, cookie);
+    });
     assert.equal(continued.response.status, 200);
     assert.equal(database.tables.survey_responses[0].current_page, "pre_review_hotel_ratings");
     const reviewEvent = {
@@ -199,8 +203,8 @@ test("browsing events survive a refresh and repeated delivery does not double co
       element_id: hotelIds[0], timestamp: openedAt + 30000,
       value: { context: "hotel_modal", duration_ms: 10000, review_read_count: 2 }
     };
-    const reviewBatch = await call({ kind: "event_batch", page_path: "/search-reviews",
-      events: [reviewEvent] }, cookie);
+    const reviewBatch = await call({ kind: "event_batch", participant_id: participantId, page_path: "/search-reviews",
+      events: [reviewEvent] });
     assert.equal(reviewBatch.response.status, 200);
     const newerReviewEvent = {
       event_id: `behavior_${crypto.randomUUID()}`, event_type: "page_timing",
@@ -214,10 +218,10 @@ test("browsing events survive a refresh and repeated delivery does not double co
       value: { context: "hotel_modal", duration_ms: 10000,
         review_stopping_position: 2, review_read_order: [2] }
     };
-    assert.equal((await call({ kind: "event_batch", page_path: "/search-reviews",
-      events: [newerReviewEvent] }, cookie)).response.status, 200);
-    assert.equal((await call({ kind: "event_batch", page_path: "/search-reviews",
-      events: [delayedOlderReviewEvent] }, cookie)).response.status, 200);
+    assert.equal((await call({ kind: "event_batch", participant_id: participantId, page_path: "/search-reviews",
+      events: [newerReviewEvent] })).response.status, 200);
+    assert.equal((await call({ kind: "event_batch", participant_id: participantId, page_path: "/search-reviews",
+      events: [delayedOlderReviewEvent] })).response.status, 200);
     const reviewRecord = database.tables.browsing_records.find(row =>
       row.browsing_stage === "reviews" && row.hotel_id === hotelIds[0]);
     assert.equal(reviewRecord.metrics.review_read_count, 2);

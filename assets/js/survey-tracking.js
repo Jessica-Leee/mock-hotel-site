@@ -1,47 +1,23 @@
 /**
  * Invisible behavioral tracking for hotel listing experiment.
  *
- * Each event: { event_type, element_id, timestamp, value }
- * Browsing events are mirrored locally until the same-origin API confirms receipt.
- *
- * Student / survey handoff:
- *   1) URL query: ?STUDENT_ID=… (legacy Prolific parameters remain accepted).
- *   2) Optional beacon: <meta name="tracking-beacon-url" content="https://…"> or ?beacon=https://…
- *      → full JSON POSTed via navigator.sendBeacon on pagehide / visibility hidden.
- *   3) Optional completion URL: <meta name="prolific-completion-url" content="https://app.prolific.com/submissions/complete?cc=CODE">
- *      → appends &study_summary_b64=… (truncated) so a same-tab redirect survey can read it.
- *      → Set <meta name="study-redirect-completion" content="true"> to auto-navigate on pagehide (optional).
- *
- * Same-tab follow-up survey (e.g. Qualtrics on your domain): read sessionStorage[HOTEL_EXPERIMENT_STORAGE_KEY]
- * for the full event array after participants return from the hotel task page.
- *
- * Browser events are mirrored through BroadcastChannel("hotel_experiment_live") and
- * localStorage hotel_experiment_live_v1 for optional same-origin research tooling.
+ * Each event: { event_id, event_type, element_id, timestamp, value }.
+ * Events live only in memory. Relevant browsing events are sent directly to the
+ * same-origin API; the server remains the only persistent state store.
  */
 (function () {
   "use strict";
 
-  var LIVE_CHANNEL = "hotel_experiment_live";
-  var LIVE_STORAGE_KEY = "hotel_experiment_live_v1";
-  var STORAGE_KEY = "hotel_experiment_tracking_v1";
-  var STREAM_OUTBOX_STORAGE_PREFIX = "hotel_experiment_stream_outbox_v1";
-  var SURVEY_USER_ID_STORAGE_PREFIX = "mock_hotel_survey_user_id_v1";
-  var SURVEY_USER_ID_CURRENT_KEY = SURVEY_USER_ID_STORAGE_PREFIX + ":current";
-  var surveyUserId = "";
   var events = [];
   var pageLoadTs = Date.now();
-  var persistTimer = null;
   var mouseInterval = null;
   var modalBindings = null;
   var hoverEl = null;
   var hoverStart = 0;
   var listingMaxScrollDepth = 0;
-  var liveBc = null;
-  var liveMirrorTimer = null;
   var streamUrl = "";
   var streamQueue = [];
   var streamTimer = null;
-  var streamSeq = 0;
   var streamFlushInFlight = false;
   var streamFlushPromise = null;
   var streamDeliveryError = "";
@@ -53,42 +29,11 @@
     return Date.now();
   }
 
-  function getMeta(name) {
-    var m = document.querySelector('meta[name="' + name + '"]');
-    return m && m.getAttribute("content") ? String(m.getAttribute("content")).trim() : "";
-  }
-
-  function pagePhase() {
-    try {
-      var p = new URLSearchParams(location.search);
-      var explicitPhase = p.get("phase");
-      var stage = (p.get("survey_stage") || "").toLowerCase();
-      var bodyVersion = (document.body && document.body.dataset.reviewVersion || "").toLowerCase();
-      var path = (location.pathname || "").toLowerCase();
-      if (explicitPhase === "3" || stage === "search_3" || stage === "post_review_ai" || bodyVersion === "with-ai-summary" || path.indexOf("search-ai-summaries") >= 0 || path.indexOf("hotel_3") >= 0) return "3";
-      if (explicitPhase === "2" || stage === "search_2" || stage === "post_review" || bodyVersion === "with" || path.indexOf("search-reviews") >= 0 || path.indexOf("hotel_2") >= 0) return "2";
-      return "1";
-    } catch (e) {
-      return "1";
-    }
-  }
-
   function currentSurveyStage() {
     try {
       return new URLSearchParams(location.search).get("survey_stage") || "";
     } catch (e) {
       return "";
-    }
-  }
-
-  function pageCondition() {
-    try {
-      var p = new URLSearchParams(location.search);
-      var condition = (p.get("cond") || "none").toLowerCase();
-      if (condition === "vanilla" || condition === "newsworthy") return condition;
-      return studyRunCondition();
-    } catch (e) {
-      return "full_reviews";
     }
   }
 
@@ -103,31 +48,6 @@
     if (stage === "search_1") return "browsing_1";
     if (stage === "search_2" || stage === "search_3") return "browsing_2";
     return "";
-  }
-
-  function studyRunCondition() {
-    try {
-      var p = new URLSearchParams(location.search);
-      var explicit = (p.get("study_condition") || "").toLowerCase();
-      var stage = (p.get("survey_stage") || "").toLowerCase();
-      var bodyVersion = (document.body && document.body.dataset.reviewVersion || "").toLowerCase();
-      var path = (location.pathname || "").toLowerCase();
-      if (
-        explicit === "ai_summary" ||
-        p.get("study_version") === "3" ||
-        stage === "search_3" ||
-        stage === "post_review_ai" ||
-        bodyVersion === "with-ai-summary" ||
-        path.indexOf("search-ai-summaries") >= 0
-      ) return "ai_summary";
-      return "full_reviews";
-    } catch (e) {
-      return "full_reviews";
-    }
-  }
-
-  function studyRunVersion() {
-    return studyRunCondition() === "ai_summary" ? "3" : "2";
   }
 
   function getStreamUrl() {
@@ -163,161 +83,9 @@
       hex.slice(12, 16) + "-" + hex.slice(16, 20) + "-" + hex.slice(20);
   }
 
-  function createSurveyUserId() {
-    try {
-      if (window.crypto && typeof window.crypto.randomUUID === "function") {
-        return "survey_user_" + window.crypto.randomUUID();
-      }
-    } catch (e) {
-      /* fall through */
-    }
-    return "survey_user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 14);
-  }
-
-  function participantIdentity() {
-    try {
-      var p = new URLSearchParams(location.search);
-      return p.get("STUDENT_ID") || p.get("student_id") || p.get("PROLIFIC_PID") || p.get("prolific_pid") || p.get("participant_id") ||
-        p.get("SESSION_ID") || p.get("session_id") || "";
-    } catch (e) {
-      return "";
-    }
-  }
-
-  function getOrCreateSurveyUserId() {
-    var identity = participantIdentity();
-    var key = SURVEY_USER_ID_STORAGE_PREFIX + ":" + encodeURIComponent(identity || "anonymous");
-    var id = "";
-    try { id = sessionStorage.getItem(key) || ""; }
-    catch (e) { /* continue */ }
-    if (!id && identity) {
-      try { id = localStorage.getItem(key) || ""; }
-      catch (e2) { /* continue */ }
-    }
-    if (!id && !identity) {
-      try { id = sessionStorage.getItem(SURVEY_USER_ID_CURRENT_KEY) || ""; }
-      catch (e3) { /* continue */ }
-    }
-    if (!id) id = createSurveyUserId();
-    try {
-      sessionStorage.setItem(key, id);
-      sessionStorage.setItem(SURVEY_USER_ID_CURRENT_KEY, id);
-    } catch (e4) {
-      /* storage can be unavailable in strict privacy modes */
-    }
-    if (identity) {
-      try { localStorage.setItem(key, id); }
-      catch (e5) { /* sessionStorage remains as a fallback */ }
-    }
-    return id;
-  }
-
-  function streamOutboxStorageKey() {
-    var prolific = prolificMeta();
-    var participant = prolific.survey_user_id || prolific.student_id || prolific.prolific_pid || prolific.session_id || "anonymous";
-    var submission = prolific.submission_id || "pending";
-    return STREAM_OUTBOX_STORAGE_PREFIX + ":" + encodeURIComponent(participant) + ":" +
-      studyRunCondition() + ":" + encodeURIComponent(submission);
-  }
-
-  function loadStreamOutbox() {
-    var key = streamOutboxStorageKey();
-    var stored = null;
-    try { stored = localStorage.getItem(key); }
-    catch (e) { /* sessionStorage remains available in some privacy modes */ }
-    if (stored === null) {
-      try { stored = sessionStorage.getItem(key); }
-      catch (e2) { /* fall back to the in-memory queue */ }
-    }
-    if (!stored) return streamQueue.slice();
-    try {
-      var parsed = JSON.parse(stored);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (e3) {
-      return streamQueue.slice();
-    }
-  }
-
-  function persistStreamOutbox(addedEntries, acknowledgedIds) {
-    // Another page may have queued events while this page was waiting for a receipt.
-    var acknowledged = new Set(acknowledgedIds || []);
-    var seen = new Set();
-    streamQueue = loadStreamOutbox().concat(addedEntries || []).filter(function (entry) {
-      if (acknowledged.has(entry.event_id) || seen.has(entry.event_id)) return false;
-      seen.add(entry.event_id);
-      return true;
-    });
-    var serialized = JSON.stringify(streamQueue);
-    var key = streamOutboxStorageKey();
-    try {
-      localStorage.setItem(key, serialized);
-    } catch (e) {
-      /* sessionStorage remains as a fallback */
-    }
-    try {
-      sessionStorage.setItem(key, serialized);
-    } catch (e2) {
-      /* storage can be unavailable in strict privacy modes */
-    }
-  }
-
   function removeStreamBatch(batch) {
-    persistStreamOutbox([], batch.map(function (entry) { return entry.event_id; }));
-  }
-
-  function initLiveRelay() {
-    try {
-      liveBc = new BroadcastChannel(LIVE_CHANNEL);
-    } catch (e) {
-      liveBc = null;
-    }
-    if (liveBc) {
-      liveBc.onmessage = function (ev) {
-        var d = ev && ev.data;
-        if (d && d.t === "request_full" && liveBc) {
-          try {
-            liveBc.postMessage({ t: "full", payload: buildPayload() });
-          } catch (e2) {
-            /* ignore */
-          }
-        }
-      };
-    }
-  }
-
-  function relayLiveEvent(entry) {
-    if (liveBc) {
-      try {
-        liveBc.postMessage({ t: "event", event: entry });
-      } catch (e) {
-        /* ignore */
-      }
-    }
-    scheduleLiveMirror();
-  }
-
-  function scheduleLiveMirror() {
-    if (liveMirrorTimer) return;
-    liveMirrorTimer = setTimeout(function () {
-      liveMirrorTimer = null;
-      try {
-        localStorage.setItem(LIVE_STORAGE_KEY, JSON.stringify(buildPayload()));
-      } catch (e) {
-        /* ignore */
-      }
-    }, 500);
-  }
-
-  function relayLiveState(state) {
-    var payloadState = Object.assign({ at_ms: now() }, state);
-    if (liveBc) {
-      try {
-        liveBc.postMessage({ t: "live_state", state: payloadState });
-      } catch (e) {
-        /* ignore */
-      }
-    }
-    scheduleLiveMirror();
+    var acknowledged = new Set(batch.map(function (entry) { return entry.event_id; }));
+    streamQueue = streamQueue.filter(function (entry) { return !acknowledged.has(entry.event_id); });
   }
 
   function enqueueStream(entry) {
@@ -332,11 +100,10 @@
         : /\/search-reviews$/.test(path) ? "search_2" : "";
     if (browsingStage) pageUrl.searchParams.set("survey_stage", browsingStage);
     entry.delivery_context = {
-      page_url: pageUrl.href, page_path: location.pathname,
-      phase: pagePhase(), cond: pageCondition(), prolific: prolificMeta()
+      page_url: pageUrl.href, page_path: location.pathname
     };
     if (!streamQueue.some(function (queued) { return queued.event_id === entry.event_id; })) {
-      persistStreamOutbox([entry]);
+      streamQueue.push(entry);
     }
     scheduleStreamFlush();
   }
@@ -351,33 +118,25 @@
     }, delay);
   }
 
-  function flushStream(reason, preferBeacon) {
+  function flushStream(reason) {
     if (!streamUrl) return;
     if (streamFlushInFlight) return streamFlushPromise;
-    persistStreamOutbox();
     if (!streamQueue.length) return;
     streamFlushInFlight = true;
 
     var context = streamQueue[0].delivery_context || {
-      page_url: location.href, page_path: location.pathname,
-      phase: pagePhase(), cond: pageCondition(), prolific: prolificMeta()
+      page_url: location.href, page_path: location.pathname
     };
     var contextKey = JSON.stringify(context);
     var batch = streamQueue.filter(function (entry) {
       return JSON.stringify(entry.delivery_context || context) === contextKey;
     }).slice(0, 400);
     var body = {
-      v: 1,
       kind: "event_batch",
       reason: reason || "unknown",
-      sent_at_ms: now(),
-      seq_start: streamSeq,
-      seq_end: streamSeq + batch.length - 1,
       page_url: context.page_url,
       page_path: context.page_path,
-      phase: context.phase,
-      cond: context.cond,
-      prolific: context.prolific,
+      participant_id: new URLSearchParams(location.search).get("participant_id") || "",
       events: batch
     };
     var serialized = JSON.stringify(body);
@@ -385,10 +144,8 @@
     while (batch.length > 1 && new Blob([serialized]).size >= 48000) {
       batch = batch.slice(0, Math.ceil(batch.length / 2));
       body.events = batch;
-      body.seq_end = streamSeq + batch.length - 1;
       serialized = JSON.stringify(body);
     }
-    streamSeq += batch.length;
     var controller = typeof AbortController === "function" ? new AbortController() : null;
     var timeout;
     var timedOut = new Promise(function (_, reject) {
@@ -397,10 +154,11 @@
         if (controller) controller.abort();
       }, 20000);
     });
-    // Navigation may interrupt the response; unacknowledged events stay queued for the next page.
+    // Navigation may interrupt this best-effort request; no browser-persistent queue is used.
     var request = Promise.resolve().then(function () {
       return fetch(streamUrl, {
         method: "POST",
+        cache: "no-store",
         mode: "cors",
         keepalive: new Blob([serialized]).size < 48000,
         signal: controller ? controller.signal : undefined,
@@ -413,9 +171,8 @@
     });
     streamFlushPromise = Promise.race([request, timedOut]).then(function (receipt) {
       if (receipt.ok !== true) throw new Error(receipt.error || "Storage was not confirmed.");
-      // Older receivers return ok only; newer receivers confirm individual event IDs.
-      var confirmed = Array.isArray(receipt.tracking_event_ids) ? new Set(receipt.tracking_event_ids) : null;
-      var acknowledged = confirmed ? batch.filter(function (entry) { return confirmed.has(entry.event_id); }) : batch;
+      var confirmed = new Set(Array.isArray(receipt.tracking_event_ids) ? receipt.tracking_event_ids : []);
+      var acknowledged = batch.filter(function (entry) { return confirmed.has(entry.event_id); });
       removeStreamBatch(acknowledged);
       if (acknowledged.length !== batch.length) throw new Error("The receiver did not confirm every tracking event.");
       streamDeliveryError = "";
@@ -435,8 +192,8 @@
 
   function log(event_type, element_id, value) {
     var eventValue = value && typeof value === "object" && !Array.isArray(value)
-      ? Object.assign({}, value, { survey_user_id: surveyUserId || getOrCreateSurveyUserId() })
-      : { event_value: value === undefined ? null : value, survey_user_id: surveyUserId || getOrCreateSurveyUserId() };
+      ? Object.assign({}, value)
+      : { event_value: value === undefined ? null : value };
     if (event_type === "popup_open" && ["shopper_profile", "hotel_order", "revealed_attributes"].indexOf(eventValue.popup_type || element_id) >= 0) {
       // Capture at opening time; a queued event may be delivered on a later page.
       eventValue.usage_stage = auxiliaryPopupStage();
@@ -449,132 +206,11 @@
       value: eventValue
     };
     events.push(entry);
-    schedulePersist();
-    relayLiveEvent(entry);
     enqueueStream(entry);
   }
 
-  function getQueryBeacon() {
-    try {
-      var p = new URLSearchParams(location.search);
-      return p.get("beacon") || p.get("tracking_beacon") || "";
-    } catch (e) {
-      return "";
-    }
-  }
-
-  function getMetaBeacon() {
-    var m = getMeta("tracking-beacon-url");
-    return m || "";
-  }
-
-  function getProlificCompletionUrl() {
-    var m = getMeta("prolific-completion-url");
-    if (m) return m;
-    try {
-      var p = new URLSearchParams(location.search);
-      return p.get("prolific_complete") || p.get("completion_url") || "";
-    } catch (e) {
-      return "";
-    }
-  }
-
-  function shouldRedirectCompletion() {
-    var m = getMeta("study-redirect-completion");
-    return m && String(m).toLowerCase() === "true";
-  }
-
-  function b64Truncate(obj, maxLen) {
-    try {
-      var s = btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
-      if (s.length > maxLen) s = s.slice(0, maxLen);
-      return s;
-    } catch (e) {
-      return "";
-    }
-  }
-
-  function passPayloadToCompletionUrl() {
-    var base = getProlificCompletionUrl();
-    if (!base) return;
-    var summary = {
-      prolific: prolificMeta(),
-      event_count: events.length,
-      ended_at_ms: now(),
-      last_payload_version: buildPayload().v
-    };
-    var url;
-    try {
-      url = new URL(base, location.href);
-    } catch (e2) {
-      return;
-    }
-    url.searchParams.set("study_summary_b64", b64Truncate(summary, 1500));
-    url.searchParams.set("study_storage_key", STORAGE_KEY);
-    if (shouldRedirectCompletion()) {
-      try {
-        location.replace(url.toString());
-      } catch (e3) {
-        location.href = url.toString();
-      }
-    }
-  }
-
-  function prolificMeta() {
-    var p = new URLSearchParams(location.search);
-    var studentId = p.get("STUDENT_ID") || p.get("student_id") || null;
-    return {
-      survey_user_id: surveyUserId || getOrCreateSurveyUserId(),
-      student_id: studentId,
-      prolific_pid: p.get("PROLIFIC_PID") || p.get("prolific_pid") || studentId,
-      study_id: p.get("STUDY_ID") || p.get("study_id") || null,
-      session_id: p.get("SESSION_ID") || p.get("session_id") || null,
-      submission_id: p.get("submission_id") || null,
-      study_condition: studyRunCondition(),
-      study_version: studyRunVersion()
-    };
-  }
-
   function buildPayload() {
-    return {
-      v: 1,
-      page_url: location.href,
-      page_path: location.pathname,
-      phase: pagePhase(),
-      cond: pageCondition(),
-      started_at_ms: pageLoadTs,
-      ended_at_ms: now(),
-      prolific: prolificMeta(),
-      events: events
-    };
-  }
-
-  function persistSync() {
-    try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(buildPayload()));
-    } catch (e) {
-      /* quota or private mode */
-    }
-  }
-
-  function schedulePersist() {
-    if (persistTimer) return;
-    persistTimer = setTimeout(function () {
-      persistTimer = null;
-      persistSync();
-    }, 400);
-  }
-
-  function flushBeacon() {
-    var url = getMetaBeacon() || getQueryBeacon();
-    if (!url || !navigator.sendBeacon) return;
-    try {
-      var body = JSON.stringify(buildPayload());
-      var blob = new Blob([body], { type: "application/json" });
-      navigator.sendBeacon(url, blob);
-    } catch (e) {
-      /* ignore */
-    }
+    return { events: events };
   }
 
   function activeHotelId() {
@@ -652,7 +288,6 @@
   function teardownModalBindings() {
     if (!modalBindings) return;
     var b = modalBindings;
-    if (b.liveStateIv) clearInterval(b.liveStateIv);
     if (b.scrollEl && b.scrollHandler) b.scrollEl.removeEventListener("scroll", b.scrollHandler);
     if (b.io) b.io.disconnect();
     if (b.reviewIo) b.reviewIo.disconnect();
@@ -866,38 +501,6 @@
     }
 
     var finalized = false;
-    function buildLiveSnapshot() {
-      var ts = now();
-      var sections = {};
-      Object.keys(sectionAccumMs).forEach(function (k) {
-        var part = k.split(":");
-        var name = part.slice(1).join(":") || k;
-        sections[name] = sectionAccumMs[k];
-      });
-      Object.keys(sectionVisibleSince).forEach(function (k) {
-        var part = k.split(":");
-        var name = part.slice(1).join(":") || k;
-        var extra = ts - sectionVisibleSince[k];
-        sections[name] = (sections[name] || 0) + extra;
-      });
-      var meanSpeed = speedSamples ? speedSum / speedSamples : 0;
-      return {
-        hotel_id: hotelId,
-        modal_elapsed_ms: activeDuration(ts),
-        scroll_depth_pct_now: Math.round(Math.min(1, Math.max(0, scrollEl.scrollTop / denom())) * 1000) / 10,
-        scroll_max_pct: Math.round(maxDepth * 1000) / 10,
-        scroll_dir_changes: dirChanges,
-        scroll_max_px_per_ms: Math.round(maxSpeed * 1000000) / 1000000,
-        scroll_mean_px_per_ms: Math.round(meanSpeed * 1000000) / 1000000,
-        sections_ms: sections
-      };
-    }
-
-    var liveStateIv = setInterval(function () {
-      if (finalized) return;
-      relayLiveState(buildLiveSnapshot());
-    }, 400);
-
     modalBindings = {
       scrollEl: scrollEl,
       scrollHandler: onScroll,
@@ -908,7 +511,6 @@
       sessionStart: sessionStart,
       detailsEl: detailsEl,
       onDetailsToggle: onDetailsToggle,
-      liveStateIv: liveStateIv,
       finalize: function (reason) {
         if (finalized) return;
         finalized = true;
@@ -1087,43 +689,11 @@
       exit_reason: "pagehide",
       max_scroll_pct: Math.round(listingMaxScrollDepth * 1000) / 10
     });
-    persistSync();
-    if (liveBc) {
-      try {
-        liveBc.postMessage({ t: "full", payload: buildPayload() });
-      } catch (e) {
-        /* ignore */
-      }
-    }
-    try {
-      localStorage.setItem(LIVE_STORAGE_KEY, JSON.stringify(buildPayload()));
-    } catch (e2) {
-      /* ignore */
-    }
-    flushStream("pagehide", true);
-    flushBeacon();
-    passPayloadToCompletionUrl();
-  }
-
-  function onVisibility() {
-    if (document.visibilityState === "hidden") {
-      persistSync();
-      flushStream("hidden", true);
-      flushBeacon();
-      passPayloadToCompletionUrl();
-    }
+    flushStream("pagehide");
   }
 
   function init() {
-    surveyUserId = getOrCreateSurveyUserId();
-    initLiveRelay();
     streamUrl = getStreamUrl();
-    streamQueue = loadStreamOutbox();
-    streamQueue.forEach(function (entry) {
-      if (!entry.event_id) entry.event_id = createEventId();
-    });
-    persistStreamOutbox(streamQueue);
-    if (streamQueue.length) scheduleStreamFlush();
     log("session_start", location.pathname, { href: location.href });
 
     window.addEventListener(
@@ -1176,15 +746,7 @@
     startMouseSampler();
     window.addEventListener("pagehide", onPageHide);
     window.addEventListener("online", function () { flushStream("online"); });
-    window.addEventListener("storage", function (event) {
-      if (event.key !== streamOutboxStorageKey()) return;
-      streamQueue = loadStreamOutbox();
-      if (streamQueue.length) scheduleStreamFlush();
-      window.dispatchEvent(new Event("hotel-storage-status"));
-    });
-    document.addEventListener("visibilitychange", onVisibility);
 
-    window.HOTEL_EXPERIMENT_STORAGE_KEY = STORAGE_KEY;
     window.HOTEL_EXPERIMENT_GET_EVENTS = function () {
       return events.slice();
     };
@@ -1200,17 +762,11 @@
       log(eventType, elementId, value);
     };
     window.HOTEL_EXPERIMENT_FLUSH = function () {
-      persistSync();
-      flushBeacon();
-      passPayloadToCompletionUrl();
       return flushStream("manual");
     };
-    window.HOTEL_EXPERIMENT_STORAGE_STATUS = function () {
+    window.HOTEL_EXPERIMENT_DELIVERY_STATUS = function () {
       return { pending: streamQueue.length, error: streamDeliveryError };
     };
-    window.HOTEL_EXPERIMENT_LIVE_CHANNEL = LIVE_CHANNEL;
-    window.HOTEL_EXPERIMENT_LIVE_STORAGE_KEY = LIVE_STORAGE_KEY;
-    window.HOTEL_EXPERIMENT_STREAM_URL = streamUrl;
   }
 
   if (document.readyState === "loading") {

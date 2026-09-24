@@ -20,51 +20,20 @@ const SURPRISE_VALUES = [
   "not_at_all_surprised", "slightly_surprised", "moderately_surprised",
   "very_surprised", "extremely_surprised"
 ];
-const COOKIE_NAME = "hotel_survey_session";
 const MAX_BODY_BYTES = 200000;
 
-function reply(status, body, extraHeaders = {}) {
+function reply(status, body) {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "no-store",
-      ...extraHeaders
+      "Cache-Control": "no-store"
     }
   });
 }
 
 function failure(status, message) {
   return reply(status, { ok: false, error: message });
-}
-
-function base64Url(bytes) {
-  let text = "";
-  for (const byte of bytes) text += String.fromCharCode(byte);
-  return btoa(text).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-async function signature(value, secret) {
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw", encoder.encode(`hotel-survey-session-v1:${secret}`),
-    { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
-  );
-  return base64Url(new Uint8Array(await crypto.subtle.sign("HMAC", key, encoder.encode(value))));
-}
-
-async function sessionId(request, secret) {
-  const cookie = (request.headers.get("Cookie") || "").split("; ")
-    .find(part => part.startsWith(`${COOKIE_NAME}=`));
-  if (!cookie) return "";
-  const value = cookie.slice(COOKIE_NAME.length + 1);
-  const match = /^([0-9a-f-]{36})\.([A-Za-z0-9_-]+)$/.exec(value);
-  if (!match) return "";
-  const expected = await signature(match[1], secret);
-  if (match[2].length !== expected.length) return "";
-  let mismatch = 0;
-  for (let i = 0; i < expected.length; i += 1) mismatch |= expected.charCodeAt(i) ^ match[2].charCodeAt(i);
-  return mismatch ? "" : match[1];
 }
 
 function supabaseUrl(env, table, query = {}) {
@@ -210,29 +179,32 @@ function completeAnswers(answers, participant) {
     /^[1-7]$/.test(String(answers.post_review_ai_use_frequency.value));
 }
 
-async function start(context, payload, secret) {
+async function stateForSurvey(env, survey) {
+  const browsing = await db(env, "browsing_records", {
+    query: { participant_id: `eq.${survey.participant_id}`, select: "browsing_stage,hotel_id" }
+  });
+  return { survey, browsing };
+}
+
+async function surveyState(env, participantId) {
+  const survey = await getParticipant(env, participantId);
+  return survey ? stateForSurvey(env, survey) : null;
+}
+
+async function resume(context, payload) {
   const studentId = String(payload.student_id || "").trim().toUpperCase();
   const condition = payload.condition;
-  if (!studentId || studentId.length > 128 || !validUuid(payload.start_id) ||
-      !["full_reviews", "ai_summary"].includes(condition)) {
+  const answer = payload.answer || {};
+  if (!studentId || studentId.length > 128 || !["full_reviews", "ai_summary"].includes(condition)) {
     return failure(400, "Enter a valid Student ID and survey condition.");
   }
-  const existingSession = await sessionId(context.request, secret);
-  if (existingSession) {
-    const row = await getParticipant(context.env, existingSession);
-    if (row && row.student_id === studentId && row.condition === condition) return reply(200, { ok: true, survey: row });
-    if (row) return failure(409, "This browser already has a different survey session.");
-  }
+  if (typeof answer !== "object" || Array.isArray(answer)) return failure(400, "Invalid Student ID response.");
   const rows = await db(context.env, "survey_responses", {
     query: { student_id: `eq.${studentId}`, select: "*" }
   });
   if (rows.length) {
-    if (rows[0].last_save_id !== payload.start_id || rows[0].condition !== condition) {
-      return failure(409, "This Student ID already has a survey record. Please contact the study team.");
-    }
-    return reply(200, { ok: true, survey: rows[0] }, {
-      "Set-Cookie": `${COOKIE_NAME}=${rows[0].participant_id}.${await signature(rows[0].participant_id, secret)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`
-    });
+    const state = await stateForSurvey(context.env, rows[0]);
+    return reply(200, { ok: true, ...state });
   }
   const participantId = crypto.randomUUID();
   let inserted;
@@ -245,9 +217,8 @@ async function start(context, payload, secret) {
         condition,
         survey_version: condition === "ai_summary" ? "3" : "2",
         assigned_attributes: assignedAttributes(studentId),
-        answers: { student_id: { ...(payload.answer || {}), value: studentId } },
-        quality_checks: qualityChecks({}, { student_id: payload.answer }),
-        last_save_id: payload.start_id,
+        answers: { student_id: { ...answer, value: studentId } },
+        quality_checks: qualityChecks({}, { student_id: answer }),
         completed_pages: ["student_id"],
         current_page: "scenario_attributes_prior"
       }
@@ -257,17 +228,14 @@ async function start(context, payload, secret) {
       const duplicate = await db(context.env, "survey_responses", {
         query: { student_id: `eq.${studentId}`, select: "*" }
       });
-      if (duplicate[0]?.last_save_id === payload.start_id && duplicate[0].condition === condition) {
-        return reply(200, { ok: true, survey: duplicate[0] }, {
-          "Set-Cookie": `${COOKIE_NAME}=${duplicate[0].participant_id}.${await signature(duplicate[0].participant_id, secret)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`
-        });
+      if (duplicate[0]) {
+        const state = await stateForSurvey(context.env, duplicate[0]);
+        return reply(200, { ok: true, ...state });
       }
-      return failure(409, "This Student ID already has a survey record. Please contact the study team.");
     }
     throw error;
   }
-  const cookie = `${COOKIE_NAME}=${participantId}.${await signature(participantId, secret)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`;
-  return reply(200, { ok: true, survey: inserted[0] }, { "Set-Cookie": cookie });
+  return reply(200, { ok: true, survey: inserted[0], browsing: [] });
 }
 
 async function save(context, payload, participantId) {
@@ -454,22 +422,17 @@ export async function handleSurveyRequest({ request, env }) {
   const origin = request.headers.get("Origin");
   if (origin && origin !== new URL(request.url).origin) return failure(403, "Cross-site request denied.");
   try {
-    const id = await sessionId(request, env.SUPABASE_SECRET_KEY);
-    if (request.method === "GET") {
-      if (!id) return reply(200, { ok: true, survey: null, browsing: [] });
-      const row = await getParticipant(env, id);
-      if (!row) return failure(401, "Survey session not found.");
-      const browsing = await db(env, "browsing_records", {
-        query: { participant_id: `eq.${id}`, select: "browsing_stage,hotel_id" }
-      });
-      return reply(200, { ok: true, survey: row, browsing });
-    }
     if (request.method !== "POST") return failure(405, "Method not allowed.");
     if (Number(request.headers.get("Content-Length")) > MAX_BODY_BYTES) return failure(413, "Request is too large.");
     const payload = await request.json();
     if (!payload || typeof payload !== "object") return failure(400, "Invalid request.");
-    if (payload.action === "start") return start({ request, env }, payload, env.SUPABASE_SECRET_KEY);
-    if (!id) return failure(401, "Please start the survey again in this browser.");
+    if (payload.action === "resume") return resume({ request, env }, payload);
+    const id = payload.participant_id;
+    if (!validUuid(id)) return failure(401, "Please enter your Student ID to resume the survey.");
+    if (payload.action === "load") {
+      const state = await surveyState(env, id);
+      return state ? reply(200, { ok: true, ...state }) : failure(401, "Survey not found.");
+    }
     if (payload.kind === "event_batch") return eventBatch({ request, env }, payload, id);
     if (payload.action === "save") return save({ request, env }, payload, id);
     if (payload.action === "browse") return browse({ request, env }, payload, id);

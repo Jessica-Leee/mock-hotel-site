@@ -5,16 +5,15 @@ const { JSDOM, VirtualConsole } = require('jsdom');
 const FakeTimers = require('@sinonjs/fake-timers');
 const errors = [];
 const sequences = new Map();
-function page(file, participant, saved = {}, now = 1800000000000, hash = '') {
+function page(file, participant, now = 1800000000000, hash = '') {
   const vc = new VirtualConsole();
   vc.on('jsdomError', error => errors.push(error.message));
   const dom = new JSDOM(fs.readFileSync(file, 'utf8'), {
-    url: `https://chicago-hotel-survey.pages.dev/${file}?STUDENT_ID=${participant}${hash}`,
+    url: `https://chicago-hotel-survey.pages.dev/${file}?participant_id=${participant}${hash}`,
     runScripts: 'outside-only', pretendToBeVisual: true, virtualConsole: vc
   });
   const w = dom.window;
   const clock = FakeTimers.withGlobal(w).install({ now, toFake: ['Date', 'setInterval', 'clearInterval', 'setTimeout', 'clearTimeout'] });
-  Object.entries(saved).forEach(([key, value]) => w.localStorage.setItem(key, value));
   w.eval(fs.readFileSync('assets/js/hotel-listings.js', 'utf8'));
   return { w, d: w.document, clock, close() { clock.uninstall(); w.close(); } };
 }
@@ -78,23 +77,8 @@ function hidden(p, value) {
       }
       assert.equal(p.d.querySelector('#studyFlowCta button').disabled, false);
       p.close();
-      p = page(file, participant + '-RELOAD');
-      await p.clock.tickAsync(1);
-      click(p, '.hotel-title__link[data-open="arlo-chicago"]');
-      await p.clock.tickAsync(5000);
-      p.w.dispatchEvent(new p.w.Event('pagehide'));
-      const saved = { ...p.w.localStorage }, now = p.clock.now;
-      p.close();
-      p = page(file, participant + '-RELOAD', saved, now + 60000, '#hotel/arlo-chicago');
-      await p.clock.tickAsync(1);
-      assert.equal(p.d.querySelector('[data-countdown-value]').textContent, '0:40');
-      assert.ok(closeButton(p).disabled);
-      await p.clock.tickAsync(5000);
-      p.d.dispatchEvent(new p.w.KeyboardEvent('keydown', { key: 'Escape' }));
-      assert.equal(modal(p), null);
-      p.close();
     }
   }
   assert.deepEqual(errors, []);
-  console.log('PASS: 3 browsing pages x 2 participants; close/Escape/backdrop/switch guards; 10-second boundary; background pause; reopening; 45-second expiry; reload persistence; both-hotels gate; fixed 150-review sequences. No network writes.');
+  console.log('PASS: 3 browsing pages x 2 participants; close/Escape/backdrop/switch guards; 10-second boundary; background pause; reopening; 45-second expiry; both-hotels gate; fixed 150-review sequences. No network writes.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

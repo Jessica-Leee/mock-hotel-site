@@ -11,7 +11,9 @@
     <script>
       (function () {
         const params = new URLSearchParams(location.search || "");
-        params.delete("study_condition");
+        ["STUDENT_ID", "student_id", "PROLIFIC_PID", "prolific_pid", "SESSION_ID",
+          "session_id", "participant_id", "submission_id", "study_condition",
+          "survey_stage", "browsing_run"].forEach(key => params.delete(key));
         params.set("study_version", "3");
         location.replace(`index.html?${params.toString()}#q1`);
       })();

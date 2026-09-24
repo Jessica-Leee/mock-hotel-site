@@ -72,7 +72,7 @@ alter table public.browsing_records enable row level security;
 revoke all on public.survey_responses, public.browsing_records from public, anon, authenticated;
 
 comment on table public.survey_responses is
-  'One participant, one assigned condition. Student ID is required, not an authentication credential.';
+  'One participant, one assigned condition. Student ID is the accepted resume credential.';
 comment on column public.survey_responses.answers is
   'Answers keyed by stable question ID. The backend validates values and merges page submissions atomically.';
 comment on column public.survey_responses.popup_statistics is

@@ -19,25 +19,33 @@
       </section>
     </main>
 
-    <script src="./assets/js/survey-tracking.js?v=20260923-5"></script>
-    <script src="./assets/js/survey-storage.js?v=20260923-3"></script>
+    <script src="./assets/js/survey-tracking.js?v=20260924-1"></script>
+    <script src="./assets/js/survey-storage.js?v=20260924-1"></script>
     <script src="./assets/js/shopper-profile.js?v=20260921-2"></script>
     <script>
       (function () {
         const params = new URLSearchParams(location.search);
-        const studentId = params.get("STUDENT_ID") || params.get("student_id") || params.get("PROLIFIC_PID") || params.get("prolific_pid") || params.get("participant_id") || "";
-        const participantIdentity = studentId || params.get("SESSION_ID") || params.get("session_id") || "";
+        const participantId = params.get("participant_id") || "";
         const requestedStudyCondition = (params.get("study_condition") || "").toLowerCase();
         const studyCondition = requestedStudyCondition === "ai_summary" || params.get("study_version") === "3"
           ? "ai_summary"
           : "full_reviews";
         const studyVersion = studyCondition === "ai_summary" ? "3" : "2";
         const surveyStage = params.get("survey_stage") || "";
-        const hotelQuestionnaireMode = surveyStage === "hotel_questionnaire" || (location.hash || "").startsWith("#hq");
-        const postReviewAiMode = surveyStage === "post_review_ai";
-        const postReviewMode = surveyStage === "post_review" || postReviewAiMode || (location.hash || "").startsWith("#pr");
+        const hotelQuestionnaireMode = Boolean(participantId) &&
+          (surveyStage === "hotel_questionnaire" || (location.hash || "").startsWith("#hq"));
+        const postReviewAiMode = Boolean(participantId) && surveyStage === "post_review_ai";
+        const postReviewMode = Boolean(participantId) &&
+          (surveyStage === "post_review" || postReviewAiMode || (location.hash || "").startsWith("#pr"));
         const ASSIGNED_ATTRIBUTE_COUNT = 4;
         let surveyStateCache = { answers: {} };
+
+        function cleanQuery() {
+          const query = new URLSearchParams(location.search);
+          ["STUDENT_ID", "student_id", "PROLIFIC_PID", "prolific_pid", "SESSION_ID",
+            "session_id", "submission_id"].forEach(key => query.delete(key));
+          return query;
+        }
 
         const hotels = [
           { id: "arlo-chicago", name: "Hotel A", priceNightly: 143 },
@@ -178,71 +186,25 @@
           });
         }
 
-        function stableShuffled(items, seedText) {
-          let seed = 2166136261;
-          const normalized = String(seedText || "");
-          for (let i = 0; i < normalized.length; i++) {
-            seed ^= normalized.charCodeAt(i);
-            seed = Math.imul(seed, 16777619);
-          }
-          const random = function () {
-            seed += 0x6D2B79F5;
-            let value = seed;
-            value = Math.imul(value ^ (value >>> 15), value | 1);
-            value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
-            return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
-          };
-          const copy = items.slice();
-          for (let i = copy.length - 1; i > 0; i--) {
-            const j = Math.floor(random() * (i + 1));
-            const temp = copy[i];
-            copy[i] = copy[j];
-            copy[j] = temp;
-          }
-          return copy;
-        }
-
         function ensureRandomization() {
           const state = getState();
-          const assignment = Object.assign({}, state.assignment || {});
-          let changed = false;
-
-          if (state.study_condition !== studyCondition || state.study_version !== studyVersion) {
-            state.study_condition = studyCondition;
-            state.study_version = studyVersion;
-            changed = true;
-          }
-
           const scenario = scenarios[0];
-          if (assignment.scenario_id !== scenario.id || assignment.scenario_title !== scenario.title) {
-            assignment.scenario_id = scenario.id;
-            assignment.scenario_title = scenario.title;
-            changed = true;
-          }
-
-          const optionalAttributeIds = attributePool.map(attribute => attribute.id)
-            .filter(id => !requiredAttributeIds.includes(id));
-          const assignmentIdentity = String(state.student_id || studentId || participantIdentity || "anonymous").trim().toUpperCase();
-          // Derive the same two optional attributes in both conditions, including with a cached legacy assignment.
-          assignment.attribute_ids = requiredAttributeIds.concat(
-            stableShuffled(optionalAttributeIds, `hotel-attributes-v2:${assignmentIdentity}`)
-              .slice(0, ASSIGNED_ATTRIBUTE_COUNT - requiredAttributeIds.length)
-          );
+          const serverAttributes = Array.isArray(state.assigned_attributes)
+            ? state.assigned_attributes : [];
+          const attributeIds = serverAttributes.length === ASSIGNED_ATTRIBUTE_COUNT
+            ? serverAttributes
+            : requiredAttributeIds.concat(["cleanliness", "service_quality"]);
+          const assignment = {
+            scenario_id: scenario.id,
+            scenario_title: scenario.title,
+            attribute_ids: attributeIds
+          };
           assignment.attribute_labels = assignment.attribute_ids.map(id => {
             const attribute = attributePool.find(item => item.id === id);
             return attribute ? attribute.label : id;
           });
-
-          if (!assignment.assigned_at) {
-            assignment.assigned_at = new Date().toISOString();
-            changed = true;
-          }
-
-          if (changed || JSON.stringify(state.assignment) !== JSON.stringify(assignment)) {
-            state.assignment = assignment;
-            state.updated_at = new Date().toISOString();
-            setState(state);
-          }
+          state.assignment = assignment;
+          setState(state);
           return assignment;
         }
 
@@ -321,7 +283,7 @@
         }
 
         function pageUrl(index) {
-          const query = location.search || (studentId ? "?STUDENT_ID=" + encodeURIComponent(studentId) : "");
+          const query = location.search;
           const prefix = postReviewMode ? "#pr" : hotelQuestionnaireMode ? "#hq" : "#q";
           return location.pathname + query + prefix + (index + 1);
         }
@@ -767,7 +729,7 @@
               <p class="survey-copy">Enter your Student ID to continue.</p>
               <label class="survey-field">
                 <span>Student ID</span>
-                <input id="answerInput" name="student_id" type="text" value="${escapeHtml(getState().student_id || studentId)}" autocomplete="off" required ${studentId ? "readonly" : ""} />
+                <input id="answerInput" name="student_id" type="text" autocomplete="off" required />
               </label>
               ${botTrapHtml("student_id", "wrong id")}
             `);
@@ -843,14 +805,12 @@
           }
           const state = getState();
           const assignment = ensureRandomization();
-          state.student_id = state.student_id || state.prolific_id || studentId;
           state.updated_at = new Date().toISOString();
           state.assignment = assignment;
           state.answers = state.answers || {};
           if (page.type === "studentId") {
             const value = document.getElementById("answerInput").value.trim();
             state.student_id = value.toUpperCase();
-            delete state.prolific_id;
             const detection = botDetectionData();
             if (/^wrong\s+id$/i.test(value)) {
               detection.bot_detection_triggered = true;
@@ -961,11 +921,9 @@
         }
 
         function goToHotelBrowsing(state) {
-          const nextParams = new URLSearchParams(location.search || "");
-          nextParams.delete("submission_id");
+          const nextParams = cleanQuery();
           const surveyState = state || getState();
-          const sid = surveyState.student_id || surveyState.prolific_id || studentId || "";
-          if (sid) nextParams.set("STUDENT_ID", sid);
+          nextParams.set("participant_id", surveyState.participant_id);
           const browsingRunId = "survey";
           surveyState.browsing_run_id = browsingRunId;
           nextParams.set("browsing_run", browsingRunId);
@@ -977,11 +935,9 @@
         }
 
         function goToReviewBrowsing(state) {
-          const nextParams = new URLSearchParams(location.search || "");
-          nextParams.delete("submission_id");
+          const nextParams = cleanQuery();
           const surveyState = state || getState();
-          const sid = surveyState.student_id || surveyState.prolific_id || studentId || "";
-          if (sid) nextParams.set("STUDENT_ID", sid);
+          nextParams.set("participant_id", surveyState.participant_id);
           const browsingRunId = params.get("browsing_run") || surveyState.browsing_run_id || "survey";
           surveyState.browsing_run_id = browsingRunId;
           nextParams.set("browsing_run", browsingRunId);
@@ -1081,7 +1037,7 @@
                 lastPage && postReviewMode ? "complete" : pageSet[index + 1].id;
             let result;
             if (page.type === "studentId") {
-              result = await window.HotelSurveyStorage.start(
+              result = await window.HotelSurveyStorage.resume(
                 state.student_id, studyCondition, state.answers.student_id
               );
             } else {
@@ -1093,6 +1049,20 @@
             }
             applyServerSurvey(result.survey);
             status.hidden = true;
+            if (page.type === "studentId") {
+              const target = nextStoredLocation(result.survey);
+              const standardIndex = standardPages().findIndex(item => item.id === result.survey.current_page);
+              if (result.survey.condition === studyCondition && standardIndex > 0) {
+                history.replaceState(null, "", target);
+                render();
+              } else if (result.survey.current_page === "complete") {
+                history.replaceState(null, "", target);
+                renderCompletionScreen();
+              } else {
+                location.replace(target);
+              }
+              return;
+            }
             if (page.type === "browseIntro") return goToHotelBrowsing(getState());
             if (lastPage && hotelQuestionnaireMode) return goToReviewBrowsing(getState());
             if (lastPage && postReviewMode) return finishPostReviewQuestionnaire();
@@ -1134,9 +1104,8 @@
 
         function nextStoredLocation(survey) {
           const current = survey.current_page;
-          const query = new URLSearchParams(location.search || "");
-          query.delete("submission_id");
-          query.set("STUDENT_ID", survey.student_id);
+          const query = cleanQuery();
+          query.set("participant_id", survey.participant_id);
           query.set("study_condition", survey.condition);
           query.set("study_version", survey.survey_version);
           query.set("browsing_run", "survey");
@@ -1169,34 +1138,40 @@
         async function initialize() {
           const button = document.getElementById("surveySubmit");
           const status = document.getElementById("surveySaveStatus");
+          if (!participantId) {
+            const query = cleanQuery();
+            query.delete("survey_stage");
+            query.delete("browsing_run");
+            const search = query.toString();
+            history.replaceState(null, "", `${location.pathname}${search ? `?${search}` : ""}#q1`);
+            ensureRandomization();
+            render();
+            return;
+          }
           button.disabled = true;
           status.hidden = false;
           status.textContent = "Loading your survey...";
           try {
-            const result = await window.HotelSurveyStorage.session();
-            if (result.survey) {
-              applyServerSurvey(result.survey);
-              const target = new URL(nextStoredLocation(result.survey), location.href);
-              const currentStage = new URLSearchParams(location.search).get("survey_stage") || "";
-              const targetStage = target.searchParams.get("survey_stage") || "";
-              if (target.pathname !== location.pathname || targetStage !== currentStage || target.hash !== location.hash ||
-                  result.survey.condition !== studyCondition) {
-                location.replace(target.href);
-                return;
-              }
-              const browsing = result.browsing || [];
-              const hasBoth = stage => hotels.every(hotel => browsing.some(record =>
-                record.browsing_stage === stage && record.hotel_id === hotel.id));
-              if (hotelQuestionnaireMode && !hasBoth("information")) {
-                location.replace(nextStoredLocation({ ...result.survey, current_page: "browsing_1" }));
-                return;
-              }
-              if (postReviewMode && !hasBoth("reviews") && result.survey.completion_status !== "complete") {
-                location.replace(nextStoredLocation({ ...result.survey, current_page: "browsing_2" }));
-                return;
-              }
-            } else if (hotelQuestionnaireMode || postReviewMode || location.hash === "#complete") {
-              throw new Error("No saved survey was found in this browser. Please start at the first page.");
+            const result = await window.HotelSurveyStorage.load();
+            applyServerSurvey(result.survey);
+            const target = new URL(nextStoredLocation(result.survey), location.href);
+            const currentStage = new URLSearchParams(location.search).get("survey_stage") || "";
+            const targetStage = target.searchParams.get("survey_stage") || "";
+            if (target.pathname !== location.pathname || targetStage !== currentStage || target.hash !== location.hash ||
+                result.survey.condition !== studyCondition) {
+              location.replace(target.href);
+              return;
+            }
+            const browsing = result.browsing || [];
+            const hasBoth = stage => hotels.every(hotel => browsing.some(record =>
+              record.browsing_stage === stage && record.hotel_id === hotel.id));
+            if (hotelQuestionnaireMode && !hasBoth("information")) {
+              location.replace(nextStoredLocation({ ...result.survey, current_page: "browsing_1" }));
+              return;
+            }
+            if (postReviewMode && !hasBoth("reviews") && result.survey.completion_status !== "complete") {
+              location.replace(nextStoredLocation({ ...result.survey, current_page: "browsing_2" }));
+              return;
             }
             if (!location.hash || !validHashForMode()) history.replaceState(null, "", pageUrl(0));
             ensureRandomization();

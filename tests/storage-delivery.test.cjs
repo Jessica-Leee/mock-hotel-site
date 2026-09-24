@@ -34,14 +34,13 @@ function openSurvey(url, fetch) {
   return { dom, window: dom.window, document: dom.window.document, errors };
 }
 
-test('questionnaire navigation waits for a confirmed server save and retries the same start ID', async () => {
+test('questionnaire navigation waits for a confirmed server resume', async () => {
   let acceptStart = false;
   let survey = null;
   const starts = [];
   const page = openSurvey('https://survey.test/?study_version=2', async (url, options = {}) => {
-    if (!options.body) return response({ ok: true, survey, browsing: [] });
     const payload = JSON.parse(options.body);
-    if (payload.action !== 'start') return response({ ok: false, error: 'Unexpected request.' }, 400);
+    if (payload.action !== 'resume') return response({ ok: false, error: 'Unexpected request.' }, 400);
     starts.push(payload);
     if (!acceptStart) return response({ ok: false, error: 'Temporary storage failure.' }, 503);
     survey = {
@@ -71,7 +70,7 @@ test('questionnaire navigation waits for a confirmed server save and retries the
     await tick(); await tick();
     assert.equal(page.window.location.hash, '#q2');
     assert.equal(starts.length, 2);
-    assert.equal(starts[0].start_id, starts[1].start_id);
+    assert.equal(starts[0].student_id, starts[1].student_id);
     assert.equal(survey.student_id, 'STUDENT-7');
     assert.deepEqual(page.errors, []);
   } finally {
@@ -79,7 +78,7 @@ test('questionnaire navigation waits for a confirmed server save and retries the
   }
 });
 
-test('a confirmed completed server session renders the completion screen after reload', async () => {
+test('entering a completed Student ID renders the completion screen', async () => {
   const survey = {
     participant_id: '00000000-0000-4000-8000-000000000002',
     student_id: 'STUDENT-8',
@@ -89,18 +88,42 @@ test('a confirmed completed server session renders the completion screen after r
     answers: {}, completed_pages: [], current_page: 'complete', completion_status: 'complete'
   };
   const page = openSurvey(
-    'https://survey.test/?STUDENT_ID=STUDENT-8&study_condition=full_reviews&study_version=2&survey_stage=post_review#complete',
-    async (url, options = {}) => options.body
-      ? response({ ok: false, error: 'Unexpected write.' }, 400)
-      : response({ ok: true, survey, browsing: [] })
+    'https://survey.test/?study_condition=full_reviews&study_version=2',
+    async (url, options = {}) => {
+      const payload = JSON.parse(options.body);
+      return payload.action === 'resume'
+        ? response({ ok: true, survey, browsing: [] })
+        : response({ ok: false, error: 'Unexpected write.' }, 400);
+    }
   );
   try {
+    await tick(); await tick();
+    page.document.getElementById('answerInput').value = 'student-8';
+    page.document.getElementById('surveySubmit').click();
     await tick(); await tick();
     assert.equal(page.window.location.hash, '#complete');
     assert.match(page.document.getElementById('surveyStorageStatus').textContent, /saved successfully/i);
     assert.equal(page.document.getElementById('surveyReturnInstruction').hidden, false);
     assert.equal(page.document.getElementById('surveySubmit').hidden, true);
     assert.deepEqual(page.errors, []);
+  } finally {
+    page.dom.window.close();
+  }
+});
+
+test('an entry load always starts at a blank Student ID page without reading storage', async () => {
+  let requests = 0;
+  const page = openSurvey(
+    'https://survey.test/?STUDENT_ID=OLD-ID&survey_stage=post_review#complete',
+    async () => { requests += 1; return response({ ok: false }, 500); }
+  );
+  try {
+    await tick(); await tick();
+    assert.equal(requests, 0);
+    assert.equal(page.window.location.hash, '#q1');
+    assert.equal(page.window.location.search, '');
+    assert.equal(page.document.getElementById('answerInput').value, '');
+    assert.match(page.document.querySelector('h1').textContent, /Student ID/);
   } finally {
     page.dom.window.close();
   }

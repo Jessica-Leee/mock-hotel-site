@@ -13,7 +13,8 @@ These identifiers are public configuration, not credentials.
 
 Each student participates in exactly one condition: `full_reviews` or
 `ai_summary`. Student ID is required and unique within this experiment.
-`participant_id` is an internal UUID, not an authentication credential.
+Student ID is the resume credential. `participant_id` is an opaque internal UUID
+used only while moving between pages after a successful resume.
 
 The initial schema creates exactly two business tables:
 
@@ -46,28 +47,23 @@ needed for the planned server-side Supabase Data API connection.
 ## Application flow
 
 `functions/api/survey.js` runs on Cloudflare Pages and uses the secret key only
-on the server. A signed, HttpOnly cookie connects one browser to its internal
-participant UUID. Student ID is required, trimmed and case-normalized, and
-unique across both conditions;
-each student completes one condition. A response from a different browser with
-the same Student ID is rejected instead of overwriting the existing row.
+on the server. Student ID is required, trimmed, case-normalized, and unique
+across both conditions. The `resume` action creates a row when the Student ID is
+new and returns the existing row otherwise. An existing row always keeps its
+original condition.
 
-On the Student ID page, `start` creates the participant row. Every subsequent
-Next sends that page's answers and waits for a database receipt before moving
-forward. Refreshing the survey fetches saved answers and resumes the saved page.
+Every entry-page load starts at Student ID. After a successful resume, internal
+navigation carries only the opaque participant UUID. Every subsequent Next
+sends that page's answers and waits for a database receipt before moving
+forward. Re-entering the Student ID restores the saved page and answers.
 The last Next writes the answer and `complete` status together. On each hotel
 browsing page, Continue sends that page's finalized hotel visits and popup
 opens, and advances only after the server confirms both hotel records.
 
-Browser memory holds answers while the current page is open. No questionnaire
-answer or answer-upload queue is persisted to localStorage. Browsing telemetry
-uses a small browser-local retry queue until the server confirms receipt.
-Existing browser-local popup timers and the fixed hotel order remain part of
-the interface.
-
-The old Apps Script deployment and spreadsheet may remain available as
-historical data, but the current pages do not stream to them. The legacy
-receiver source is intentionally no longer part of this application.
+Browser memory holds only the current page state. The application does not use
+cookies, localStorage, sessionStorage, or IndexedDB. Browsing telemetry has an
+in-memory retry queue, so events not yet confirmed when a tab closes may be
+lost. Confirmed questionnaire answers and browsing records remain in Supabase.
 
 ## Verification before pilot use
 
@@ -77,15 +73,15 @@ Run the local tests:
 node --test tests/supabase-handler.test.mjs tests/survey-storage-client.test.cjs
 ```
 
-After deployment, use a fresh test Student ID and a separate private browser
-session for each condition, then complete both flows. For each test, confirm
+After deployment, use a fresh test Student ID for each condition, then complete
+both flows. For each test, confirm
 one `survey_responses` row with
 `completion_status = complete`, the expected answer keys, and four
-`browsing_records` rows (2 stages x 2 hotels). Refresh during a questionnaire
-to confirm it resumes on the next unanswered page. Try duplicate Continue and
-retry saves to confirm visit counts do not double. Check that the former Google
-Sheet receives no new test row. Actual production writes cannot be proved by
-mocked local tests alone.
+`browsing_records` rows (2 stages x 2 hotels). Close the site, reopen the entry
+URL, and re-enter the Student ID to confirm it resumes on the next unanswered
+page. Try duplicate Continue and
+retry saves to confirm visit counts do not double. Actual production writes
+cannot be proved by mocked local tests alone.
 
 The code is local until committed and deployed. Cloudflare bindings become
 available to the Pages Function on a deployment after they were saved.

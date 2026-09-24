@@ -18,11 +18,8 @@ async function check(version) {
     beforeParse(w) {
       w.scrollTo = () => {};
       w.fetch = async (url, options = {}) => {
-        if (!options.body) {
-          return { ok: true, status: 200, json: async () => ({ ok: true, survey: serverSurvey, browsing: [] }) };
-        }
         const payload = JSON.parse(options.body);
-        if (payload.action === 'start') {
+        if (payload.action === 'resume') {
           serverSurvey = {
             participant_id: '00000000-0000-4000-8000-000000000001',
             student_id: payload.student_id,
@@ -40,7 +37,7 @@ async function check(version) {
             completed_pages: [...new Set([...(serverSurvey.completed_pages || []), payload.page_id])]
           };
         }
-        return { ok: true, status: 200, json: async () => ({ ok: true, survey: serverSurvey }) };
+        return { ok: true, status: 200, json: async () => ({ ok: true, survey: serverSurvey, browsing: [] }) };
       };
       w.navigator.sendBeacon = () => true;
       w.IntersectionObserver = class { observe() {} unobserve() {} disconnect() {} };

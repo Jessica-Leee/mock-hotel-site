@@ -4,6 +4,7 @@
   const endpoint = "./api/survey";
   const pageStartedAt = Date.now();
   const pendingIds = new Map();
+  let participantId = new URLSearchParams(location.search).get("participant_id") || "";
 
   function requestId(key) {
     if (!pendingIds.has(key)) pendingIds.set(key, crypto.randomUUID());
@@ -16,10 +17,10 @@
     let response;
     try {
       response = await fetch(endpoint, {
-        method: payload ? "POST" : "GET",
-        credentials: "same-origin",
-        headers: payload ? { "Content-Type": "application/json" } : {},
-        body: payload ? JSON.stringify(payload) : undefined,
+        method: "POST",
+        cache: "no-store",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
         signal: controller.signal
       });
     } catch (error) {
@@ -41,6 +42,15 @@
     return payload && Array.isArray(payload.events) ? payload.events : [];
   }
 
+  function stage() {
+    const version = document.body && document.body.dataset.reviewVersion;
+    if (version === "without") return "browsing_1";
+    if (version === "with" || version === "with-ai-summary") return "browsing_2";
+    const page = new URLSearchParams(location.search).get("survey_stage");
+    return page === "hotel_questionnaire" ? "questionnaire_1" :
+      page === "post_review" || page === "post_review_ai" ? "questionnaire_2" : "";
+  }
+
   function popupEvents() {
     return events().filter(event => event.event_type === "popup_open").map(event => ({
       event_id: event.event_id,
@@ -51,15 +61,6 @@
     }));
   }
 
-  function stage() {
-    const version = document.body && document.body.dataset.reviewVersion;
-    if (version === "without") return "browsing_1";
-    if (version === "with" || version === "with-ai-summary") return "browsing_2";
-    const page = new URLSearchParams(location.search).get("survey_stage");
-    return page === "hotel_questionnaire" ? "questionnaire_1" :
-      page === "post_review" || page === "post_review_ai" ? "questionnaire_2" : "";
-  }
-
   function visits() {
     return events().filter(event => event.event_type === "page_timing" &&
       event.value && event.value.context === "hotel_modal")
@@ -68,57 +69,52 @@
         hotel_id: event.element_id,
         closed_at: event.timestamp,
         metrics: Object.fromEntries(Object.entries(event.value).filter(([key]) =>
-          key !== "survey_user_id" && key !== "hotel_display_position"))
+          key !== "participant_id" && key !== "hotel_display_position"))
       }));
   }
 
-  function flushTracking() {
-    if (typeof window.HOTEL_EXPERIMENT_FLUSH !== "function") return;
-    try {
-      Promise.resolve(window.HOTEL_EXPERIMENT_FLUSH()).catch(() => {});
-    } catch (_) {
-      // Tracking has its own durable retry queue; the page save confirms required data.
-    }
+  function requireParticipant() {
+    if (!participantId) throw new Error("Please enter your Student ID to resume the survey.");
+    return participantId;
   }
 
   window.HotelSurveyStorage = {
-    session: () => request(),
-    start: async (studentId, condition, answer) => {
-      const key = `start:${studentId}:${condition}`;
+    load: () => request({ action: "load", participant_id: requireParticipant() }),
+    resume: async (studentId, condition, answer) => {
       const result = await request({
-        action: "start", start_id: requestId(key), student_id: studentId, condition, answer
+        action: "resume", student_id: studentId, condition, answer
       });
-      pendingIds.delete(key);
+      participantId = result.survey.participant_id;
       return result;
     },
     save: async (pageId, answers, nextPage, complete) => {
-      flushTracking();
       const popups = popupEvents();
       const key = `save:${pageId}:${JSON.stringify(answers)}:${popups.map(item => item.event_id).join(",")}`;
       const result = await request({
-      action: "save",
-      save_id: requestId(key),
-      page_id: pageId,
-      answers,
-      next_page: nextPage,
-      complete: !!complete,
-      popup_events: popups
+        action: "save",
+        participant_id: requireParticipant(),
+        save_id: requestId(key),
+        page_id: pageId,
+        answers,
+        next_page: nextPage,
+        complete: !!complete,
+        popup_events: popups
       });
       pendingIds.delete(key);
       return result;
     },
     browse: async stageName => {
-      flushTracking();
       const hotelVisits = visits();
       const popups = popupEvents();
       const key = `browse:${stageName}:${hotelVisits.map(item => item.visit_id).join(",")}:${popups.map(item => item.event_id).join(",")}`;
       const result = await request({
-      action: "browse",
-      save_id: requestId(key),
-      stage: stageName,
-      stage_duration_ms: Date.now() - pageStartedAt,
-      visits: hotelVisits,
-      popup_events: popups
+        action: "browse",
+        participant_id: requireParticipant(),
+        save_id: requestId(key),
+        stage: stageName,
+        stage_duration_ms: Date.now() - pageStartedAt,
+        visits: hotelVisits,
+        popup_events: popups
       });
       pendingIds.delete(key);
       return result;
