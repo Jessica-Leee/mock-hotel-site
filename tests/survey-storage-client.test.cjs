@@ -36,6 +36,8 @@ test('browsing sends each finalized hotel visit and popup stage', async () => {
   let sent;
   const context = vm.createContext({
     window: {
+      HOTEL_EXPERIMENT_FLUSH: () => new Promise(() => {}),
+      HOTEL_EXPERIMENT_STORAGE_STATUS: () => ({ pending: 3 }),
       HOTEL_EXPERIMENT_GET_PAYLOAD: () => ({ events: [
         { event_id: 'behavior_00000000-0000-4000-8000-000000000001',
           event_type: 'popup_open', timestamp: 1000, element_id: `hotel:${hotelId}`,

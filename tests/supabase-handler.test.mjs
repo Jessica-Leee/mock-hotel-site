@@ -179,7 +179,7 @@ test("browsing events survive a refresh and repeated delivery does not double co
         value: { context: "hotel_modal", duration_ms: 12000, scroll_max_pct: 70 }
       }
     ]);
-    const batch = { kind: "event_batch", page_path: "/search-no-reviews.html", events };
+    const batch = { kind: "event_batch", page_path: "/search-no-reviews", events };
     const first = await call(batch, cookie);
     assert.equal(first.response.status, 200);
     assert.deepEqual(first.data.tracking_event_ids, events.map(event => event.event_id));
@@ -194,6 +194,16 @@ test("browsing events survive a refresh and repeated delivery does not double co
     }, cookie);
     assert.equal(continued.response.status, 200);
     assert.equal(database.tables.survey_responses[0].current_page, "pre_review_hotel_ratings");
+    const reviewEvent = {
+      event_id: `behavior_${crypto.randomUUID()}`, event_type: "page_timing",
+      element_id: hotelIds[0], timestamp: openedAt + 30000,
+      value: { context: "hotel_modal", duration_ms: 10000, review_read_count: 2 }
+    };
+    const reviewBatch = await call({ kind: "event_batch", page_path: "/search-reviews",
+      events: [reviewEvent] }, cookie);
+    assert.equal(reviewBatch.response.status, 200);
+    assert.equal(database.tables.browsing_records.find(row =>
+      row.browsing_stage === "reviews" && row.hotel_id === hotelIds[0]).metrics.review_read_count, 2);
   } finally {
     globalThis.fetch = originalFetch;
   }

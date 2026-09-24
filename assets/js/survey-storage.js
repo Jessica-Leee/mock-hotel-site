@@ -72,12 +72,13 @@
       }));
   }
 
-  async function flushTracking() {
+  function flushTracking() {
     if (typeof window.HOTEL_EXPERIMENT_FLUSH !== "function") return;
-    await window.HOTEL_EXPERIMENT_FLUSH();
-    const status = typeof window.HOTEL_EXPERIMENT_STORAGE_STATUS === "function"
-      ? window.HOTEL_EXPERIMENT_STORAGE_STATUS() : { pending: 0 };
-    if (status.pending) throw new Error("Browsing activity is still saving. Please try again.");
+    try {
+      Promise.resolve(window.HOTEL_EXPERIMENT_FLUSH()).catch(() => {});
+    } catch (_) {
+      // Tracking has its own durable retry queue; the page save confirms required data.
+    }
   }
 
   window.HotelSurveyStorage = {
@@ -91,7 +92,7 @@
       return result;
     },
     save: async (pageId, answers, nextPage, complete) => {
-      await flushTracking();
+      flushTracking();
       const popups = popupEvents();
       const key = `save:${pageId}:${JSON.stringify(answers)}:${popups.map(item => item.event_id).join(",")}`;
       const result = await request({
@@ -107,7 +108,7 @@
       return result;
     },
     browse: async stageName => {
-      await flushTracking();
+      flushTracking();
       const hotelVisits = visits();
       const popups = popupEvents();
       const key = `browse:${stageName}:${hotelVisits.map(item => item.visit_id).join(",")}:${popups.map(item => item.event_id).join(",")}`;

@@ -385,9 +385,9 @@ async function browse(context, payload, participantId) {
 }
 
 function browsingStageForPath(path) {
-  const name = String(path || "").split("/").pop().toLowerCase();
-  if (name === "search-no-reviews.html") return { stage: "information", popupStage: "browsing_1" };
-  if (["search-reviews.html", "search-ai-summaries.html"].includes(name)) {
+  const name = String(path || "").split("/").pop().toLowerCase().replace(/\.html$/, "");
+  if (name === "search-no-reviews") return { stage: "information", popupStage: "browsing_1" };
+  if (["search-reviews", "search-ai-summaries"].includes(name)) {
     return { stage: "reviews", popupStage: "browsing_2" };
   }
   return null;
