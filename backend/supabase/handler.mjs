@@ -442,16 +442,16 @@ export async function handleSurveyRequest({ request, env }) {
     if (Number(request.headers.get("Content-Length")) > MAX_BODY_BYTES) return failure(413, "Request is too large.");
     const payload = await request.json();
     if (!payload || typeof payload !== "object") return failure(400, "Invalid request.");
-    if (payload.action === "resume") return resume({ request, env }, payload);
+    if (payload.action === "resume") return await resume({ request, env }, payload);
     const id = payload.participant_id;
     if (!validUuid(id)) return failure(401, "Please enter your Student ID to resume the survey.");
     if (payload.action === "load") {
       const state = await surveyState(env, id);
       return state ? reply(200, { ok: true, ...state }) : failure(401, "Survey not found.");
     }
-    if (payload.kind === "event_batch") return eventBatch({ request, env }, payload, id);
-    if (payload.action === "save") return save({ request, env }, payload, id);
-    if (payload.action === "browse") return browse({ request, env }, payload, id);
+    if (payload.kind === "event_batch") return await eventBatch({ request, env }, payload, id);
+    if (payload.action === "save") return await save({ request, env }, payload, id);
+    if (payload.action === "browse") return await browse({ request, env }, payload, id);
     return failure(400, "Unknown survey action.");
   } catch (error) {
     if (error instanceof SyntaxError) return failure(400, "Invalid JSON request.");

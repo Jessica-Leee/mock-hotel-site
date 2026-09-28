@@ -329,3 +329,22 @@ test("server requires the condition-specific minimum viewing time", async () => 
     globalThis.fetch = originalFetch;
   }
 });
+
+test("database failures return a stable JSON error instead of an uncaught 500", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => {
+    throw new Error("database unavailable");
+  };
+  try {
+    const result = await call({
+      action: "resume", student_id: "database-error-student", condition: "full_reviews"
+    });
+    assert.equal(result.response.status, 503);
+    assert.deepEqual(result.data, {
+      ok: false,
+      error: "Survey storage is temporarily unavailable. Please try again."
+    });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

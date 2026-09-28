@@ -111,6 +111,38 @@ test('entering a completed Student ID renders the completion screen', async () =
   }
 });
 
+test('a participant URL loads the saved questionnaire page', async () => {
+  const survey = {
+    participant_id: '00000000-0000-4000-8000-000000000003',
+    student_id: 'STUDENT-9',
+    condition: 'full_reviews_min2sec',
+    survey_version: '2',
+    assigned_attributes: ['location_convenience', 'fitness_facilities', 'cleanliness', 'breakfast_quality'],
+    answers: { student_id: { value: 'STUDENT-9' } },
+    completed_pages: ['student_id'],
+    current_page: 'scenario_attributes_prior',
+    completion_status: 'in_progress'
+  };
+  const page = openSurvey(
+    `https://survey.test/?study_condition=full_reviews_min2sec&study_version=2&participant_id=${survey.participant_id}#q2`,
+    async (url, options = {}) => {
+      const payload = JSON.parse(options.body);
+      return payload.action === 'load'
+        ? response({ ok: true, survey, browsing: [] })
+        : response({ ok: false, error: 'Unexpected write.' }, 400);
+    }
+  );
+  try {
+    await tick(); await tick();
+    assert.equal(page.window.location.hash, '#q2');
+    assert.match(page.document.querySelector('h1').textContent, /trip scenario/i);
+    assert.equal(page.document.getElementById('surveySubmit').disabled, false);
+    assert.deepEqual(page.errors, []);
+  } finally {
+    page.dom.window.close();
+  }
+});
+
 test('an entry load always starts at a blank Student ID page without reading storage', async () => {
   let requests = 0;
   const page = openSurvey(
