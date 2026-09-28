@@ -242,3 +242,90 @@ test("browsing events survive a refresh and repeated delivery does not double co
     globalThis.fetch = originalFetch;
   }
 });
+
+test("server requires the condition-specific minimum viewing time", async () => {
+  const originalFetch = globalThis.fetch;
+  const database = fakeDatabase();
+  globalThis.fetch = database.fetchDb;
+  try {
+    const started = await call({
+      action: "resume", student_id: "minimum-time-student",
+      condition: "full_reviews_min2sec", answer: { value: "minimum-time-student" }
+    });
+    const participantId = started.data.survey.participant_id;
+    const timingEvents = durationMs => hotelIds.map((hotelId, index) => ({
+      event_id: `behavior_${crypto.randomUUID()}`,
+      event_type: "page_timing",
+      element_id: hotelId,
+      timestamp: Date.now() + index,
+      value: { context: "hotel_modal", duration_ms: durationMs }
+    }));
+    const sendTimings = durationMs => call({
+      kind: "event_batch", participant_id: participantId,
+      page_path: "/search-no-reviews", events: timingEvents(durationMs)
+    });
+
+    assert.equal((await sendTimings(1500)).response.status, 200);
+    assert.deepEqual((await call({ action: "load", participant_id: participantId })).data.browsing, []);
+    const tooSoon = await call({
+      action: "browse", participant_id: participantId, save_id: crypto.randomUUID(),
+      stage: "information", visits: [], popup_events: []
+    });
+    assert.equal(tooSoon.response.status, 400);
+    assert.match(tooSoon.data.error, /2 seconds/);
+
+    assert.equal((await sendTimings(500)).response.status, 200);
+    const resumed = await call({ action: "load", participant_id: participantId });
+    assert.equal(resumed.data.browsing.length, 2);
+    assert.equal((await call({
+      action: "browse", participant_id: participantId, save_id: crypto.randomUUID(),
+      stage: "information", visits: [], popup_events: []
+    })).response.status, 200);
+
+    const originalCondition = await call({
+      action: "resume", student_id: "ten-second-student",
+      condition: "full_reviews", answer: { value: "ten-second-student" }
+    });
+    const originalParticipantId = originalCondition.data.survey.participant_id;
+    const originalEvents = hotelIds.map((hotelId, index) => ({
+      event_id: `behavior_${crypto.randomUUID()}`,
+      event_type: "page_timing",
+      element_id: hotelId,
+      timestamp: Date.now() + index,
+      value: { context: "hotel_modal", duration_ms: 2000 }
+    }));
+    assert.equal((await call({
+      kind: "event_batch", participant_id: originalParticipantId,
+      page_path: "/search-no-reviews", events: originalEvents
+    })).response.status, 200);
+    const originalTooSoon = await call({
+      action: "browse", participant_id: originalParticipantId, save_id: crypto.randomUUID(),
+      stage: "information", visits: [], popup_events: []
+    });
+    assert.equal(originalTooSoon.response.status, 400);
+    assert.match(originalTooSoon.data.error, /10 seconds/);
+
+    const malformedEvent = await call({
+      kind: "event_batch", participant_id: originalParticipantId,
+      page_path: "/search-no-reviews",
+      events: [{
+        event_id: `behavior_${"-".repeat(36)}`,
+        event_type: "page_timing",
+        element_id: hotelIds[0],
+        timestamp: Date.now(),
+        value: { context: "hotel_modal", duration_ms: 10000 }
+      }]
+    });
+    assert.equal(malformedEvent.response.status, 400);
+    assert.match(malformedEvent.data.error, /Invalid browsing event/);
+
+    const malformedPopups = await call({
+      action: "browse", participant_id: originalParticipantId, save_id: crypto.randomUUID(),
+      stage: "information", visits: [], popup_events: {}
+    });
+    assert.equal(malformedPopups.response.status, 400);
+    assert.match(malformedPopups.data.error, /Invalid browsing save/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

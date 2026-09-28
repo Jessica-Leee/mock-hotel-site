@@ -20,9 +20,12 @@ const SURPRISE_VALUES = [
   "not_at_all_surprised", "slightly_surprised", "moderately_surprised",
   "very_surprised", "extremely_surprised"
 ];
-const CONDITIONS = [
-  "full_reviews", "ai_summary", "full_reviews_min2sec", "ai_summary_min2sec"
-];
+const CONDITION_CONFIG = {
+  full_reviews: { surveyVersion: "2", minimumViewingMs: 10000 },
+  ai_summary: { surveyVersion: "3", minimumViewingMs: 10000 },
+  full_reviews_min2sec: { surveyVersion: "2", minimumViewingMs: 2000 },
+  ai_summary_min2sec: { surveyVersion: "3", minimumViewingMs: 2000 }
+};
 const MAX_BODY_BYTES = 200000;
 
 function reply(status, body) {
@@ -79,8 +82,8 @@ function validUuid(value) {
 }
 
 function validEventId(value) {
-  return validUuid(value) || typeof value === "string" &&
-    /^behavior_[0-9a-f-]{36}$/i.test(value);
+  return validUuid(value) ||
+    typeof value === "string" && value.startsWith("behavior_") && validUuid(value.slice(9));
 }
 
 function assignedAttributes(studentId) {
@@ -183,9 +186,12 @@ function completeAnswers(answers, participant) {
 }
 
 async function stateForSurvey(env, survey) {
-  const browsing = await db(env, "browsing_records", {
-    query: { participant_id: `eq.${survey.participant_id}`, select: "browsing_stage,hotel_id" }
+  const rows = await db(env, "browsing_records", {
+    query: { participant_id: `eq.${survey.participant_id}`, select: "browsing_stage,hotel_id,metrics" }
   });
+  const minimumViewingMs = CONDITION_CONFIG[survey.condition].minimumViewingMs;
+  const browsing = rows.filter(record =>
+    Number(record.metrics?.total_viewing_ms) >= minimumViewingMs);
   return { survey, browsing };
 }
 
@@ -198,7 +204,7 @@ async function resume(context, payload) {
   const studentId = String(payload.student_id || "").trim().toUpperCase();
   const condition = payload.condition;
   const answer = payload.answer || {};
-  if (!studentId || studentId.length > 128 || !CONDITIONS.includes(condition)) {
+  if (!studentId || studentId.length > 128 || !Object.hasOwn(CONDITION_CONFIG, condition)) {
     return failure(400, "Enter a valid Student ID and survey condition.");
   }
   if (typeof answer !== "object" || Array.isArray(answer)) return failure(400, "Invalid Student ID response.");
@@ -218,7 +224,7 @@ async function resume(context, payload) {
         participant_id: participantId,
         student_id: studentId,
         condition,
-        survey_version: condition.startsWith("ai_summary") ? "3" : "2",
+        survey_version: CONDITION_CONFIG[condition].surveyVersion,
         assigned_attributes: assignedAttributes(studentId),
         answers: { student_id: { ...answer, value: studentId } },
         quality_checks: qualityChecks({}, { student_id: answer }),
@@ -244,6 +250,7 @@ async function resume(context, payload) {
 async function save(context, payload, participantId) {
   if (!validUuid(payload.save_id) || !/^[a-z0-9_-]{1,100}$/.test(payload.page_id || "") ||
       !payload.answers || typeof payload.answers !== "object" || Array.isArray(payload.answers) ||
+      (payload.popup_events !== undefined && !Array.isArray(payload.popup_events)) ||
       !/^[a-z0-9_-]{1,100}$/.test(payload.next_page || "")) {
     return failure(400, "Invalid survey page save.");
   }
@@ -320,7 +327,8 @@ async function updateBrowsing(env, participantId, stage, hotelId, visit) {
 
 async function browse(context, payload, participantId) {
   if (!validUuid(payload.save_id) || !["information", "reviews"].includes(payload.stage) ||
-      !Array.isArray(payload.visits) || payload.visits.length > 100) {
+      !Array.isArray(payload.visits) || payload.visits.length > 100 ||
+      (payload.popup_events !== undefined && !Array.isArray(payload.popup_events))) {
     return failure(400, "Invalid browsing save.");
   }
   const participant = await getParticipant(context.env, participantId);
@@ -338,10 +346,16 @@ async function browse(context, payload, participantId) {
     }
   }));
   const rows = await db(context.env, "browsing_records", {
-    query: { participant_id: `eq.${participantId}`, browsing_stage: `eq.${payload.stage}`, select: "hotel_id" }
+    query: {
+      participant_id: `eq.${participantId}`,
+      browsing_stage: `eq.${payload.stage}`,
+      select: "hotel_id,metrics"
+    }
   });
-  if (!HOTELS.every(hotelId => rows.some(row => row.hotel_id === hotelId))) {
-    return failure(400, "Please view both hotels before continuing.");
+  const minimumViewingMs = CONDITION_CONFIG[participant.condition].minimumViewingMs;
+  if (!HOTELS.every(hotelId => rows.some(row =>
+    row.hotel_id === hotelId && Number(row.metrics?.total_viewing_ms) >= minimumViewingMs))) {
+    return failure(400, `Please view both hotels for at least ${minimumViewingMs / 1000} seconds before continuing.`);
   }
   const { error } = await updateResponse(context.env, participantId, payload.save_id, current => ({
     popup_statistics: {
@@ -381,7 +395,6 @@ async function eventBatch(context, payload, participantId) {
     }
     const page = browsingStageForPath(event.delivery_context?.page_path || payload.page_path);
     const value = event.value || {};
-    if (event.event_type === "popup_inventory") continue;
     if (event.event_type === "popup_open") {
       const popupType = value.popup_type;
       const stage = value.usage_stage || (page && page.popupStage);

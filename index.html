@@ -19,23 +19,25 @@
       </section>
     </main>
 
-    <script src="./assets/js/survey-tracking.js?v=20260924-1"></script>
+    <script src="./assets/js/survey-tracking.js?v=20260927-2"></script>
     <script src="./assets/js/survey-storage.js?v=20260924-1"></script>
     <script src="./assets/js/shopper-profile.js?v=20260921-2"></script>
     <script>
       (function () {
         const params = new URLSearchParams(location.search);
         const participantId = params.get("participant_id") || "";
-        const studyConditions = new Set([
-          "full_reviews", "ai_summary", "full_reviews_min2sec", "ai_summary_min2sec"
-        ]);
+        const studyVersions = {
+          full_reviews: "2",
+          ai_summary: "3",
+          full_reviews_min2sec: "2",
+          ai_summary_min2sec: "3"
+        };
         const requestedStudyCondition = (params.get("study_condition") || "").toLowerCase();
-        const inferredBaseCondition = params.get("study_version") === "3" ? "ai_summary" : "full_reviews";
-        const inferredSuffix = params.get("study_variant") === "min2sec" ? "_min2sec" : "";
-        const studyCondition = studyConditions.has(requestedStudyCondition)
-          ? requestedStudyCondition : inferredBaseCondition + inferredSuffix;
+        const studyCondition = Object.hasOwn(studyVersions, requestedStudyCondition)
+          ? requestedStudyCondition
+          : params.get("study_version") === "3" ? "ai_summary" : "full_reviews";
         const isAiSummaryCondition = condition => condition.startsWith("ai_summary");
-        const studyVersion = isAiSummaryCondition(studyCondition) ? "3" : "2";
+        const studyVersion = studyVersions[studyCondition];
         const surveyStage = params.get("survey_stage") || "";
         const hotelQuestionnaireMode = Boolean(participantId) &&
           (surveyStage === "hotel_questionnaire" || (location.hash || "").startsWith("#hq"));
@@ -48,7 +50,7 @@
         function cleanQuery() {
           const query = new URLSearchParams(location.search);
           ["STUDENT_ID", "student_id", "PROLIFIC_PID", "prolific_pid", "SESSION_ID",
-            "session_id", "submission_id"].forEach(key => query.delete(key));
+            "session_id", "submission_id", "browsing_run"].forEach(key => query.delete(key));
           return query;
         }
 
@@ -929,9 +931,6 @@
           const nextParams = cleanQuery();
           const surveyState = state || getState();
           nextParams.set("participant_id", surveyState.participant_id);
-          const browsingRunId = "survey";
-          surveyState.browsing_run_id = browsingRunId;
-          nextParams.set("browsing_run", browsingRunId);
           nextParams.set("study_condition", studyCondition);
           nextParams.set("study_version", studyVersion);
           setState(surveyState);
@@ -943,9 +942,6 @@
           const nextParams = cleanQuery();
           const surveyState = state || getState();
           nextParams.set("participant_id", surveyState.participant_id);
-          const browsingRunId = params.get("browsing_run") || surveyState.browsing_run_id || "survey";
-          surveyState.browsing_run_id = browsingRunId;
-          nextParams.set("browsing_run", browsingRunId);
           nextParams.set("study_condition", studyCondition);
           nextParams.set("study_version", studyVersion);
           setState(surveyState);
@@ -1088,18 +1084,6 @@
           else render();
         });
 
-        window.MOCK_HOTEL_SURVEY_STORAGE_STATUS = function () {
-          const state = getState();
-          return {
-            participant_id: state.participant_id || "",
-            study_condition: studyCondition,
-            study_version: studyVersion,
-            completion_status: state.completion_status || "in_progress",
-            saved_answer_count: Object.keys(state.answers || {}).length,
-            server_confirmed_at: state.updated_at || ""
-          };
-        };
-
         function validHashForMode() {
           const hash = location.hash || "";
           if (postReviewMode) return /^#pr\d+$/.test(hash) || hash === "#complete";
@@ -1113,7 +1097,6 @@
           query.set("participant_id", survey.participant_id);
           query.set("study_condition", survey.condition);
           query.set("study_version", survey.survey_version);
-          query.set("browsing_run", "survey");
           // Cloudflare Pages serves index.html at the canonical directory URL.
           let path = "./";
           let stage = "";
@@ -1146,7 +1129,6 @@
           if (!participantId) {
             const query = cleanQuery();
             query.delete("survey_stage");
-            query.delete("browsing_run");
             const search = query.toString();
             history.replaceState(null, "", `${location.pathname}${search ? `?${search}` : ""}#q1`);
             ensureRandomization();

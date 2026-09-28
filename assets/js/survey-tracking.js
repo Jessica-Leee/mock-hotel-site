@@ -9,13 +9,8 @@
   "use strict";
 
   var events = [];
-  var pageLoadTs = Date.now();
-  var mouseInterval = null;
   var modalBindings = null;
-  var hoverEl = null;
-  var hoverStart = 0;
-  var listingMaxScrollDepth = 0;
-  var streamUrl = "";
+  var streamUrl = "./api/survey";
   var streamQueue = [];
   var streamTimer = null;
   var streamFlushInFlight = false;
@@ -48,10 +43,6 @@
     if (stage === "search_1") return "browsing_1";
     if (stage === "search_2" || stage === "search_3") return "browsing_2";
     return "";
-  }
-
-  function getStreamUrl() {
-    return "./api/survey";
   }
 
   function createEventId() {
@@ -90,8 +81,7 @@
 
   function enqueueStream(entry) {
     if (!streamUrl) return;
-    // Only these events are sent to the survey database. Other UI telemetry remains local.
-    if (["popup_open", "popup_inventory"].indexOf(entry.event_type) < 0 &&
+    if (entry.event_type !== "popup_open" &&
         !(entry.event_type === "page_timing" && entry.value.context === "hotel_modal")) return;
     var pageUrl = new URL(location.href);
     var path = location.pathname.toLowerCase().replace(/\.html$/, "");
@@ -174,7 +164,7 @@
       var confirmed = new Set(Array.isArray(receipt.tracking_event_ids) ? receipt.tracking_event_ids : []);
       var acknowledged = batch.filter(function (entry) { return confirmed.has(entry.event_id); });
       removeStreamBatch(acknowledged);
-      if (acknowledged.length !== batch.length) throw new Error("The receiver did not confirm every tracking event.");
+      if (acknowledged.length !== batch.length) throw new Error("The server did not confirm every tracking event.");
       streamDeliveryError = "";
       streamRetryCount = 0;
     }).catch(function (error) {
@@ -209,82 +199,6 @@
     enqueueStream(entry);
   }
 
-  function buildPayload() {
-    return { events: events };
-  }
-
-  function activeHotelId() {
-    var mr = document.getElementById("modalRoot");
-    if (mr && mr.getAttribute("data-active-hotel")) return mr.getAttribute("data-active-hotel");
-    var h = location.hash || "";
-    if (h.startsWith("#hotel/")) return h.split("/")[1] || "modal";
-    return "modal";
-  }
-
-  function elementIdFromTarget(el) {
-    if (!el || el.nodeType !== 1) return "unknown";
-    if (el.closest && el.closest(".modal-root")) {
-      var hid = activeHotelId();
-      if (el.getAttribute("data-amenity")) return hid + ":amenity:" + el.getAttribute("data-amenity");
-      if (el.getAttribute("data-map") === "1" || (el.closest && el.closest("[data-map='1']"))) return hid + ":map";
-      if (el.getAttribute("data-photo")) return hid + ":gallery:" + el.getAttribute("data-photo");
-      if (el.getAttribute("data-open")) return "results:open:" + el.getAttribute("data-open");
-      if (el.getAttribute("data-book")) return hid + ":book";
-      if (el.getAttribute("data-fave")) return hid + ":save";
-      if (el.getAttribute("data-close") === "1") return hid + ":close";
-      if (el.getAttribute("data-chip")) return hid + ":review_chip:" + el.getAttribute("data-chip");
-      if (el.tagName === "SUMMARY" && el.closest && el.closest("[data-track-section='room_types']"))
-        return hid + ":room_types_summary";
-      if (el.closest && el.closest("[data-track-section='room_types']")) return hid + ":room_types";
-      if (el.id === "sortSelect") return "results:sort";
-      return hid + ":" + (el.tagName || "el").toLowerCase();
-    }
-    if (el.getAttribute("data-open")) return "results:open:" + el.getAttribute("data-open");
-    var card = el.closest && el.closest("[data-hotel-id]");
-    var cid = card ? card.getAttribute("data-hotel-id") : "results";
-    var amenityNode = el.closest && el.closest("[data-amenity]");
-    if (amenityNode) return cid + ":amenity:" + (amenityNode.getAttribute("data-amenity") || "");
-    if (el.id) return cid + ":" + el.id;
-    return cid + ":" + (el.tagName || "el").toLowerCase();
-  }
-
-  function onDocumentClick(ev) {
-    var t = ev.target;
-    var interactive = t && t.closest && t.closest(
-      "button,a,[data-open],[data-close],[data-amenity],[data-map],[data-book],[data-fave],[data-photo],summary,.gimg,.chip,input,select,textarea"
-    );
-    if (!interactive) return;
-    var id = elementIdFromTarget(interactive);
-    var value = {
-      tag: interactive.tagName,
-      role: interactive.getAttribute && interactive.getAttribute("role"),
-      phase_hash: location.hash || ""
-    };
-    log("click", id, value);
-  }
-
-  function pickHoverTarget(t) {
-    if (!t || !t.closest) return null;
-    return (
-      t.closest(".amenity") ||
-      t.closest("[data-amenity]") ||
-      t.closest("[data-map='1']") ||
-      t.closest(".gimg") ||
-      null
-    );
-  }
-
-  function hoverKey(el) {
-    return elementIdFromTarget(el);
-  }
-
-  function finishHover() {
-    if (!hoverEl) return;
-    var dur = now() - hoverStart;
-    if (dur >= 30) log("hover_duration", hoverKey(hoverEl), { duration_ms: dur });
-    hoverEl = null;
-  }
-
   function teardownModalBindings() {
     if (!modalBindings) return;
     var b = modalBindings;
@@ -292,7 +206,6 @@
     if (b.io) b.io.disconnect();
     if (b.reviewIo) b.reviewIo.disconnect();
     if (b.onVisibilityChange) document.removeEventListener("visibilitychange", b.onVisibilityChange);
-    if (b.detailsEl && b.onDetailsToggle) b.detailsEl.removeEventListener("toggle", b.onDetailsToggle);
     modalBindings = null;
   }
 
@@ -491,15 +404,6 @@
     }
     document.addEventListener("visibilitychange", onModalVisibilityChange);
 
-    var detailsEl = root.querySelector("[data-track-section='room_types']");
-    var onDetailsToggle = null;
-    if (detailsEl) {
-      onDetailsToggle = function () {
-        log("room_types_toggle", hotelId, { open: !!detailsEl.open });
-      };
-      detailsEl.addEventListener("toggle", onDetailsToggle);
-    }
-
     var finalized = false;
     modalBindings = {
       scrollEl: scrollEl,
@@ -509,8 +413,6 @@
       onVisibilityChange: onModalVisibilityChange,
       hotelId: hotelId,
       sessionStart: sessionStart,
-      detailsEl: detailsEl,
-      onDetailsToggle: onDetailsToggle,
       finalize: function (reason) {
         if (finalized) return;
         finalized = true;
@@ -592,17 +494,9 @@
           review_visibility: reviewVisibility,
           hotel_display_position: hotelDisplayPosition > 0 ? hotelDisplayPosition : null
         });
-        log("scroll_depth_max", hotelId, { max_pct: maxPct });
-        log("scroll_speed", hotelId, {
-          max_px_per_ms: maxSp,
-          mean_px_per_ms: meanSp
-        });
-        log("scroll_direction_changes", hotelId, { count: dirChanges });
-        log("section_visibility", hotelId, { sections_ms: visBySection });
       }
     };
 
-    log("hotel_modal_open", hotelId, { hash: location.hash || "" });
     log("popup_open", "hotel:" + hotelId, {
       popup_type: "hotel",
       hotel_id: hotelId,
@@ -659,82 +553,13 @@
     }, 0);
   }
 
-  function startMouseSampler() {
-    if (mouseInterval) return;
-    mouseInterval = setInterval(function () {
-      var mr = document.getElementById("modalRoot");
-      var modalOpen = !!(mr && mr.classList.contains("is-open"));
-      log("mouse_position", "viewport", {
-        x: window.__lastMouseX != null ? window.__lastMouseX : null,
-        y: window.__lastMouseY != null ? window.__lastMouseY : null,
-        vw: document.documentElement.clientWidth,
-        vh: document.documentElement.clientHeight,
-        hotel_modal_open: modalOpen
-      });
-    }, 500);
-  }
-
-  function onMouseMove(ev) {
-    window.__lastMouseX = ev.clientX;
-    window.__lastMouseY = ev.clientY;
-  }
-
   function onPageHide() {
-    finishHover();
     if (modalBindings && modalBindings.finalize) modalBindings.finalize("page_exit");
     teardownModalBindings();
-    log("page_timing", "results_page", {
-      context: "listing_shell",
-      duration_ms: now() - pageLoadTs,
-      exit_reason: "pagehide",
-      max_scroll_pct: Math.round(listingMaxScrollDepth * 1000) / 10
-    });
     flushStream("pagehide");
   }
 
   function init() {
-    streamUrl = getStreamUrl();
-    log("session_start", location.pathname, { href: location.href });
-
-    window.addEventListener(
-      "scroll",
-      function () {
-        var mr = document.getElementById("modalRoot");
-        if (mr && mr.classList.contains("is-open")) return;
-        var d = document.documentElement;
-        var st = d.scrollTop || document.body.scrollTop || 0;
-        var denom = Math.max(1, (d.scrollHeight || 1) - (d.clientHeight || 1));
-        var depth = Math.min(1, Math.max(0, st / denom));
-        if (depth > listingMaxScrollDepth) listingMaxScrollDepth = depth;
-      },
-      { passive: true }
-    );
-
-    document.addEventListener("click", onDocumentClick, true);
-    document.addEventListener("mousemove", onMouseMove, { passive: true });
-
-    document.addEventListener(
-      "mouseover",
-      function (e) {
-        var el = pickHoverTarget(e.target);
-        if (!el || el === hoverEl) return;
-        if (hoverEl) finishHover();
-        hoverEl = el;
-        hoverStart = now();
-      },
-      true
-    );
-    document.addEventListener(
-      "mouseout",
-      function (e) {
-        if (!hoverEl) return;
-        var rel = e.relatedTarget;
-        if (rel && hoverEl.contains(rel)) return;
-        finishHover();
-      },
-      true
-    );
-
     var modalRoot = document.getElementById("modalRoot");
     if (modalRoot) {
       var mo = new MutationObserver(scheduleSyncModal);
@@ -743,7 +568,6 @@
     window.addEventListener("hashchange", scheduleSyncModal);
     scheduleSyncModal();
 
-    startMouseSampler();
     window.addEventListener("pagehide", onPageHide);
     window.addEventListener("online", function () { flushStream("online"); });
 
@@ -756,7 +580,7 @@
       lastModalOpen = false;
     };
     window.HOTEL_EXPERIMENT_GET_PAYLOAD = function () {
-      return buildPayload();
+      return { events: events };
     };
     window.HOTEL_EXPERIMENT_TRACK = function (eventType, elementId, value) {
       log(eventType, elementId, value);

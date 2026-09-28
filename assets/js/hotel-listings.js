@@ -2123,62 +2123,29 @@
       review.stimulusId = neutralHotelId + "_review_" + String(index + 1).padStart(3, "0");
     });
   });
-  window.EXACT_HOTEL_REVIEWS = EMBEDDED_EXACT_HOTEL_REVIEWS;
-
   function exactReviewsFor(hotelId) {
-    const exact = window.EXACT_HOTEL_REVIEWS && window.EXACT_HOTEL_REVIEWS[hotelId];
+    const exact = EMBEDDED_EXACT_HOTEL_REVIEWS[hotelId];
     return Array.isArray(exact) ? exact : [];
   }
 
-  function studyCondition() {
+  const STUDY_CONDITIONS = new Set([
+    "full_reviews", "ai_summary", "full_reviews_min2sec", "ai_summary_min2sec"
+  ]);
+  const STUDY_CONDITION = (() => {
     const params = new URLSearchParams(location.search || "");
     const explicit = (params.get("study_condition") || "").toLowerCase();
-    if (["full_reviews", "ai_summary", "full_reviews_min2sec", "ai_summary_min2sec"].includes(explicit)) {
-      return explicit;
-    }
+    if (STUDY_CONDITIONS.has(explicit)) return explicit;
     return params.get("study_version") === "3" || aiSummaryRequested() ? "ai_summary" : "full_reviews";
-  }
-
-  function popupMinimumMs() {
-    return studyCondition().endsWith("_min2sec") ? 2000 : 10000;
-  }
-
-  function popupMinimumSeconds() {
-    return popupMinimumMs() / 1000;
-  }
-
-  function fixedVisibleHotelIds() {
-    return requiredHotelIds();
-  }
-
-  function getHotelViewState() {
-    return {
-      viewedHotelIds: hotelViewState.viewedHotelIds.slice(),
-      updatedAt: hotelViewState.updatedAt
-    };
-  }
-
-  function setHotelViewState(state) {
-    hotelViewState = state;
-  }
-
-  function getHotelReviewViewState() {
-    return {
-      viewedHotelIds: hotelReviewViewState.viewedHotelIds.slice(),
-      updatedAt: hotelReviewViewState.updatedAt
-    };
-  }
-
-  function setHotelReviewViewState(state) {
-    hotelReviewViewState = state;
-  }
+  })();
+  const POPUP_MINIMUM_MS = STUDY_CONDITION.endsWith("_min2sec") ? 2000 : 10000;
+  const POPUP_MINIMUM_SECONDS = POPUP_MINIMUM_MS / 1000;
 
   function viewedHotelSet() {
-    return new Set(getHotelViewState().viewedHotelIds);
+    return new Set(hotelViewState.viewedHotelIds);
   }
 
   function viewedReviewHotelSet() {
-    return new Set(getHotelReviewViewState().viewedHotelIds);
+    return new Set(hotelReviewViewState.viewedHotelIds);
   }
 
   function requiredHotelIds() {
@@ -2186,23 +2153,17 @@
   }
 
   function markNoReviewHotelViewed(hotelId) {
-    const state = getHotelViewState();
-    const viewed = new Set(state.viewedHotelIds);
+    const viewed = viewedHotelSet();
     if (viewed.has(hotelId)) return;
     viewed.add(hotelId);
-    state.viewedHotelIds = Array.from(viewed);
-    state.updatedAt = new Date().toISOString();
-    setHotelViewState(state);
+    hotelViewState = { viewedHotelIds: Array.from(viewed), updatedAt: new Date().toISOString() };
   }
 
   function markReviewHotelViewed(hotelId) {
-    const state = getHotelReviewViewState();
-    const viewed = new Set(state.viewedHotelIds);
+    const viewed = viewedReviewHotelSet();
     if (viewed.has(hotelId)) return;
     viewed.add(hotelId);
-    state.viewedHotelIds = Array.from(viewed);
-    state.updatedAt = new Date().toISOString();
-    setHotelReviewViewState(state);
+    hotelReviewViewState = { viewedHotelIds: Array.from(viewed), updatedAt: new Date().toISOString() };
   }
 
   function restoreServerProgress(records) {
@@ -2657,15 +2618,6 @@
     return (Number(score5 || 0) * 2).toFixed(1);
   }
 
-  function bookingScoreWord(score10) {
-    const score = Number(score10 || 0);
-    if (score >= 9.0) return "Wonderful";
-    if (score >= 8.5) return "Excellent";
-    if (score >= 8.0) return "Very Good";
-    if (score >= 7.0) return "Good";
-    return "Pleasant";
-  }
-
   const LOCATION_INFO_RE = /\b(location|nearby|attractions?|airport|beach|station|subway|metro|train|transit|walking|walkable|walk|mile|mi\b|ft\b|address|michigan avenue|loop|west loop|wicker park|gold coast|river north|streeterville|magnificent mile|fulton market|millennium|cloud gate|navy pier|willis tower|united center|art institute|state\/lake|ogilvie|clark\/division|morgan|damen)\b/i;
 
   function isLocationInfoText(value) {
@@ -2737,13 +2689,9 @@
     if (shouldScroll) scrollIntoModalView(reviews);
   }
 
-  function starText(n) {
-    return `${n}-star`;
-  }
-
   function visibleHotels() {
     if (!visibleHotelIds) {
-      visibleHotelIds = fixedVisibleHotelIds();
+      visibleHotelIds = requiredHotelIds();
     }
     const hotelById = new Map(HOTELS.map(hotel => [hotel.id, hotel]));
     return visibleHotelIds.map(id => hotelById.get(id)).filter(Boolean);
@@ -2773,15 +2721,6 @@
       return !priorityKeys.has(key);
     });
     return prioritized.concat(remainder).slice(0, limit);
-  }
-
-  function trackHotelPopupInventory() {
-    if (typeof window.HOTEL_EXPERIMENT_TRACK !== "function") return;
-    const hotelIds = visibleHotels().map(hotel => hotel.id);
-    window.HOTEL_EXPERIMENT_TRACK("popup_inventory", "hotel_popups", {
-      popup_type: "hotel",
-      hotel_ids: hotelIds
-    });
   }
 
   function surveyQueryString(nextStage) {
@@ -2819,7 +2758,7 @@
     const update = () => {
       if (!activeHotelSession || activeHotelSession.hotelId !== hotelId) return;
       const remaining = POPUP_TIME_LIMIT_MS - popupUsedMs(hotelId);
-      const minimumRemaining = Math.max(0, popupMinimumMs() - popupUsedMs(hotelId));
+      const minimumRemaining = Math.max(0, POPUP_MINIMUM_MS - popupUsedMs(hotelId));
       const timer = document.querySelector("[data-popup-countdown]");
       if (timer) {
         timer.querySelector("[data-countdown-value]").textContent = formatCountdown(remaining);
@@ -2832,7 +2771,7 @@
       document.querySelectorAll("#modalRoot button[data-close='1']").forEach(button => {
         button.disabled = minimumRemaining > 0;
         button.setAttribute("aria-label", minimumRemaining > 0
-          ? `Close (available after ${popupMinimumSeconds()} seconds of viewing)` : "Close");
+          ? `Close (available after ${POPUP_MINIMUM_SECONDS} seconds of viewing)` : "Close");
       });
       if (remaining <= 0) closeModal("popup_time_limit");
     };
@@ -2843,7 +2782,7 @@
   function popupCountdownHtml() {
     return `<div class="browse-countdown popup-countdown" data-popup-countdown>
       <div class="popup-countdown__instructions">
-        <span>View each hotel for at least ${popupMinimumSeconds()} seconds. Maximum: 45 seconds total.</span>
+        <span>View each hotel for at least ${POPUP_MINIMUM_SECONDS} seconds. Maximum: 45 seconds total.</span>
         <span class="popup-countdown__minimum" data-minimum-countdown></span>
       </div>
       <div class="popup-countdown__remaining" role="timer" aria-label="Viewing time remaining">
@@ -2883,7 +2822,7 @@
       ` : `
         <div>
           <strong>Post-review questions locked:</strong>
-          Open the ${state.showAiSummary ? "reviews and AI summary" : "reviews"} for both hotels and view each for at least ${popupMinimumSeconds()} seconds before continuing.
+          Open the ${state.showAiSummary ? "reviews and AI summary" : "reviews"} for both hotels and view each for at least ${POPUP_MINIMUM_SECONDS} seconds before continuing.
           <div class="study-flow__note">Completed ${formatCount(viewedCount)} of ${formatCount(required.length)} ${popupLabel}.</div>
         </div>
         <button class="btn study-flow__btn" type="button" disabled>Continue to post-review questions</button>
@@ -2903,7 +2842,7 @@
       ` : `
         <div>
           <strong>Hotel questions locked:</strong>
-          Open each hotel detail popup and view it for at least ${popupMinimumSeconds()} seconds before continuing.
+          Open each hotel detail popup and view it for at least ${POPUP_MINIMUM_SECONDS} seconds before continuing.
           <div class="study-flow__note">Completed ${formatCount(viewedCount)} of ${formatCount(required.length)} hotel popups.</div>
         </div>
         <button class="btn study-flow__btn" type="button" disabled>Continue to hotel questions</button>
@@ -2964,17 +2903,6 @@
       results.appendChild(card);
     }
     renderStudyFlowCta();
-  }
-
-  function ratingBreakdownRows(hotel) {
-    const b = hotel.ratingBreakdown;
-    if (!b) return "";
-    return Object.keys(b).filter(k => !isLocationInfoText(k)).map(k => `
-      <div class="breakdown__row">
-        <span class="breakdown__k">${escapeXml(k)}</span>
-        <span class="breakdown__v">${escapeXml(bookingScore(b[k]))}</span>
-      </div>
-    `).join("");
   }
 
   function detailNotesHtml(hotel) {
@@ -3090,15 +3018,6 @@
       scoreText,
       ...reviewFallbackParts(review)
     };
-  }
-
-  function reviewDetailHtml(label, value) {
-    if (!value) return "";
-    return `
-      <div class="review__detail" data-chip="${escapeXml(value)}">
-        <span>${escapeXml(value)}</span>
-      </div>
-    `;
   }
 
   function reviewTextBlockHtml(kind, text) {
@@ -3392,7 +3311,7 @@
   function closeModal(source) {
     const root = document.getElementById("modalRoot");
     if (!root.classList.contains("is-open")) return true;
-    if (activeHotelSession && popupUsedMs(activeHotelSession.hotelId) < popupMinimumMs()) return false;
+    if (activeHotelSession && popupUsedMs(activeHotelSession.hotelId) < POPUP_MINIMUM_MS) return false;
     stopPopupCountdown();
     if (typeof window.HOTEL_EXPERIMENT_FINALIZE_MODAL === "function") window.HOTEL_EXPERIMENT_FINALIZE_MODAL(source);
     const profileClose = document.querySelector("#shopperProfileModalRoot.is-open [data-close-shopper-profile]");
@@ -3495,16 +3414,15 @@
         restoreServerProgress(result.browsing);
       } catch (error) {
         const target = new URL("./", location.href);
-        target.searchParams.set("study_condition", studyCondition());
+        target.searchParams.set("study_condition", STUDY_CONDITION);
         location.replace(target.href);
         return;
       }
     }
     document.querySelectorAll("[data-viewing-requirement]").forEach(element => {
-      element.textContent = `View each hotel for at least ${popupMinimumSeconds()} seconds before closing its popup. Each hotel has a 45-second total viewing limit; reopening resumes the remaining time.`;
+      element.textContent = `View each hotel for at least ${POPUP_MINIMUM_SECONDS} seconds before closing its popup. Each hotel has a 45-second total viewing limit; reopening resumes the remaining time.`;
     });
     renderResults();
-    trackHotelPopupInventory();
     wireGlobalHandlers();
 
     const h = location.hash || "";

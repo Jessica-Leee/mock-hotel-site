@@ -61,7 +61,9 @@ order. The original links require at least 10 seconds of active viewing per
 hotel popup. The two `min2sec` links are otherwise identical but require 2
 seconds. All conditions keep the 45-second maximum per hotel and browsing stage.
 Time while the document is hidden is excluded. Participants can continue only
-after both hotel popups have been viewed and closed.
+after both hotel popups have been viewed and closed. The API rechecks each
+hotel's cumulative active-viewing time before advancing, so a refresh cannot
+bypass the condition-specific minimum.
 
 The four stored condition names are `full_reviews`, `ai_summary`,
 `full_reviews_min2sec`, and `ai_summary_min2sec`.
@@ -84,9 +86,10 @@ npm test
 
 All HTTP and database calls are mocked. The tests do not write to
 Supabase or any historical spreadsheet. They cover the questionnaire flow,
-Student ID resume behavior, Supabase handler, page navigation, popup timing,
-stage attribution, in-page retries, partial acknowledgements, fallback event
-IDs, payload splitting, hidden-tab timing, and out-of-order visits.
+Student ID resume behavior, Supabase handler, page navigation, client and server
+popup timing gates, stage attribution, in-page retries, partial
+acknowledgements, fallback event IDs, payload splitting, hidden-tab timing, and
+out-of-order visits.
 
 ## Cloudflare Pages deployment
 
