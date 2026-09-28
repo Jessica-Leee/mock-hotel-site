@@ -13,6 +13,8 @@ Sheets.
 
 - Survey: https://chicago-hotel-survey.pages.dev/
 - Survey Summaries: https://chicago-hotel-survey.pages.dev/survey-summaries.html
+- Survey, 2-second minimum: https://chicago-hotel-survey.pages.dev/survey-min2sec.html
+- Survey Summaries, 2-second minimum: https://chicago-hotel-survey.pages.dev/survey-summaries-min2sec.html
 
 `index.html` starts the full-review condition. `survey-summaries.html` starts
 the AI-summary condition with `study_version=3`; `survey-ai-summaries.html`
@@ -24,6 +26,8 @@ remains only as a compatibility redirect for previously shared links.
 .
 ├── index.html                         # Survey and questionnaires
 ├── survey-summaries.html              # AI-summary survey entry
+├── survey-min2sec.html                 # 2-second full-review entry
+├── survey-summaries-min2sec.html       # 2-second AI-summary entry
 ├── search-no-reviews.html             # Listings without reviews
 ├── search-reviews.html                # Listings with full reviews
 ├── search-ai-summaries.html           # Listings with AI summaries
@@ -53,10 +57,14 @@ IndexedDB. Details and database initialization are in
 ## Study behavior
 
 The experiment contains Hotel A and Hotel B, each with 150 reviews in a fixed
-order. Each hotel popup requires at least 10 cumulative seconds of active
-viewing and has a cumulative 45-second budget per browsing stage. Time while the
-document is hidden is excluded. Participants can continue only after both hotel
-popups have been viewed and closed.
+order. The original links require at least 10 seconds of active viewing per
+hotel popup. The two `min2sec` links are otherwise identical but require 2
+seconds. All conditions keep the 45-second maximum per hotel and browsing stage.
+Time while the document is hidden is excluded. Participants can continue only
+after both hotel popups have been viewed and closed.
+
+The four stored condition names are `full_reviews`, `ai_summary`,
+`full_reviews_min2sec`, and `ai_summary_min2sec`.
 
 Every visit to an entry URL starts on the Student ID page. The server returns
 the first unfinished page, or the completion screen for a finished response.

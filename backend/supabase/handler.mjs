@@ -20,6 +20,9 @@ const SURPRISE_VALUES = [
   "not_at_all_surprised", "slightly_surprised", "moderately_surprised",
   "very_surprised", "extremely_surprised"
 ];
+const CONDITIONS = [
+  "full_reviews", "ai_summary", "full_reviews_min2sec", "ai_summary_min2sec"
+];
 const MAX_BODY_BYTES = 200000;
 
 function reply(status, body) {
@@ -195,7 +198,7 @@ async function resume(context, payload) {
   const studentId = String(payload.student_id || "").trim().toUpperCase();
   const condition = payload.condition;
   const answer = payload.answer || {};
-  if (!studentId || studentId.length > 128 || !["full_reviews", "ai_summary"].includes(condition)) {
+  if (!studentId || studentId.length > 128 || !CONDITIONS.includes(condition)) {
     return failure(400, "Enter a valid Student ID and survey condition.");
   }
   if (typeof answer !== "object" || Array.isArray(answer)) return failure(400, "Invalid Student ID response.");
@@ -215,7 +218,7 @@ async function resume(context, payload) {
         participant_id: participantId,
         student_id: studentId,
         condition,
-        survey_version: condition === "ai_summary" ? "3" : "2",
+        survey_version: condition.startsWith("ai_summary") ? "3" : "2",
         assigned_attributes: assignedAttributes(studentId),
         answers: { student_id: { ...answer, value: studentId } },
         quality_checks: qualityChecks({}, { student_id: answer }),

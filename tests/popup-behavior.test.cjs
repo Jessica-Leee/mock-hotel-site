@@ -5,11 +5,11 @@ const { JSDOM, VirtualConsole } = require('jsdom');
 const FakeTimers = require('@sinonjs/fake-timers');
 const errors = [];
 const sequences = new Map();
-function page(file, participant, now = 1800000000000, hash = '') {
+function page(file, participant, now = 1800000000000, hash = '', condition = '') {
   const vc = new VirtualConsole();
   vc.on('jsdomError', error => errors.push(error.message));
   const dom = new JSDOM(fs.readFileSync(file, 'utf8'), {
-    url: `https://chicago-hotel-survey.pages.dev/${file}?participant_id=${participant}${hash}`,
+    url: `https://chicago-hotel-survey.pages.dev/${file}?participant_id=${participant}${condition ? `&study_condition=${condition}` : ''}${hash}`,
     runScripts: 'outside-only', pretendToBeVisual: true, virtualConsole: vc
   });
   const w = dom.window;
@@ -79,6 +79,23 @@ function hidden(p, value) {
       p.close();
     }
   }
+  for (const [file, condition] of [
+    ['search-no-reviews.html', 'full_reviews_min2sec'],
+    ['search-ai-summaries.html', 'ai_summary_min2sec']
+  ]) {
+    const p = page(file, 'MIN-TWO-SECONDS', 1800000000000, '', condition);
+    await p.clock.tickAsync(1);
+    assert.match(p.d.querySelector('[data-viewing-requirement]').textContent, /at least 2 seconds/);
+    click(p, '.hotel-title__link[data-open="arlo-chicago"]');
+    await p.clock.tickAsync(1999);
+    click(p, '.modal-backdrop');
+    assert.ok(modal(p), 'cannot close before two seconds');
+    await p.clock.tickAsync(1);
+    assert.equal(closeButton(p).disabled, false);
+    click(p, '#modalRoot button[data-close]');
+    assert.equal(modal(p), null);
+    p.close();
+  }
   assert.deepEqual(errors, []);
-  console.log('PASS: 3 browsing pages x 2 participants; close/Escape/backdrop/switch guards; 10-second boundary; background pause; reopening; 45-second expiry; both-hotels gate; fixed 150-review sequences. No network writes.');
+  console.log('PASS: existing 10-second and new 2-second conditions; close guards; background pause; reopening; 45-second expiry; both-hotels gate; fixed 150-review sequences. No network writes.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

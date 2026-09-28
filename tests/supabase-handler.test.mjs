@@ -155,6 +155,17 @@ test("one student, one condition, confirmed page saves and idempotent browsing",
       answers: { post_review_ai_use_frequency: { value: "4" } } });
     assert.equal(incomplete.response.status, 400);
     assert.equal((await call({ action: "load", participant_id: controlParticipant })).data.survey.completion_status, "in_progress");
+
+    for (const [condition, version] of [
+      ["full_reviews_min2sec", "2"], ["ai_summary_min2sec", "3"]
+    ]) {
+      const variant = await call({
+        action: "resume", student_id: `student-${condition}`, condition
+      });
+      assert.equal(variant.response.status, 200);
+      assert.equal(variant.data.survey.condition, condition);
+      assert.equal(variant.data.survey.survey_version, version);
+    }
   } finally {
     globalThis.fetch = originalFetch;
   }

@@ -11,8 +11,9 @@ These identifiers are public configuration, not credentials.
 
 ## Scope
 
-Each student participates in exactly one condition: `full_reviews` or
-`ai_summary`. Student ID is required and unique within this experiment.
+Each student participates in exactly one condition: `full_reviews`,
+`ai_summary`, `full_reviews_min2sec`, or `ai_summary_min2sec`. Student ID is
+required and unique within this experiment.
 Student ID is the resume credential. `participant_id` is an opaque internal UUID
 used only while moving between pages after a successful resume.
 
@@ -31,6 +32,10 @@ Run `001_initial_schema.sql` once in the SQL Editor of the new project. It uses
 a transaction, contains no data deletion, and intentionally fails if these
 tables already exist. Verify both tables have RLS enabled and zero rows. No
 browser/public read or write policies should be added.
+
+For a project initialized before the two `min2sec` conditions existed, run
+`002_add_min2sec_conditions.sql` once. It only replaces the condition check
+constraint; it does not update or delete existing responses.
 
 ## Cloudflare connection
 

@@ -26,11 +26,16 @@
       (function () {
         const params = new URLSearchParams(location.search);
         const participantId = params.get("participant_id") || "";
+        const studyConditions = new Set([
+          "full_reviews", "ai_summary", "full_reviews_min2sec", "ai_summary_min2sec"
+        ]);
         const requestedStudyCondition = (params.get("study_condition") || "").toLowerCase();
-        const studyCondition = requestedStudyCondition === "ai_summary" || params.get("study_version") === "3"
-          ? "ai_summary"
-          : "full_reviews";
-        const studyVersion = studyCondition === "ai_summary" ? "3" : "2";
+        const inferredBaseCondition = params.get("study_version") === "3" ? "ai_summary" : "full_reviews";
+        const inferredSuffix = params.get("study_variant") === "min2sec" ? "_min2sec" : "";
+        const studyCondition = studyConditions.has(requestedStudyCondition)
+          ? requestedStudyCondition : inferredBaseCondition + inferredSuffix;
+        const isAiSummaryCondition = condition => condition.startsWith("ai_summary");
+        const studyVersion = isAiSummaryCondition(studyCondition) ? "3" : "2";
         const surveyStage = params.get("survey_stage") || "";
         const hotelQuestionnaireMode = Boolean(participantId) &&
           (surveyStage === "hotel_questionnaire" || (location.hash || "").startsWith("#hq"));
@@ -786,7 +791,7 @@
           } else if (page.type === "aiUseFrequency") {
             setQuestionHtml(aiUseFrequencyHtml());
           } else {
-            const secondStage = studyCondition === "ai_summary"
+            const secondStage = isAiSummaryCondition(studyCondition)
               ? "the version with AI-generated review summaries"
               : "the version with full reviews";
             setQuestionHtml(`
@@ -944,7 +949,7 @@
           nextParams.set("study_condition", studyCondition);
           nextParams.set("study_version", studyVersion);
           setState(surveyState);
-          const useAiSummary = studyCondition === "ai_summary";
+          const useAiSummary = isAiSummaryCondition(studyCondition);
           nextParams.set("survey_stage", useAiSummary ? "search_3" : "search_2");
           location.replace((useAiSummary ? "search-ai-summaries.html?" : "search-reviews.html?") + nextParams.toString());
         }
@@ -1117,13 +1122,13 @@
             path = "search-no-reviews.html";
             stage = "search_1";
           } else if (current === "browsing_2") {
-            path = survey.condition === "ai_summary" ? "search-ai-summaries.html" : "search-reviews.html";
-            stage = survey.condition === "ai_summary" ? "search_3" : "search_2";
+            path = isAiSummaryCondition(survey.condition) ? "search-ai-summaries.html" : "search-reviews.html";
+            stage = isAiSummaryCondition(survey.condition) ? "search_3" : "search_2";
           } else if (current === "pre_review_hotel_ratings") {
             stage = "hotel_questionnaire";
             hash = "#hq1";
           } else if (current === "complete" || postReviewPages.some(page => page.id === current)) {
-            stage = survey.condition === "ai_summary" ? "post_review_ai" : "post_review";
+            stage = isAiSummaryCondition(survey.condition) ? "post_review_ai" : "post_review";
             const index = postReviewPages.findIndex(page => page.id === current);
             hash = current === "complete" ? "#complete" : `#pr${index + 1}`;
           } else {

@@ -5,7 +5,9 @@ begin;
 create table public.survey_responses (
   participant_id uuid primary key default gen_random_uuid(),
   student_id text not null unique,
-  condition text not null check (condition in ('full_reviews', 'ai_summary')),
+  condition text not null check (condition in (
+    'full_reviews', 'ai_summary', 'full_reviews_min2sec', 'ai_summary_min2sec'
+  )),
   survey_version text not null,
   assigned_attributes text[] not null,
   answers jsonb not null default '{}'::jsonb,

@@ -11,6 +11,7 @@ test("saved questionnaire pages resolve to the canonical Cloudflare root", () =>
     URLSearchParams,
     location: { search: "?participant_id=00000000-0000-4000-8000-000000000001&survey_stage=hotel_questionnaire" },
     cleanQuery: () => new URLSearchParams("?participant_id=00000000-0000-4000-8000-000000000001&survey_stage=hotel_questionnaire"),
+    isAiSummaryCondition: condition => condition.startsWith("ai_summary"),
     postReviewPages: [{ id: "post_review_choice" }],
     standardPages: () => [{ id: "student_id" }]
   };
