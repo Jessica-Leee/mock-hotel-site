@@ -1,4 +1,8 @@
-# Hotel survey site
+# Hotel decision experiment
+
+A web experiment for studying how full reviews and AI summaries affect hotel choices. It includes survey questionnaires, hotel browsing, saved responses, and active-viewing controls.
+
+Built with JavaScript, Cloudflare Pages Functions, and Supabase.
 
 ## Live site
 
