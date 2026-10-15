@@ -1,4 +1,4 @@
-# Hotel decision experiment
+# Hotel Choice Experiment
 
 A web experiment for studying how full reviews and AI summaries affect hotel choices. It includes survey questionnaires, hotel browsing, saved responses, and active-viewing controls.
 
