@@ -4,6 +4,21 @@ A web experiment for studying how full reviews and AI summaries affect hotel cho
 
 Built with JavaScript, Cloudflare Pages Functions, and Supabase.
 
+## Start here
+
+- For a code walkthrough, see [Project guide](docs/PROJECT_GUIDE.md).
+- For a database-backed deployment, see [Supabase setup](backend/supabase/SETUP.md).
+- For an offline check, use Node.js 20 or later and run:
+
+  ```sh
+  npm ci --ignore-scripts
+  npm test
+  ```
+
+The tests mock HTTP and database access. A plain static web server can preview
+the pages, but saving and resuming a questionnaire require the Pages Function
+and its Supabase bindings.
+
 ## Live site
 
 **https://chicago-hotel-survey.pages.dev/**
@@ -81,10 +96,10 @@ close time rather than network arrival order.
 
 ## Local tests
 
-Install the pinned development dependencies and run the full suite:
+Install the locked development dependencies and run the full suite:
 
 ```sh
-npm install
+npm ci --ignore-scripts
 npm test
 ```
 
